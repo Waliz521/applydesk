@@ -53,6 +53,11 @@ export function DashboardPage() {
           },
         ]
       })
+      mapped.sort((a, b) => {
+        const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
+        const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
+        return da.localeCompare(db)
+      })
       setRows(mapped)
       setCatalogues((catsRes.data ?? []) as Catalogue[])
       const apps = (appsRes.data ?? []) as Pick<Application, 'id' | 'status_id' | 'programme_id'>[]
@@ -115,6 +120,12 @@ export function DashboardPage() {
             <p className="mt-2 text-sm text-slate-600">
               Orange <span className="font-medium">EPOS · 2 yr work</span> is a named development course (apply to the university).
               Teal <span className="font-medium">Not EPOS</span> is not on that list (e.g. EAGLE) — no two-year rule, and Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
+            </p>
+          ) : null}
+          {selectedCatalogue?.slug === 'poland' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> means you pay the university (cost on the card). Rose{' '}
+              <span className="font-medium">NAWA scholarship</span> is a separate government grant — Pakistan was not on the 2026/27 Banach list.
             </p>
           ) : null}
         </div>

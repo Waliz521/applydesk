@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DateStatusBadge, FundingBadge, OpenBadge, PriorityBadge } from '@/components/Badges'
 import { countriesInvolved } from '@/lib/countries'
-import { fundingDetail, fundingScheme } from '@/lib/funding'
-import { cycleState, daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
+import { deadlineFieldLabel, fundingDetail, fundingScheme, tuitionText } from '@/lib/funding'
+import { applyByDate, cycleState, daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
 import type { Programme, ProgrammeCycle } from '@/lib/types'
 
 function latestCycle(programme: Programme): ProgrammeCycle | undefined {
@@ -14,7 +14,7 @@ function openDateLabel(cycle: ProgrammeCycle | undefined): string {
   if (cycle?.application_opens_on) return formatDate(cycle.application_opens_on)
   const note = cycle?.extra_dates?.opens_text?.trim()
   if (note) return note
-  if (cycle?.scholarship_deadline) {
+  if (cycle?.scholarship_deadline || cycle?.self_funded_deadline) {
     const confirmed = (cycle.date_status || '').toLowerCase() === 'confirmed'
     return confirmed
       ? 'Not published — apply until the deadline'
@@ -44,11 +44,13 @@ export function ProgrammeCard({
   const cy = cycle ?? latestCycle(programme)
   const extra = programme.extra
   const state = openState ?? (cy ? cycleState(cy) : 'unknown')
-  const due = daysUntil(cy?.scholarship_deadline)
-  const urgency = deadlineUrgency(cy?.scholarship_deadline)
+  const scheme = fundingScheme(programme, catalogueName)
+  const cost = tuitionText(programme)
+  const applyBy = applyByDate(cy)
+  const due = daysUntil(applyBy)
+  const urgency = deadlineUrgency(applyBy)
   const href = programme.apply_url || programme.website
   const countries = countriesInvolved(programme)
-  const scheme = fundingScheme(programme, catalogueName)
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
@@ -89,13 +91,20 @@ export function ProgrammeCard({
             <dd className="line-clamp-2">{openDateLabel(cy)}</dd>
           </div>
           <div>
-            <dt className="text-muted">Scholarship deadline</dt>
+            <dt className="text-muted">{deadlineFieldLabel(scheme)}</dt>
             <dd className={urgencyClass(urgency)}>
-              {formatDate(cy?.scholarship_deadline)}
+              {formatDate(applyBy)}
               {due !== null && due >= 0 ? <span className="ml-1 text-xs">({due}d)</span> : null}
             </dd>
           </div>
         </dl>
+
+        {cost ? (
+          <p className="mt-3 text-sm">
+            <span className="text-muted">Cost. </span>
+            <span className="font-medium text-ink">{cost}</span>
+          </p>
+        ) : null}
 
         <p className="mt-3 line-clamp-2 min-h-[2.5rem] text-sm text-slate-600">
           {programme.fit_notes || '\u00a0'}
@@ -187,6 +196,12 @@ export function ProgrammeCard({
               <p>
                 <span className="font-medium text-ink">Watch-outs. </span>
                 <span className="text-slate-600">{extra.watch_outs}</span>
+              </p>
+            ) : null}
+            {extra?.self_funded_text ? (
+              <p>
+                <span className="font-medium text-ink">Self-funded path. </span>
+                <span className="text-slate-600">{extra.self_funded_text}</span>
               </p>
             ) : null}
             {extra?.scholarships_text ? (

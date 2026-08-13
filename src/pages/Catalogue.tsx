@@ -6,6 +6,7 @@ import { fundingScheme } from '@/lib/funding'
 import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
+import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { supabase } from '@/lib/supabase'
 import type { Catalogue, Programme, ProgrammeCycle } from '@/lib/types'
 
@@ -24,6 +25,7 @@ export function CataloguePage() {
   const [funding, setFunding] = useState<'all' | FundingScheme>('all')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [seeding, setSeeding] = useState(false)
   const canEdit = Boolean(profile?.is_admin)
 
   async function loadCatalogues() {
@@ -78,14 +80,18 @@ export function CataloguePage() {
     const q = query.trim().toLowerCase()
     return programmes.filter((p) => {
       if (priority !== 'all' && p.priority !== priority) return false
-      if (active?.slug === 'daad' && funding !== 'all' && fundingScheme(p, active?.name) !== funding) {
+      if (
+        (active?.slug === 'daad' || active?.slug === 'poland') &&
+        funding !== 'all' &&
+        fundingScheme(p, active?.name) !== funding
+      ) {
         return false
       }
       if (!q) return true
       const blob = [p.acronym, p.name, p.official_title, p.coordinator, p.fit_notes].join(' ').toLowerCase()
       return blob.includes(q)
     })
-  }, [programmes, query, priority, funding, active?.name])
+  }, [programmes, query, priority, funding, active?.name, active?.slug])
 
   async function addProgramme(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -115,6 +121,27 @@ export function CataloguePage() {
     setProgrammes((data ?? []) as Programme[])
   }
 
+  async function loadPolandList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedPolandCatalogue()
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Poland list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'poland')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
   async function track(programme: Programme) {
     if (!user) return
     setBusyId(programme.id)
@@ -140,7 +167,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. DAAD is two tracks (EPOS vs not EPOS). Search, filter, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks. Poland is mostly self-funded tuition. Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -160,6 +187,16 @@ export function CataloguePage() {
             {c.name}
           </button>
         ))}
+        {canEdit && !catalogues.some((c) => c.slug === 'poland') ? (
+          <button
+            type="button"
+            onClick={() => void loadPolandList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Poland…' : 'Add Poland catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -172,13 +209,25 @@ export function CataloguePage() {
                 <p className="mt-2 text-xs text-muted">{programmes.length} programmes · {visible.length} shown</p>
               </div>
               {canEdit ? (
-                <button
-                  type="button"
-                  onClick={() => setShowForm((v) => !v)}
-                  className="rounded-lg bg-sky px-3 py-2 text-sm font-semibold text-white"
-                >
-                  {showForm ? 'Close' : 'Add programme'}
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  {active.slug === 'poland' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadPolandList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Poland GIS list'}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setShowForm((v) => !v)}
+                    className="rounded-lg bg-sky px-3 py-2 text-sm font-semibold text-white"
+                  >
+                    {showForm ? 'Close' : 'Add programme'}
+                  </button>
+                </div>
               ) : null}
             </div>
 
@@ -213,6 +262,30 @@ export function CataloguePage() {
                     ['all', 'All DAAD'],
                     ['epos', 'EPOS (2 yr work)'],
                     ['study_scholarship', 'Not EPOS'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'poland' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Poland'],
+                    ['self_funded', 'Self-funded (tuition)'],
+                    ['nawa', 'NAWA scholarship'],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -305,6 +378,13 @@ export function CataloguePage() {
               Two different DAAD tracks — not the same application:
               <FundingBadge scheme="epos" /> named development courses; apply to the university; 2 years’ work after bachelor
               <FundingBadge scheme="study_scholarship" /> not on the EPOS list (e.g. EAGLE). No 2-year rule. Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
+            </p>
+          ) : null}
+
+          {active.slug === 'poland' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> you pay tuition (cost on the card). Rose{' '}
+              <FundingBadge scheme="nawa" /> is the Polish government scholarship — Pakistan was not eligible in 2026/27.
             </p>
           ) : null}
         </div>

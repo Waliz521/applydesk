@@ -1,4 +1,4 @@
-export type FundingScheme = 'epos' | 'study_scholarship' | 'emjm' | 'none'
+export type FundingScheme = 'epos' | 'study_scholarship' | 'emjm' | 'self_funded' | 'nawa' | 'none'
 
 export type ProgrammeExtra = {
   apply?: string | null
@@ -7,6 +7,7 @@ export type ProgrammeExtra = {
   deadline_text?: string | null
   self_funded_text?: string | null
   scholarships_text?: string | null
+  tuition_text?: string | null
   prepare?: string | null
   watch_outs?: string | null
   last_checked?: string | null

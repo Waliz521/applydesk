@@ -39,14 +39,22 @@ export function urgencyClass(kind: ReturnType<typeof deadlineUrgency>): string {
   }
 }
 
+export function applyByDate(cycle: {
+  scholarship_deadline: string | null
+  self_funded_deadline?: string | null
+} | null | undefined): string | null {
+  return cycle?.scholarship_deadline || cycle?.self_funded_deadline || null
+}
+
 export function cycleState(cycle: {
   application_opens_on: string | null
   scholarship_deadline: string | null
+  self_funded_deadline?: string | null
   date_status?: string | null
 }): 'open' | 'upcoming' | 'closed' | 'unknown' {
   const today = todayIso()
   const opens = cycle.application_opens_on
-  const due = cycle.scholarship_deadline
+  const due = applyByDate(cycle)
   const confirmed = (cycle.date_status || '').toLowerCase() === 'confirmed'
   if (opens && opens > today) return 'upcoming'
   if (due && due < today) return 'closed'
