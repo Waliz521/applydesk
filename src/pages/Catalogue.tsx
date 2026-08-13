@@ -125,7 +125,10 @@ export function CataloguePage() {
     setSeeding(true)
     setError(null)
     setNotice(null)
-    const result = await seedPolandCatalogue()
+    const result = await seedPolandCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
     setSeeding(false)
     if (result.error) {
       setError(result.error)

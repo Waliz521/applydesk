@@ -220,25 +220,35 @@ const PROGRAMMES: SeedRec[] = [
 const DESCRIPTION =
   'Public Polish GIS / geodesy master’s in English. These degrees are self-funded (tuition on each card). Banach NAWA is a separate scholarship; Pakistan was not eligible in 2026/27.'
 
-export async function seedPolandCatalogue(): Promise<{ error: string | null; count: number }> {
-  const { data: existingCat, error: catLookupError } = await supabase
-    .from('catalogues')
-    .select('id')
-    .eq('slug', 'poland')
-    .is('owner_user_id', null)
-    .maybeSingle()
+export async function seedPolandCatalogue(opts?: {
+  userId?: string
+  isAdmin?: boolean
+}): Promise<{ error: string | null; count: number }> {
+  const userId = opts?.userId
+  const isAdmin = Boolean(opts?.isAdmin)
+
+  let existingQuery = supabase.from('catalogues').select('id, owner_user_id').eq('slug', 'poland')
+  if (userId) {
+    existingQuery = existingQuery.or(`owner_user_id.is.null,owner_user_id.eq.${userId}`)
+  } else {
+    existingQuery = existingQuery.is('owner_user_id', null)
+  }
+  const { data: existingCats, error: catLookupError } = await existingQuery
   if (catLookupError) return { error: catLookupError.message, count: 0 }
 
-  let catalogueId = existingCat?.id as string | undefined
+  const systemCat = existingCats?.find((c) => c.owner_user_id == null)
+  const ownCat = existingCats?.find((c) => c.owner_user_id === userId)
+  let catalogueId = (systemCat?.id ?? ownCat?.id) as string | undefined
+
   if (!catalogueId) {
     const { data: created, error: createError } = await supabase
       .from('catalogues')
       .insert({
-        owner_user_id: null,
+        owner_user_id: isAdmin || !userId ? null : userId,
         slug: 'poland',
         name: 'Poland (self-funded)',
         description: DESCRIPTION,
-        is_system: true,
+        is_system: isAdmin || !userId,
       })
       .select('id')
       .single()

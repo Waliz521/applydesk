@@ -3,12 +3,13 @@ import { CatalogueSelect } from '@/components/CatalogueSelect'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
+import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { addProgrammeToTracker } from '@/lib/tracker'
 import { supabase } from '@/lib/supabase'
 import type { Application, Catalogue, OpenRow, Programme, ProgrammeCycle } from '@/lib/types'
 
 export function DashboardPage() {
-  const { user } = useAuth()
+  const { user, profile, loading: authLoading } = useAuth()
   const [rows, setRows] = useState<OpenRow[]>([])
   const [catalogues, setCatalogues] = useState<Catalogue[]>([])
   const [catalogueId, setCatalogueId] = useState('all')
@@ -19,63 +20,104 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [seeding, setSeeding] = useState(false)
+  const hasPoland = catalogues.some((c) => c.slug === 'poland')
+
+  async function loadDashboard() {
+    const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
+      supabase
+        .from('programme_cycles')
+        .select('*, programme:programmes(*, catalogue:catalogues(*))')
+        .order('scholarship_deadline', { ascending: true, nullsFirst: false }),
+      supabase.from('applications').select('id, status_id, programme_id'),
+      supabase.from('application_statuses').select('id, slug'),
+      supabase.from('catalogues').select('*').eq('is_archived', false).order('name'),
+    ])
+    if (cyclesRes.error) setError(cyclesRes.error.message)
+    const mapped: OpenRow[] = (cyclesRes.data ?? []).flatMap((row) => {
+      const cycle = row as ProgrammeCycle & {
+        programme: (Programme & { catalogue: Catalogue | Catalogue[] | null }) | null
+      }
+      const programme = cycle.programme
+      if (!programme || Array.isArray(programme)) return []
+      const catalogue = Array.isArray(programme.catalogue)
+        ? programme.catalogue[0]
+        : programme.catalogue
+      if (!catalogue) return []
+      return [
+        {
+          ...cycle,
+          programme,
+          catalogue,
+          open_state: cycleState(cycle),
+        },
+      ]
+    })
+    mapped.sort((a, b) => {
+      const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
+      const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
+      return da.localeCompare(db)
+    })
+    setRows(mapped)
+    setCatalogues((catsRes.data ?? []) as Catalogue[])
+    const apps = (appsRes.data ?? []) as Pick<Application, 'id' | 'status_id' | 'programme_id'>[]
+    setAppCount(apps.length)
+    setTracked(new Set(apps.map((a) => a.programme_id).filter(Boolean) as string[]))
+    const progressIds = new Set(
+      (statusesRes.data ?? [])
+        .filter((s) => s.slug === 'in_progress' || s.slug === 'watching')
+        .map((s) => s.id),
+    )
+    setInProgress(apps.filter((a) => a.status_id && progressIds.has(a.status_id)).length)
+    setLoading(false)
+    return (catsRes.data ?? []) as Catalogue[]
+  }
 
   useEffect(() => {
+    if (authLoading || (user && !profile)) return
     let cancelled = false
     async function load() {
-      const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
-        supabase
-          .from('programme_cycles')
-          .select('*, programme:programmes(*, catalogue:catalogues(*))')
-          .order('scholarship_deadline', { ascending: true, nullsFirst: false }),
-        supabase.from('applications').select('id, status_id, programme_id'),
-        supabase.from('application_statuses').select('id, slug'),
-        supabase.from('catalogues').select('*').eq('is_archived', false).order('name'),
-      ])
+      const cats = await loadDashboard()
+      if (cancelled || !user) return
+      if (cats.some((c) => c.slug === 'poland')) return
+      setSeeding(true)
+      const result = await seedPolandCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
       if (cancelled) return
-      if (cyclesRes.error) setError(cyclesRes.error.message)
-      const mapped: OpenRow[] = (cyclesRes.data ?? []).flatMap((row) => {
-        const cycle = row as ProgrammeCycle & {
-          programme: (Programme & { catalogue: Catalogue | Catalogue[] | null }) | null
-        }
-        const programme = cycle.programme
-        if (!programme || Array.isArray(programme)) return []
-        const catalogue = Array.isArray(programme.catalogue)
-          ? programme.catalogue[0]
-          : programme.catalogue
-        if (!catalogue) return []
-        return [
-          {
-            ...cycle,
-            programme,
-            catalogue,
-            open_state: cycleState(cycle),
-          },
-        ]
-      })
-      mapped.sort((a, b) => {
-        const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
-        const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
-        return da.localeCompare(db)
-      })
-      setRows(mapped)
-      setCatalogues((catsRes.data ?? []) as Catalogue[])
-      const apps = (appsRes.data ?? []) as Pick<Application, 'id' | 'status_id' | 'programme_id'>[]
-      setAppCount(apps.length)
-      setTracked(new Set(apps.map((a) => a.programme_id).filter(Boolean) as string[]))
-      const progressIds = new Set(
-        (statusesRes.data ?? [])
-          .filter((s) => s.slug === 'in_progress' || s.slug === 'watching')
-          .map((s) => s.id),
-      )
-      setInProgress(apps.filter((a) => a.status_id && progressIds.has(a.status_id)).length)
-      setLoading(false)
+      setSeeding(false)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+      setNotice(`Poland catalogue added (${result.count} programmes).`)
+      await loadDashboard()
     }
     void load()
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [authLoading, user?.id, profile?.is_admin, profile])
+
+  async function addPoland() {
+    if (!user) return
+    setSeeding(true)
+    setError(null)
+    const result = await seedPolandCatalogue({
+      userId: user.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Poland catalogue added (${result.count} programmes).`)
+    const cats = await loadDashboard()
+    const poland = cats.find((c) => c.slug === 'poland')
+    if (poland) setCatalogueId(poland.id)
+  }
 
   const visibleRows = useMemo(
     () => (catalogueId === 'all' ? rows : rows.filter((r) => r.catalogue.id === catalogueId)),
@@ -131,6 +173,22 @@ export function DashboardPage() {
         </div>
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
+
+      {!hasPoland && !loading ? (
+        <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-700">
+            Poland is not in this dropdown yet. It has to be written into the database once (deploy only updates the app).
+          </p>
+          <button
+            type="button"
+            onClick={() => void addPoland()}
+            disabled={seeding || !user}
+            className="shrink-0 rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {seeding ? 'Adding Poland…' : 'Add Poland catalogue'}
+          </button>
+        </div>
+      ) : null}
 
       <section className="grid gap-4 sm:grid-cols-3">
         <Stat label="Open now" value={loading ? '…' : String(openRows.length)} tone="emerald" />
