@@ -14,7 +14,12 @@ function openDateLabel(cycle: ProgrammeCycle | undefined): string {
   if (cycle?.application_opens_on) return formatDate(cycle.application_opens_on)
   const note = cycle?.extra_dates?.opens_text?.trim()
   if (note) return note
-  if (cycle?.scholarship_deadline) return 'Not published — apply until the deadline'
+  if (cycle?.scholarship_deadline) {
+    const confirmed = (cycle.date_status || '').toLowerCase() === 'confirmed'
+    return confirmed
+      ? 'Not published — apply until the deadline'
+      : 'Not published yet — portal not open'
+  }
   return '—'
 }
 

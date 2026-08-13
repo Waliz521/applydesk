@@ -71,7 +71,7 @@ DATES = {
         "scholarships": None,
     },
     "MUrCS+": {
-        "opens": None,
+        "opens": "2026-11-15",
         "scholarship": "2027-01-15",
         "starts": "2027-09-01",
         "status": "expected",
