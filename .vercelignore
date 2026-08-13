@@ -1,0 +1,6 @@
+legacy
+scripts
+*.md
+!README.md
+.env*
+!.env.example
