@@ -1,12 +1,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { DateStatusBadge, OpenBadge, PriorityBadge } from '@/components/Badges'
+import { DateStatusBadge, FundingBadge, OpenBadge, PriorityBadge } from '@/components/Badges'
 import { countriesInvolved } from '@/lib/countries'
+import { fundingDetail, fundingScheme } from '@/lib/funding'
 import { cycleState, daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
 import type { Programme, ProgrammeCycle } from '@/lib/types'
 
 function latestCycle(programme: Programme): ProgrammeCycle | undefined {
   return programme.cycles?.[0]
+}
+
+function openDateLabel(cycle: ProgrammeCycle | undefined): string {
+  if (cycle?.application_opens_on) return formatDate(cycle.application_opens_on)
+  const note = cycle?.extra_dates?.opens_text?.trim()
+  if (note) return note
+  if (cycle?.scholarship_deadline) return 'Not published — apply until the deadline'
+  return '—'
 }
 
 export function ProgrammeCard({
@@ -34,6 +43,7 @@ export function ProgrammeCard({
   const urgency = deadlineUrgency(cy?.scholarship_deadline)
   const href = programme.apply_url || programme.website
   const countries = countriesInvolved(programme)
+  const scheme = fundingScheme(programme, catalogueName)
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
@@ -62,6 +72,7 @@ export function ProgrammeCard({
           </div>
           <div className="flex max-w-[40%] shrink-0 flex-wrap justify-end gap-1.5">
             <PriorityBadge value={programme.priority} />
+            <FundingBadge scheme={scheme} />
             <OpenBadge state={state} />
             {cy ? <DateStatusBadge status={cy.date_status} /> : null}
           </div>
@@ -70,7 +81,7 @@ export function ProgrammeCard({
         <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
           <div>
             <dt className="text-muted">Opens</dt>
-            <dd>{formatDate(cy?.application_opens_on)}</dd>
+            <dd className="line-clamp-2">{openDateLabel(cy)}</dd>
           </div>
           <div>
             <dt className="text-muted">Scholarship deadline</dt>
@@ -121,6 +132,12 @@ export function ProgrammeCard({
 
         {open ? (
           <div className="mt-4 space-y-3 border-t border-line pt-4 text-sm">
+            {fundingDetail(scheme) ? (
+              <p>
+                <span className="font-medium text-ink">Funding. </span>
+                <span className="text-slate-600">{fundingDetail(scheme)}</span>
+              </p>
+            ) : null}
             {programme.coordinator ? (
               <p>
                 <span className="font-medium text-ink">Consortium. </span>

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
-import { PriorityBadge } from '@/components/Badges'
+import { FundingBadge, PriorityBadge } from '@/components/Badges'
 import { useAuth } from '@/context/AuthContext'
+import { fundingScheme } from '@/lib/funding'
+import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
 import { supabase } from '@/lib/supabase'
@@ -19,6 +21,7 @@ export function CataloguePage() {
   const [showForm, setShowForm] = useState(false)
   const [query, setQuery] = useState('')
   const [priority, setPriority] = useState<(typeof PRIORITY_FILTERS)[number]>('all')
+  const [funding, setFunding] = useState<'all' | FundingScheme>('all')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const canEdit = Boolean(profile?.is_admin)
@@ -75,11 +78,14 @@ export function CataloguePage() {
     const q = query.trim().toLowerCase()
     return programmes.filter((p) => {
       if (priority !== 'all' && p.priority !== priority) return false
+      if (active?.slug === 'daad' && funding !== 'all' && fundingScheme(p, active?.name) !== funding) {
+        return false
+      }
       if (!q) return true
       const blob = [p.acronym, p.name, p.official_title, p.coordinator, p.fit_notes].join(' ').toLowerCase()
       return blob.includes(q)
     })
-  }, [programmes, query, priority])
+  }, [programmes, query, priority, funding, active?.name])
 
   async function addProgramme(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -134,7 +140,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. Search, filter by priority, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks (EPOS vs not EPOS). Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -143,7 +149,10 @@ export function CataloguePage() {
           <button
             key={c.id}
             type="button"
-            onClick={() => setActiveId(c.id)}
+            onClick={() => {
+              setActiveId(c.id)
+              setFunding('all')
+            }}
             className={`rounded-full px-3 py-1.5 text-sm ${
               c.id === activeId ? 'bg-navy text-white' : 'bg-white text-slate-600 ring-1 ring-line hover:bg-slate-50'
             }`}
@@ -195,6 +204,30 @@ export function CataloguePage() {
                 ))}
               </div>
             </div>
+
+            {active.slug === 'daad' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All DAAD'],
+                    ['epos', 'EPOS (2 yr work)'],
+                    ['study_scholarship', 'Not EPOS'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             {showForm && canEdit ? (
               <form onSubmit={(e) => void addProgramme(e)} className="mt-4 grid gap-3 md:grid-cols-2">
@@ -248,6 +281,7 @@ export function CataloguePage() {
                   key={p.id}
                   programme={p}
                   cycle={p.cycles?.[0]}
+                  catalogueName={active.name}
                   tracked={tracked.has(p.id)}
                   tracking={busyId === p.id}
                   onTrack={() => void track(p)}
@@ -263,6 +297,14 @@ export function CataloguePage() {
               <PriorityBadge value="A-" /> water + spatial
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
+            </p>
+          ) : null}
+
+          {active.slug === 'daad' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Two different DAAD tracks — not the same application:
+              <FundingBadge scheme="epos" /> named development courses; apply to the university; 2 years’ work after bachelor
+              <FundingBadge scheme="study_scholarship" /> not on the EPOS list (e.g. EAGLE). No 2-year rule. Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
             </p>
           ) : null}
         </div>

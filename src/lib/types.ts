@@ -1,3 +1,5 @@
+export type FundingScheme = 'epos' | 'study_scholarship' | 'emjm' | 'none'
+
 export type ProgrammeExtra = {
   apply?: string | null
   target_start?: string | null
@@ -8,6 +10,8 @@ export type ProgrammeExtra = {
   prepare?: string | null
   watch_outs?: string | null
   last_checked?: string | null
+  funding_scheme?: FundingScheme | null
+  work_years_required?: boolean | null
 }
 
 export type CycleExtraDates = {

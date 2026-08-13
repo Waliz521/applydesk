@@ -111,6 +111,12 @@ export function DashboardPage() {
               ? `${selectedCatalogue.name}. Open calls first, then TBA. Re-check EXPECTED dates on the official site.`
               : 'All catalogues. Open calls first, then TBA. Re-check EXPECTED dates on the official site.'}
           </p>
+          {selectedCatalogue?.slug === 'daad' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Orange <span className="font-medium">EPOS · 2 yr work</span> is a named development course (apply to the university).
+              Teal <span className="font-medium">Not EPOS</span> is not on that list (e.g. EAGLE) — no two-year rule, and Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
+            </p>
+          ) : null}
         </div>
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
