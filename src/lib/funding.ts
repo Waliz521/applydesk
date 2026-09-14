@@ -2,7 +2,17 @@ import type { FundingScheme, Programme } from '@/lib/types'
 
 export type { FundingScheme }
 
-const STORED: FundingScheme[] = ['epos', 'study_scholarship', 'emjm', 'self_funded', 'nawa', 'none']
+const STORED: FundingScheme[] = [
+  'epos',
+  'study_scholarship',
+  'emjm',
+  'self_funded',
+  'nawa',
+  'oead',
+  'partial',
+  'full',
+  'none',
+]
 
 export function fundingScheme(programme: Programme, catalogueName?: string): FundingScheme {
   const stored = programme.extra?.funding_scheme
@@ -11,8 +21,24 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
   const slug = (programme.slug || '').toLowerCase()
   const acronym = (programme.acronym || '').toLowerCase()
   if (cat.includes('erasmus')) return 'emjm'
-  if (cat.includes('poland') || cat.includes('self-funded')) {
+  if (
+    cat.includes('poland') ||
+    cat.includes('austria') ||
+    cat.includes('netherlands') ||
+    cat.includes('self-funded')
+  ) {
     if (slug.includes('nawa') || acronym === 'nawa') return 'nawa'
+    if (slug.includes('busek') || acronym === 'oead' || acronym === 'busek') return 'oead'
+    if (
+      slug.includes('scholarship') ||
+      slug.includes('excellence') ||
+      slug.includes('one-world') ||
+      slug.includes('ernst-mach') ||
+      slug.includes('okp')
+    ) {
+      return 'partial'
+    }
+    if (slug.includes('bleumink')) return 'full'
     return 'self_funded'
   }
   if (slug.includes('eagle') || acronym === 'eagle') return 'study_scholarship'
@@ -33,6 +59,12 @@ export function fundingLabel(scheme: FundingScheme): string | null {
       return 'Self-funded · tuition'
     case 'nawa':
       return 'NAWA scholarship'
+    case 'oead':
+      return 'OeAD · Busek'
+    case 'partial':
+      return 'Partial scholarship'
+    case 'full':
+      return 'Full university grant'
     default:
       return null
   }
@@ -50,6 +82,12 @@ export function fundingClass(scheme: FundingScheme): string {
       return 'bg-slate-800 text-white'
     case 'nawa':
       return 'bg-rose-700 text-white'
+    case 'oead':
+      return 'bg-rose-700 text-white'
+    case 'partial':
+      return 'bg-violet-700 text-white'
+    case 'full':
+      return 'bg-emerald-800 text-white'
     default:
       return 'bg-slate-200 text-slate-700'
   }
@@ -64,9 +102,15 @@ export function fundingDetail(scheme: FundingScheme): string | null {
     case 'emjm':
       return 'Erasmus Mundus Joint Master scholarship. No two-year work rule. Apply on the programme website. A full EMJM award generally replaces a German blocked account if your visa is for Germany; confirm with the mission that issues the visa.'
     case 'self_funded':
-      return 'You pay tuition. This is not Erasmus Mundus or DAAD EPOS. Poland has no blocked account, but the Islamabad consulate still wants proof of funds and usually first-year tuition paid or shown. You may work after you are a full-time student at a public university; that is not a visa document.'
+      return 'You pay tuition (amount on the card). This is not a full Erasmus Mundus or DAAD EPOS award. Visa proof-of-funds still applies: Austria and Poland want bank evidence and often first-year tuition shown; the Netherlands invoices first-year tuition and living before IND; a German first semester usually means a blocked account.'
     case 'nawa':
       return 'Banach NAWA is a Polish government master’s scholarship, applied on the NAWA portal, separate from university admission. Pakistan was not on the 2026/27 country list (call closed 8 May 2026). Watch the next spring announcement before treating it as open to you.'
+    case 'oead':
+      return 'OeAD Erhard Busek Grant. Pakistan is on the country list. It is a full two-year master’s award (€1,300/month + travel, tuition waived by the university) when a call is open. You cannot apply to OeAD directly — the Austrian university must nominate you after unconditional admission. OeAD currently says no further call is planned after 2025/26. Recheck oead.at / grants.at before treating it as open.'
+    case 'partial':
+      return 'Partial award only. It does not replace tuition + living the way Erasmus Mundus or DAAD EPOS can. Read the card for the remaining amount you must still pay, and for visa proof-of-funds. Apply to the university (or the named portal) after or with admission — not as a standalone government fellowship unless the card says so.'
+    case 'full':
+      return 'University-funded full master’s (tuition + living). Not Erasmus Mundus and not DAAD. There is usually no separate scholarship form — complete the master’s admission by the date on the card and wait to be nominated. Places are few.'
     default:
       return null
   }
@@ -79,6 +123,6 @@ export function tuitionText(programme: Programme): string | null {
 
 export function deadlineFieldLabel(scheme: FundingScheme): string {
   if (scheme === 'self_funded') return 'Admission deadline'
-  if (scheme === 'nawa') return 'Scholarship deadline'
+  if (scheme === 'nawa' || scheme === 'oead' || scheme === 'partial' || scheme === 'full') return 'Scholarship deadline'
   return 'Scholarship deadline'
 }

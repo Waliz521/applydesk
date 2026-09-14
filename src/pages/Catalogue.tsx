@@ -6,6 +6,9 @@ import { fundingScheme } from '@/lib/funding'
 import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
+import { seedAustriaCatalogue } from '@/lib/seedAustria'
+import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { supabase } from '@/lib/supabase'
 import type { Catalogue, Programme, ProgrammeCycle } from '@/lib/types'
@@ -81,7 +84,11 @@ export function CataloguePage() {
     return programmes.filter((p) => {
       if (priority !== 'all' && p.priority !== priority) return false
       if (
-        (active?.slug === 'daad' || active?.slug === 'poland') &&
+        (active?.slug === 'daad' ||
+          active?.slug === 'poland' ||
+          active?.slug === 'austria' ||
+          active?.slug === 'netherlands' ||
+          active?.slug === 'erasmus-mundus') &&
         funding !== 'all' &&
         fundingScheme(p, active?.name) !== funding
       ) {
@@ -145,6 +152,77 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
+  async function loadAustriaList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedAustriaCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Austria list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'austria')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
+  async function loadNetherlandsList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedNetherlandsCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Netherlands list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'netherlands')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
+  async function loadCartography() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedCartographyProgramme({
+      userId: user?.id,
+      force: true,
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(result.added ? 'Cartography M.Sc. added to Erasmus Mundus.' : 'Cartography M.Sc. refreshed.')
+    if (!activeId) return
+    const { data } = await supabase
+      .from('programmes')
+      .select('*, cycles:programme_cycles(*)')
+      .eq('catalogue_id', activeId)
+      .order('name')
+    setProgrammes((data ?? []) as Programme[])
+  }
+
   async function track(programme: Programme) {
     if (!user) return
     setBusyId(programme.id)
@@ -170,7 +248,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. DAAD is two tracks. Poland is mostly self-funded tuition. Search, filter, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, and the Netherlands mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -200,6 +278,26 @@ export function CataloguePage() {
             {seeding ? 'Adding Poland…' : 'Add Poland catalogue'}
           </button>
         ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'austria') ? (
+          <button
+            type="button"
+            onClick={() => void loadAustriaList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Austria…' : 'Add Austria catalogue'}
+          </button>
+        ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'netherlands') ? (
+          <button
+            type="button"
+            onClick={() => void loadNetherlandsList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Netherlands…' : 'Add Netherlands catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -221,6 +319,36 @@ export function CataloguePage() {
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
                       {seeding ? 'Updating…' : 'Load / refresh Poland GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'austria' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadAustriaList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Austria GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'netherlands' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadNetherlandsList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Netherlands GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'erasmus-mundus' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadCartography()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Add / refresh Cartography M.Sc.'}
                     </button>
                   ) : null}
                   <button
@@ -305,6 +433,80 @@ export function CataloguePage() {
               </div>
             ) : null}
 
+            {active.slug === 'austria' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Austria'],
+                    ['self_funded', 'Self-funded (tuition)'],
+                    ['oead', 'OeAD · Busek'],
+                    ['partial', 'Partial / other'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'netherlands' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Netherlands'],
+                    ['self_funded', 'Self-funded (tuition)'],
+                    ['partial', 'Partial scholarship'],
+                    ['full', 'Full university grant'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'erasmus-mundus' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Erasmus'],
+                    ['emjm', 'EMJM scholarship'],
+                    ['self_funded', 'No EM award (tuition)'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             {showForm && canEdit ? (
               <form onSubmit={(e) => void addProgramme(e)} className="mt-4 grid gap-3 md:grid-cols-2">
                 <label className="text-sm font-medium">
@@ -373,6 +575,7 @@ export function CataloguePage() {
               <PriorityBadge value="A-" /> water + spatial
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
+              · Grey <FundingBadge scheme="self_funded" /> Cartography M.Sc. is still a joint programme, but there is no EMJM award after 2025.
             </p>
           ) : null}
 
@@ -388,6 +591,22 @@ export function CataloguePage() {
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
               Grey <FundingBadge scheme="self_funded" /> you pay tuition (cost on the card). Rose{' '}
               <FundingBadge scheme="nawa" /> is the Polish government scholarship — Pakistan was not eligible in 2026/27.
+            </p>
+          ) : null}
+
+          {active.slug === 'austria' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> statutory tuition. Rose <FundingBadge scheme="oead" /> Erhard Busek (no new
+              call planned). Violet <FundingBadge scheme="partial" /> One World after arrival, or Ernst Mach (not a master’s). CDE /
+              Cartography are under Erasmus Mundus.
+            </p>
+          ) : null}
+
+          {active.slug === 'netherlands' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. Violet <FundingBadge scheme="partial" /> NL
+              Scholarship, ITC Excellence, Wageningen Excellence. Green <FundingBadge scheme="full" /> Eric Bleumink (Groningen only).
+              Orange Knowledge is closed. GEM is under Erasmus Mundus.
             </p>
           ) : null}
         </div>

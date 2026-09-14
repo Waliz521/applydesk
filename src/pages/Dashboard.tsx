@@ -3,6 +3,9 @@ import { CatalogueSelect } from '@/components/CatalogueSelect'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
+import { seedAustriaCatalogue } from '@/lib/seedAustria'
+import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { addProgrammeToTracker } from '@/lib/tracker'
 import { supabase } from '@/lib/supabase'
@@ -22,6 +25,8 @@ export function DashboardPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [seeding, setSeeding] = useState(false)
   const hasPoland = catalogues.some((c) => c.slug === 'poland')
+  const hasAustria = catalogues.some((c) => c.slug === 'austria')
+  const hasNetherlands = catalogues.some((c) => c.slug === 'netherlands')
 
   async function loadDashboard() {
     const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
@@ -79,19 +84,66 @@ export function DashboardPage() {
     async function load() {
       const cats = await loadDashboard()
       if (cancelled || !user) return
-      if (cats.some((c) => c.slug === 'poland')) return
-      setSeeding(true)
-      const result = await seedPolandCatalogue({
-        userId: user.id,
-        isAdmin: Boolean(profile?.is_admin),
-      })
+      const notes: string[] = []
+      const { data: sentinels } = await supabase
+        .from('programmes')
+        .select('slug')
+        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink'])
+      const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
+      const needPoland = !cats.some((c) => c.slug === 'poland')
+      const needAustria = !cats.some((c) => c.slug === 'austria') || !slugs.has('oead-busek')
+      const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
+      if (needPoland || needAustria || needNetherlands) setSeeding(true)
+      if (needPoland) {
+        const result = await seedPolandCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Poland catalogue added (${result.count} programmes).`)
+      }
+      if (needAustria) {
+        const result = await seedAustriaCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Austria catalogue added (${result.count} programmes).`)
+      }
+      if (needNetherlands) {
+        const result = await seedNetherlandsCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Netherlands catalogue added (${result.count} programmes).`)
+      }
+      const cartography = await seedCartographyProgramme({ userId: user.id })
       if (cancelled) return
-      setSeeding(false)
-      if (result.error) {
-        setError(result.error)
+      if (cartography.error) {
+        setSeeding(false)
+        setError(cartography.error)
         return
       }
-      setNotice(`Poland catalogue added (${result.count} programmes).`)
+      if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
+      setSeeding(false)
+      if (notes.length === 0) return
+      setNotice(notes.join(' '))
       await loadDashboard()
     }
     void load()
@@ -100,23 +152,61 @@ export function DashboardPage() {
     }
   }, [authLoading, user?.id, profile?.is_admin, profile])
 
-  async function addPoland() {
+  async function addMissingCatalogues() {
     if (!user) return
     setSeeding(true)
     setError(null)
-    const result = await seedPolandCatalogue({
-      userId: user.id,
-      isAdmin: Boolean(profile?.is_admin),
-    })
-    setSeeding(false)
-    if (result.error) {
-      setError(result.error)
+    const notes: string[] = []
+    if (!hasPoland) {
+      const result = await seedPolandCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Poland catalogue added (${result.count} programmes).`)
+    }
+    if (!hasAustria) {
+      const result = await seedAustriaCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Austria catalogue added (${result.count} programmes).`)
+    }
+    if (!hasNetherlands) {
+      const result = await seedNetherlandsCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Netherlands catalogue added (${result.count} programmes).`)
+    }
+    const cartography = await seedCartographyProgramme({ userId: user.id, force: true })
+    if (cartography.error) {
+      setSeeding(false)
+      setError(cartography.error)
       return
     }
-    setNotice(`Poland catalogue added (${result.count} programmes).`)
+    if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
+    setSeeding(false)
+    setNotice(notes.join(' ') || 'Catalogues are up to date.')
     const cats = await loadDashboard()
-    const poland = cats.find((c) => c.slug === 'poland')
-    if (poland) setCatalogueId(poland.id)
+    const austria = cats.find((c) => c.slug === 'austria')
+    const netherlands = cats.find((c) => c.slug === 'netherlands')
+    if (!hasNetherlands && netherlands) setCatalogueId(netherlands.id)
+    else if (!hasAustria && austria) setCatalogueId(austria.id)
   }
 
   const visibleRows = useMemo(
@@ -170,22 +260,43 @@ export function DashboardPage() {
               <span className="font-medium">NAWA scholarship</span> is a separate government grant — Pakistan was not on the 2026/27 Banach list.
             </p>
           ) : null}
+          {selectedCatalogue?.slug === 'austria' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> is statutory Austrian tuition. Rose{' '}
+              <span className="font-medium">OeAD · Busek</span> is the full master’s grant (no new call planned). Violet{' '}
+              <span className="font-medium">Partial</span> is One World (Salzburg living stipend) or Ernst Mach (short stay, not a degree).
+            </p>
+          ) : null}
+          {selectedCatalogue?.slug === 'netherlands' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> is ITC / WUR / GIMA / Delft fees (~€22k/year). Violet{' '}
+              <span className="font-medium">Partial</span> is NL Scholarship (€5,000), ITC Excellence, or Wageningen Excellence. Green{' '}
+              <span className="font-medium">Full university grant</span> is Eric Bleumink at Groningen only — not an ITC GIS scholarship.
+              GEM sits in Erasmus Mundus.
+            </p>
+          ) : null}
         </div>
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
 
-      {!hasPoland && !loading ? (
+      {(!hasPoland || !hasAustria || !hasNetherlands) && !loading ? (
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            Poland is not in this dropdown yet. It has to be written into the database once (deploy only updates the app).
+            {[!hasPoland && 'Poland', !hasAustria && 'Austria', !hasNetherlands && 'Netherlands']
+              .filter(Boolean)
+              .join(' and ')}{' '}
+            {(!hasPoland ? 1 : 0) + (!hasAustria ? 1 : 0) + (!hasNetherlands ? 1 : 0) > 1
+              ? 'are not in this dropdown yet.'
+              : 'is not in this dropdown yet.'}{' '}
+            They have to be written into the database once (deploy only updates the app).
           </p>
           <button
             type="button"
-            onClick={() => void addPoland()}
+            onClick={() => void addMissingCatalogues()}
             disabled={seeding || !user}
             className="shrink-0 rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {seeding ? 'Adding Poland…' : 'Add Poland catalogue'}
+            {seeding ? 'Adding catalogues…' : 'Add missing catalogues'}
           </button>
         </div>
       ) : null}

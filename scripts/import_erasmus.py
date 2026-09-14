@@ -66,9 +66,10 @@ DATES = {
     "Cartography": {
         "opens": "2027-01-01",
         "scholarship": None,
+        "self_funded": "2027-05-31",
         "starts": "2027-10-01",
         "status": "expected",
-        "scholarships": None,
+        "scholarships": False,
     },
     "MUrCS+": {
         "opens": "2026-11-15",
@@ -356,6 +357,7 @@ def main() -> None:
                 "watch_outs": rec.get("Notes / watch-outs"),
                 "last_checked": rec.get("Last checked"),
                 "source": "Erasmus_Mundus_GIS_Catalogue.xlsx",
+                **({"funding_scheme": "self_funded"} if scholarships is False else {}),
             },
         }
 
@@ -380,6 +382,7 @@ def main() -> None:
             "starts_on": dates.get("starts"),
             "application_opens_on": dates.get("opens"),
             "scholarship_deadline": dates.get("scholarship"),
+            "self_funded_deadline": dates.get("self_funded"),
             "date_status": date_status,
             "scholarships_available": scholarships,
             "extra_dates": {

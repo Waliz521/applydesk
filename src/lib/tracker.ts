@@ -13,6 +13,12 @@ function trackerScholarshipName(programme: Programme): string {
       return 'Self-funded (tuition)'
     case 'nawa':
       return 'Banach NAWA'
+    case 'oead':
+      return 'OeAD Erhard Busek'
+    case 'partial':
+      return 'Partial scholarship'
+    case 'full':
+      return 'Eric Bleumink Fellowship'
     case 'emjm':
       return 'Erasmus Mundus Joint Master'
     default:
