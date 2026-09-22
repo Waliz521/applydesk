@@ -8,6 +8,7 @@ import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { supabase } from '@/lib/supabase'
@@ -88,6 +89,7 @@ export function CataloguePage() {
           active?.slug === 'poland' ||
           active?.slug === 'austria' ||
           active?.slug === 'netherlands' ||
+          active?.slug === 'hong-kong' ||
           active?.slug === 'erasmus-mundus') &&
         funding !== 'all' &&
         fundingScheme(p, active?.name) !== funding
@@ -200,6 +202,30 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
+  async function loadHongKongList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedHongKongCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Hong Kong list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'hong-kong')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
   async function loadCartography() {
     setSeeding(true)
     setError(null)
@@ -248,7 +274,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, and the Netherlands mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, the Netherlands, and Hong Kong mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -298,6 +324,16 @@ export function CataloguePage() {
             {seeding ? 'Adding Netherlands…' : 'Add Netherlands catalogue'}
           </button>
         ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'hong-kong') ? (
+          <button
+            type="button"
+            onClick={() => void loadHongKongList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Hong Kong…' : 'Add Hong Kong catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -339,6 +375,16 @@ export function CataloguePage() {
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
                       {seeding ? 'Updating…' : 'Load / refresh Netherlands GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'hong-kong' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadHongKongList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Hong Kong list'}
                     </button>
                   ) : null}
                   {active.slug === 'erasmus-mundus' ? (
@@ -483,6 +529,31 @@ export function CataloguePage() {
               </div>
             ) : null}
 
+            {active.slug === 'hong-kong' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Hong Kong'],
+                    ['partial', 'RPG / PGS / IPFS'],
+                    ['full', 'HKPFS (PhD)'],
+                    ['self_funded', 'Taught MSc (tuition)'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             {active.slug === 'erasmus-mundus' ? (
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 <span className="text-xs font-medium text-muted">Funding type</span>
@@ -607,6 +678,14 @@ export function CataloguePage() {
               Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. Violet <FundingBadge scheme="partial" /> NL
               Scholarship, ITC Excellence, Wageningen Excellence. Green <FundingBadge scheme="full" /> Eric Bleumink (Groningen only).
               Orange Knowledge is closed. GEM is under Erasmus Mundus.
+            </p>
+          ) : null}
+
+          {active.slug === 'hong-kong' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Violet <FundingBadge scheme="partial" /> HKU/PolyU MPhil/PhD with PGS, IPFS, or supervisor studentship — email faculty first.
+              Green <FundingBadge scheme="full" /> HKPFS (PhD). Grey <FundingBadge scheme="self_funded" /> taught MSc GeoDS (~HK$250k). Planning
+              notes: <span className="font-medium">hong-kong-universities.md</span> in the repo.
             </p>
           ) : null}
         </div>

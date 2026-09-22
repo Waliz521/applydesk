@@ -25,10 +25,12 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     cat.includes('poland') ||
     cat.includes('austria') ||
     cat.includes('netherlands') ||
+    cat.includes('hong kong') ||
     cat.includes('self-funded')
   ) {
     if (slug.includes('nawa') || acronym === 'nawa') return 'nawa'
     if (slug.includes('busek') || acronym === 'oead' || acronym === 'busek') return 'oead'
+    if (slug.includes('hkpfs') || acronym === 'hkpfs') return 'full'
     if (
       slug.includes('scholarship') ||
       slug.includes('excellence') ||
@@ -39,6 +41,8 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
       return 'partial'
     }
     if (slug.includes('bleumink')) return 'full'
+    if (slug.includes('geods')) return 'self_funded'
+    if (slug.includes('rpg') || slug.includes('geog-rpg') || slug.includes('lsgs')) return 'partial'
     return 'self_funded'
   }
   if (slug.includes('eagle') || acronym === 'eagle') return 'study_scholarship'

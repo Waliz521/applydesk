@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
 import { addProgrammeToTracker } from '@/lib/tracker'
@@ -27,6 +28,7 @@ export function DashboardPage() {
   const hasPoland = catalogues.some((c) => c.slug === 'poland')
   const hasAustria = catalogues.some((c) => c.slug === 'austria')
   const hasNetherlands = catalogues.some((c) => c.slug === 'netherlands')
+  const hasHongKong = catalogues.some((c) => c.slug === 'hong-kong')
 
   async function loadDashboard() {
     const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
@@ -88,12 +90,13 @@ export function DashboardPage() {
       const { data: sentinels } = await supabase
         .from('programmes')
         .select('slug')
-        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink'])
+        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg'])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
       const needAustria = !cats.some((c) => c.slug === 'austria') || !slugs.has('oead-busek')
       const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
-      if (needPoland || needAustria || needNetherlands) setSeeding(true)
+      const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
+      if (needPoland || needAustria || needNetherlands || needHongKong) setSeeding(true)
       if (needPoland) {
         const result = await seedPolandCatalogue({
           userId: user.id,
@@ -132,6 +135,19 @@ export function DashboardPage() {
           return
         }
         notes.push(`Netherlands catalogue added (${result.count} programmes).`)
+      }
+      if (needHongKong) {
+        const result = await seedHongKongCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Hong Kong catalogue added (${result.count} programmes).`)
       }
       const cartography = await seedCartographyProgramme({ userId: user.id })
       if (cancelled) return
@@ -193,6 +209,18 @@ export function DashboardPage() {
       }
       notes.push(`Netherlands catalogue added (${result.count} programmes).`)
     }
+    if (!hasHongKong) {
+      const result = await seedHongKongCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Hong Kong catalogue added (${result.count} programmes).`)
+    }
     const cartography = await seedCartographyProgramme({ userId: user.id, force: true })
     if (cartography.error) {
       setSeeding(false)
@@ -205,7 +233,9 @@ export function DashboardPage() {
     const cats = await loadDashboard()
     const austria = cats.find((c) => c.slug === 'austria')
     const netherlands = cats.find((c) => c.slug === 'netherlands')
-    if (!hasNetherlands && netherlands) setCatalogueId(netherlands.id)
+    const hongKong = cats.find((c) => c.slug === 'hong-kong')
+    if (!hasHongKong && hongKong) setCatalogueId(hongKong.id)
+    else if (!hasNetherlands && netherlands) setCatalogueId(netherlands.id)
     else if (!hasAustria && austria) setCatalogueId(austria.id)
   }
 
@@ -275,17 +305,24 @@ export function DashboardPage() {
               GEM sits in Erasmus Mundus.
             </p>
           ) : null}
+          {selectedCatalogue?.slug === 'hong-kong' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Violet <span className="font-medium">Partial</span> is MPhil/PhD with PGS, IPFS, or dept studentship (supervisor-first). Green{' '}
+              <span className="font-medium">Full university grant</span> is HKPFS (PhD only, all HK universities). Dark{' '}
+              <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k) — not the funded research path.
+            </p>
+          ) : null}
         </div>
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
 
-      {(!hasPoland || !hasAustria || !hasNetherlands) && !loading ? (
+      {(!hasPoland || !hasAustria || !hasNetherlands || !hasHongKong) && !loading ? (
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            {[!hasPoland && 'Poland', !hasAustria && 'Austria', !hasNetherlands && 'Netherlands']
+            {[!hasPoland && 'Poland', !hasAustria && 'Austria', !hasNetherlands && 'Netherlands', !hasHongKong && 'Hong Kong']
               .filter(Boolean)
               .join(' and ')}{' '}
-            {(!hasPoland ? 1 : 0) + (!hasAustria ? 1 : 0) + (!hasNetherlands ? 1 : 0) > 1
+            {(!hasPoland ? 1 : 0) + (!hasAustria ? 1 : 0) + (!hasNetherlands ? 1 : 0) + (!hasHongKong ? 1 : 0) > 1
               ? 'are not in this dropdown yet.'
               : 'is not in this dropdown yet.'}{' '}
             They have to be written into the database once (deploy only updates the app).
