@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
@@ -157,6 +158,14 @@ export function DashboardPage() {
         return
       }
       if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
+      // Quietly refresh confirmed EMJM deadlines (GEM / CDE / GroundwatCH / Cartography)
+      const emjm = await seedErasmusEmjmUpdates({ userId: user.id })
+      if (cancelled) return
+      if (emjm.error) {
+        setSeeding(false)
+        setError(emjm.error)
+        return
+      }
       setSeeding(false)
       if (notes.length === 0) return
       setNotice(notes.join(' '))
@@ -228,6 +237,13 @@ export function DashboardPage() {
       return
     }
     if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
+    const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true })
+    if (emjm.error) {
+      setSeeding(false)
+      setError(emjm.error)
+      return
+    }
+    if (emjm.updated) notes.push(`EMJM dates refreshed (${emjm.count} programmes).`)
     setSeeding(false)
     setNotice(notes.join(' ') || 'Catalogues are up to date.')
     const cats = await loadDashboard()
@@ -310,6 +326,14 @@ export function DashboardPage() {
               Violet <span className="font-medium">Partial</span> is MPhil/PhD with PGS, IPFS, or dept studentship (supervisor-first). Green{' '}
               <span className="font-medium">Full university grant</span> is HKPFS (PhD only, all HK universities). Dark{' '}
               <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k) — not the funded research path.
+            </p>
+          ) : null}
+          {selectedCatalogue?.slug === 'erasmus-mundus' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
+              Pakistan is eligible. <span className="font-medium">GEM</span> opens 1 Oct 2026 (deadline 15 Jan 2027).{' '}
+              <span className="font-medium">GroundwatCH</span> Partner deadline 3 Jan 2027. <span className="font-medium">CDE</span> worldwide call Nov 2026–mid Jan 2027.{' '}
+              Grey <span className="font-medium">Self-funded</span> includes Cartography (no EMJM after 2025).
             </p>
           ) : null}
         </div>

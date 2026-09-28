@@ -8,6 +8,7 @@ import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
+import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
@@ -230,16 +231,27 @@ export function CataloguePage() {
     setSeeding(true)
     setError(null)
     setNotice(null)
-    const result = await seedCartographyProgramme({
+    const result = await seedErasmusEmjmUpdates({
       userId: user?.id,
       force: true,
     })
-    setSeeding(false)
+    // Keep legacy Cartography-only seed as fallback if Erasmus catalogue exists but slugs differ
     if (result.error) {
-      setError(result.error)
-      return
+      const carto = await seedCartographyProgramme({ userId: user?.id, force: true })
+      setSeeding(false)
+      if (carto.error) {
+        setError(carto.error)
+        return
+      }
+      setNotice(carto.added ? 'Cartography M.Sc. added to Erasmus Mundus.' : 'Cartography M.Sc. refreshed.')
+    } else {
+      setSeeding(false)
+      setNotice(
+        result.updated
+          ? `EMJM details refreshed (${result.count}): GEM, CDE, GroundwatCH, Cartography.`
+          : 'EMJM programmes already up to date.',
+      )
     }
-    setNotice(result.added ? 'Cartography M.Sc. added to Erasmus Mundus.' : 'Cartography M.Sc. refreshed.')
     if (!activeId) return
     const { data } = await supabase
       .from('programmes')
@@ -394,7 +406,7 @@ export function CataloguePage() {
                       disabled={seeding}
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
-                      {seeding ? 'Updating…' : 'Add / refresh Cartography M.Sc.'}
+                      {seeding ? 'Updating…' : 'Refresh EMJM dates (GEM / CDE / GroundwatCH / Cartography)'}
                     </button>
                   ) : null}
                   <button
@@ -646,7 +658,8 @@ export function CataloguePage() {
               <PriorityBadge value="A-" /> water + spatial
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
-              · Grey <FundingBadge scheme="self_funded" /> Cartography M.Sc. is still a joint programme, but there is no EMJM award after 2025.
+              · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM opens 1 Oct 2026 · GroundwatCH Partner
+              deadline 3 Jan 2027 · CDE Nov 2026–mid Jan 2027. Grey <FundingBadge scheme="self_funded" /> Cartography — no EMJM after 2025.
             </p>
           ) : null}
 

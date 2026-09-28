@@ -21,18 +21,19 @@ CYCLE_LABEL = "2027 intake"
 # Parsed ISO dates from the workbook text (Pakistan / Partner Country).
 # Original wording is stored on extra / extra_dates so nothing is lost.
 DATES = {
+    # Dates checked against official programme sites, 28 Sep 2026.
     "GEM": {
         "opens": "2026-10-01",
         "scholarship": "2027-01-15",
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "CDE": {
         "opens": "2026-11-01",
-        "scholarship": "2027-01-18",
+        "scholarship": "2027-01-15",  # mid-January 2027 — exact day TBA
         "starts": "2027-10-01",
-        "status": "confirmed",
+        "status": "expected",
         "scholarships": True,
     },
     "GeoTech": {
@@ -51,9 +52,9 @@ DATES = {
     },
     "GroundwatCH": {
         "opens": "2026-10-01",
-        "scholarship": "2027-01-05",
+        "scholarship": "2027-01-03",  # Partner Countries; Programme Countries 7 Feb 2027
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "FloodRISK": {

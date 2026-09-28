@@ -39,7 +39,7 @@ const PROGRAMME: SeedRec = {
       'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation letter (their 5 questions). Two recommendation letters. Map/visualisation portfolio strongly recommended (PDF or link to info@cartographymaster.eu).',
     watch_outs:
       'Still branded Erasmus Mundus, but there is no scholarship for 2026 or 2027. ITC/Twente thesis option ends after the 2026 cohort.',
-    last_checked: '14 Sep 2026',
+    last_checked: '28 Sep 2026',
   },
 }
 
@@ -64,7 +64,7 @@ export async function seedCartographyProgramme(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: [PROGRAMME],
-    source: 'cartographymaster.eu handbook and apply pages, 14 Sep 2026',
+    source: 'cartographymaster.eu handbook and apply pages, 28 Sep 2026',
   })
   return { ...result, added: !result.error && result.count > 0 }
 }

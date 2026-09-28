@@ -104,7 +104,7 @@ export function fundingDetail(scheme: FundingScheme): string | null {
     case 'study_scholarship':
       return 'Not DAAD EPOS — no two-year work rule for this course. DAAD Pakistan’s master’s list (Aug 2026) does not include Study Scholarships for all disciplines (those listed are architecture/arts). GIS funding here is usually self-funded or another scholarship. Recheck daad.pk with origin Pakistan before treating a DAAD portal scheme as open to you.'
     case 'emjm':
-      return 'Erasmus Mundus Joint Master scholarship. No two-year work rule. Apply on the programme website. A full EMJM award generally replaces a German blocked account if your visa is for Germany; confirm with the mission that issues the visa.'
+      return 'Erasmus Mundus Joint Master (EMJM). Apply on each programme website (no single EU form). Pakistan is a Partner Country and is eligible. Typical award: €1,400/month for up to 24 months (€33,600) plus tuition/participation covered; travel/installation rules vary by consortium. No two-year work rule. Geographic caps apply (usually ≤10% of awards to one nationality across editions). Cartography has no EMJM after 2025 — self-funded only. Confirm visa proof-of-funds with the host that issues the first visa.'
     case 'self_funded':
       return 'You pay tuition (amount on the card). This is not a full Erasmus Mundus or DAAD EPOS award. Visa proof-of-funds still applies: Austria and Poland want bank evidence and often first-year tuition shown; the Netherlands invoices first-year tuition and living before IND; a German first semester usually means a blocked account.'
     case 'nawa':
