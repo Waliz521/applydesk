@@ -51,6 +51,12 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
   return 'none'
 }
 
+/** EPOS scholarships need 2 years' work after bachelor — hidden from lists when ineligible. */
+export function isEposProgramme(programme: Programme, catalogueName?: string): boolean {
+  if (programme.extra?.work_years_required === true) return true
+  return fundingScheme(programme, catalogueName) === 'epos'
+}
+
 export function fundingLabel(scheme: FundingScheme): string | null {
   switch (scheme) {
     case 'epos':

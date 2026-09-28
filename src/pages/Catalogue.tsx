@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { FundingBadge, PriorityBadge } from '@/components/Badges'
 import { useAuth } from '@/context/AuthContext'
-import { fundingScheme } from '@/lib/funding'
+import { fundingScheme, isEposProgramme } from '@/lib/funding'
 import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker } from '@/lib/tracker'
@@ -84,6 +84,7 @@ export function CataloguePage() {
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
     return programmes.filter((p) => {
+      if (isEposProgramme(p, active?.name)) return false
       if (priority !== 'all' && p.priority !== priority) return false
       if (
         (active?.slug === 'daad' ||
@@ -448,8 +449,7 @@ export function CataloguePage() {
                 <span className="text-xs font-medium text-muted">Funding type</span>
                 {(
                   [
-                    ['all', 'All DAAD'],
-                    ['epos', 'EPOS (2 yr work)'],
+                    ['all', 'All DAAD (shown)'],
                     ['study_scholarship', 'Not EPOS'],
                   ] as const
                 ).map(([id, label]) => (
@@ -665,9 +665,9 @@ export function CataloguePage() {
 
           {active.slug === 'daad' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Two different DAAD tracks — not the same application:
-              <FundingBadge scheme="epos" /> named development courses; apply to the university; 2 years’ work after bachelor
-              <FundingBadge scheme="study_scholarship" /> not on the EPOS list (e.g. EAGLE). No 2-year rule. Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
+              EPOS courses (2 years’ work) are hidden — not eligible.
+              <FundingBadge scheme="study_scholarship" /> remains (e.g. EAGLE). No 2-year rule. Pakistan’s DAAD master’s list does not
+              currently include Study Scholarships for all disciplines for GIS.
             </p>
           ) : null}
 

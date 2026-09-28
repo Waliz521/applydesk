@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CatalogueSelect } from '@/components/CatalogueSelect'
+import {
+  applyCycleFilters,
+  CycleFilterBar,
+  DEFAULT_CYCLE_FILTERS,
+  monthsFromRows,
+  type CycleFilters,
+} from '@/components/CycleFilterBar'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
+import { isEposProgramme } from '@/lib/funding'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
@@ -26,6 +34,8 @@ export function DashboardPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [seeding, setSeeding] = useState(false)
+  const [openFilters, setOpenFilters] = useState<CycleFilters>(DEFAULT_CYCLE_FILTERS)
+  const [upcomingFilters, setUpcomingFilters] = useState<CycleFilters>(DEFAULT_CYCLE_FILTERS)
   const hasPoland = catalogues.some((c) => c.slug === 'poland')
   const hasAustria = catalogues.some((c) => c.slug === 'austria')
   const hasNetherlands = catalogues.some((c) => c.slug === 'netherlands')
@@ -52,6 +62,8 @@ export function DashboardPage() {
         ? programme.catalogue[0]
         : programme.catalogue
       if (!catalogue) return []
+      // Skip DAAD EPOS (2 yr work) — not eligible for the scholarship track
+      if (isEposProgramme(programme, catalogue.name)) return []
       return [
         {
           ...cycle,
@@ -153,18 +165,25 @@ export function DashboardPage() {
       const cartography = await seedCartographyProgramme({ userId: user.id })
       if (cancelled) return
       if (cartography.error) {
-        setSeeding(false)
-        setError(cartography.error)
-        return
+        // Non-admins cannot insert catalogue rows — ignore RLS noise on live.
+        if (profile?.is_admin) {
+          setSeeding(false)
+          setError(cartography.error)
+          return
+        }
+      } else if (cartography.added) {
+        notes.push('Cartography M.Sc. added to Erasmus Mundus.')
       }
-      if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
-      // Quietly refresh confirmed EMJM deadlines (GEM / CDE / GroundwatCH / Cartography)
-      const emjm = await seedErasmusEmjmUpdates({ userId: user.id })
-      if (cancelled) return
-      if (emjm.error) {
-        setSeeding(false)
-        setError(emjm.error)
-        return
+      // EMJM date refresh writes programme_cycles — only admins pass RLS.
+      if (profile?.is_admin) {
+        const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true })
+        if (cancelled) return
+        if (emjm.error) {
+          setSeeding(false)
+          setError(emjm.error)
+          return
+        }
+        if (emjm.updated) notes.push(`EMJM dates refreshed (${emjm.count} programmes).`)
       }
       setSeeding(false)
       if (notes.length === 0) return
@@ -264,6 +283,19 @@ export function DashboardPage() {
   const watch = useMemo(() => visibleRows.filter((r) => r.open_state === 'unknown'), [visibleRows])
   const selectedCatalogue = catalogues.find((c) => c.id === catalogueId)
 
+  const openMonths = useMemo(() => monthsFromRows(openRows), [openRows])
+  const upcomingMonths = useMemo(() => monthsFromRows(upcoming), [upcoming])
+  const filteredOpen = useMemo(() => applyCycleFilters(openRows, openFilters), [openRows, openFilters])
+  const filteredUpcoming = useMemo(
+    () => applyCycleFilters(upcoming, upcomingFilters),
+    [upcoming, upcomingFilters],
+  )
+
+  useEffect(() => {
+    setOpenFilters(DEFAULT_CYCLE_FILTERS)
+    setUpcomingFilters(DEFAULT_CYCLE_FILTERS)
+  }, [catalogueId])
+
   async function track(row: OpenRow) {
     if (!user) return
     setBusyId(row.programme.id)
@@ -296,8 +328,9 @@ export function DashboardPage() {
           </p>
           {selectedCatalogue?.slug === 'daad' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Orange <span className="font-medium">EPOS · 2 yr work</span> is a named development course (apply to the university).
-              Teal <span className="font-medium">Not EPOS</span> is not on that list (e.g. EAGLE) — no two-year rule, and Pakistan’s DAAD master’s list does not currently include Study Scholarships for all disciplines.
+              EPOS courses (2 years’ work after bachelor) are hidden — you are not eligible for that scholarship track.
+              What remains is teal <span className="font-medium">Not EPOS</span> (e.g. EAGLE): no two-year rule; Pakistan’s DAAD master’s list
+              does not currently include Study Scholarships for all disciplines for GIS.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'poland' ? (
@@ -363,8 +396,8 @@ export function DashboardPage() {
       ) : null}
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Open now" value={loading ? '…' : String(openRows.length)} tone="emerald" />
-        <Stat label="Opening soon" value={loading ? '…' : String(upcoming.length)} tone="amber" />
+        <Stat label="Open now" value={loading ? '…' : String(filteredOpen.length)} tone="emerald" />
+        <Stat label="Opening soon" value={loading ? '…' : String(filteredUpcoming.length)} tone="amber" />
         <Stat
           label="In your tracker"
           value={loading ? '…' : String(appCount)}
@@ -380,23 +413,39 @@ export function DashboardPage() {
         title="Open now"
         empty={
           catalogueId === 'all'
-            ? 'Nothing with an open window in the catalogue yet.'
-            : 'Nothing open in this catalogue right now.'
+            ? 'Nothing with an open window matches these filters.'
+            : 'Nothing open in this catalogue matches these filters.'
         }
         loading={loading}
-        rows={openRows}
+        rows={filteredOpen}
         tracked={tracked}
         busyId={busyId}
         onTrack={track}
+        filters={
+          <CycleFilterBar
+            filters={openFilters}
+            months={openMonths}
+            onChange={setOpenFilters}
+            onReset={() => setOpenFilters(DEFAULT_CYCLE_FILTERS)}
+          />
+        }
       />
       <CycleSection
         title="Opening soon"
-        empty="No upcoming open dates stored yet."
+        empty="No upcoming open dates match these filters."
         loading={false}
-        rows={upcoming}
+        rows={filteredUpcoming}
         tracked={tracked}
         busyId={busyId}
         onTrack={track}
+        filters={
+          <CycleFilterBar
+            filters={upcomingFilters}
+            months={upcomingMonths}
+            onChange={setUpcomingFilters}
+            onReset={() => setUpcomingFilters(DEFAULT_CYCLE_FILTERS)}
+          />
+        }
       />
       <CycleSection
         title="Watch — dates TBA"
@@ -419,6 +468,7 @@ function CycleSection({
   tracked,
   busyId,
   onTrack,
+  filters,
 }: {
   title: string
   empty: string
@@ -427,12 +477,14 @@ function CycleSection({
   tracked: Set<string>
   busyId: string | null
   onTrack: (row: OpenRow) => void
+  filters?: React.ReactNode
 }) {
   return (
     <section>
       <h2 className="mb-3 text-lg font-semibold">
         {title} <span className="text-sm font-normal text-muted">({rows.length})</span>
       </h2>
+      {filters}
       {loading ? (
         <p className="text-sm text-muted">Loading…</p>
       ) : rows.length === 0 ? (

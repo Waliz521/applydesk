@@ -152,8 +152,19 @@ export async function upsertSeedProgrammes(opts: {
         target_start: rec.extra.target_start,
       },
     }
-    if (cycles && cycles.length > 0) {
-      const { error } = await supabase.from('programme_cycles').update(cyclePayload).eq('id', cycles[0].id)
+    let cycleId = cycles?.[0]?.id as string | undefined
+    if (!cycleId) {
+      // Label may have changed (e.g. "2027 intake" → "2027–2029 intake"). Update the
+      // existing cycle instead of inserting — inserts fail RLS for non-admin users.
+      const { data: existing } = await supabase
+        .from('programme_cycles')
+        .select('id')
+        .eq('programme_id', programmeId)
+        .limit(1)
+      cycleId = existing?.[0]?.id as string | undefined
+    }
+    if (cycleId) {
+      const { error } = await supabase.from('programme_cycles').update(cyclePayload).eq('id', cycleId)
       if (error) return { error: error.message, count }
     } else {
       const { error } = await supabase.from('programme_cycles').insert(cyclePayload)
