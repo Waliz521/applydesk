@@ -184,6 +184,26 @@ export function DashboardPage() {
           return
         }
         if (emjm.updated) notes.push(`EMJM dates refreshed (${emjm.count} programmes).`)
+        const nl = await seedNetherlandsCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (nl.error) {
+          setSeeding(false)
+          setError(nl.error)
+          return
+        }
+        const hk = await seedHongKongCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (hk.error) {
+          setSeeding(false)
+          setError(hk.error)
+          return
+        }
       }
       setSeeding(false)
       if (notes.length === 0) return

@@ -23,21 +23,21 @@ const PROGRAMMES: SeedRec[] = [
     scholarships: true,
     funding_scheme: 'partial',
     extra: {
-      apply: 'YES — target Sep 2027 after supervisor agreement. May 2027 intake closes 31 Jan 2027.',
-      target_start: '1 September 2027 (recommended)',
-      opens_text: 'PolyU RPG for Sep 2027: expected 1 Sep 2026 – 31 May 2027. LSGS follows the dept RPG page.',
+      apply: 'Jan 2027 LSGI deadline was 30 Sep 2026 — closed. May 2027 still open until 31 Jan 2027. Sep 2027 RPG until 31 May 2027. HKPFS for Sep 2027 is OPEN until 1 Dec 2026.',
+      target_start: '1 September 2027 (recommended). May 2027 if a supervisor is already committed.',
+      opens_text: 'Sep 2027 RPG: 1 Sep 2026 – 31 May 2027. HKPFS initial application OPEN since 1 Sep 2026.',
       deadline_text:
-        'EXPECTED 31 May 2027 (Sep 2027 LSGS). HKPFS nomination deadline EXPECTED 1 Dec 2026 — same application cycle.',
+        'HKPFS initial application CONFIRMED 1 Dec 2026, 12:00 noon HKT (RGC). PolyU full application 1 Dec 2026, 23:59 HKT. May 2027 LSGI: 31 Jan 2027. Jan 2027 closed 30 Sep 2026.',
       tuition_text: 'RPG with studentship: tuition usually waived or covered by award. Without funding, RPG fees are not a taught-MSc-style HK$250k path — do not apply without a supervisor studentship plan.',
       self_funded_text:
         'Treat as funded-only. IPFS / dept quota / HKPFS require supervisor support — not a pay-your-own-tuition taught master.',
       scholarships_text:
-        'HKPFS (PhD, highly competitive). PolyU IPFS auto-consider for eligible international PhD. Dept grants via supervisor. Jan 2027 intake window closes ~30 Sep 2026 — only if supervisor already committed.',
+        'HKPFS OPEN (1 Sep–1 Dec 2026). PolyU package 2027/28: stipend HK$344,400/year, tuition waiver, conference HK$14,400/year, cash award HK$40,000 year 1 then HK$20,000/year. IPFS auto-consider for eligible international PhD. Jan 2027 intake closed 30 Sep 2026.',
       prepare:
-        'BS geospatial/GIS or related. IELTS/TOEFL per PolyU GS. Research proposal + CV for supervisor email before portal submission.',
+        'BS geospatial/GIS or related. IELTS/TOEFL per PolyU GS. Research proposal + CV for supervisor email before portal submission. HKPFS: initial RGC form first, then PolyU quoting the reference number.',
       watch_outs:
-        'GS Ambassador Programme is for current students only. Do not apply to RPG without contacting LSGS faculty first.',
-      last_checked: '22 Sep 2026',
+        'GS Ambassador Programme is for current students only. Do not apply to RPG without contacting LSGS faculty first. Jan 2027 window has closed.',
+      last_checked: '1 Oct 2026',
     },
   },
   {
@@ -65,14 +65,14 @@ const PROGRAMMES: SeedRec[] = [
       apply: 'YES — research route only if you need stipend + fee waiver.',
       target_start: 'September 2027 (align with HKPFS)',
       opens_text: 'HKU Grad School main round typically opens Sep for the following academic year — confirm gradsch.hku.hk.',
-      deadline_text: 'HKPFS: EXPECTED 1 Dec 2026. Department main round often Dec–Jan — confirm Geography + Grad School pages.',
+      deadline_text: 'HKPFS CONFIRMED: initial application 1 Dec 2026, 12:00 noon HKT. HKU full application same day 23:59 HKT (RGC apply page, 1 Oct 2026).',
       tuition_text: 'With PGS/HKPFS: stipend + fee waiver. Without award, research programmes are not affordable on self-pay for most international students.',
       self_funded_text: 'Same as funded-only planning — supervisor quota and PGS/HKPFS are the realistic paths.',
       scholarships_text:
-        'HKPFS (~HK$28,700/month + travel + waiver). PGS stipend (lower, supervisor nomination). Pakistan eligible for university postgraduate schemes.',
-      prepare: 'Email 1–2 faculty with tailored proposal. BS GIS + thesis/publications help. IELTS per Grad School minimum.',
+        'HKPFS OPEN until 1 Dec 2026 (initial noon HKT). Stipend about HK$344,400/year plus travel and fee waiver (RGC / university packages differ). PGS is the backup if not shortlisted. Pakistan eligible.',
+      prepare: 'Email 1–2 faculty with tailored proposal. BS GIS + thesis/publications help. IELTS per Grad School minimum. Get the HKPFS reference number before the university form.',
       watch_outs: 'MSc(GeoDS) is a separate taught programme (~HK$250k) — listed separately as self-funded.',
-      last_checked: '22 Sep 2026',
+      last_checked: '1 Oct 2026',
     },
   },
   {
@@ -135,13 +135,13 @@ const PROGRAMMES: SeedRec[] = [
       target_start: 'Fellowship tied to Sep 2027 PhD admission',
       opens_text: 'EXPECTED 1 Sep 2026 — same window as university HKPFS nomination.',
       deadline_text: 'EXPECTED 1 Dec 2026 for 2027/28 intake — confirm PolyU GS + HKU Grad School.',
-      tuition_text: 'Fee waiver component plus stipend ~HK$28,700/month (figures on Grad School pages; adjust for inflation yearly).',
+      tuition_text: 'Fee waiver plus stipend. PolyU quotes HK$344,400/year for 2027/28 HKPFS awardees (~HK$28,700/month). Results around May 2027.',
       self_funded_text: 'N/A — this row is the fellowship only.',
       scholarships_text:
         'Presidential/ university top-ups may apply for awardees. MPhil candidates are not HKPFS-eligible — PhD only.',
       prepare: 'Strong proposal, grades, research output. Supervisor must support nomination in the RPG form.',
       watch_outs: 'Extremely competitive. Have PGS / dept backup if not shortlisted.',
-      last_checked: '22 Sep 2026',
+      last_checked: '1 Oct 2026',
     },
   },
 ]
@@ -163,6 +163,6 @@ export async function seedHongKongCatalogue(opts: {
   return upsertSeedProgrammes({
     catalogueId,
     programmes: PROGRAMMES,
-    source: 'HKU Geography / Grad School, PolyU LSGS & GS pages, 22 Sep 2026',
+    source: 'HKU Geography / Grad School, PolyU LSGS & GS, RGC HKPFS apply page, 1 Oct 2026',
   })
 }

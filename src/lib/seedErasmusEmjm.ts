@@ -25,9 +25,9 @@ const PROGRAMMES: SeedRec[] = [
     funding_scheme: 'emjm',
     extra: {
       apply:
-        'YES — portal opens 1 Oct 2026 for the 2027–2029 intake. 2026–2028 portal is closed. One track only.',
+        'OPEN NOW (1 Oct 2026) for the 2027–2029 intake. One track only. Complete file by 15 Jan 2027 is auto-considered for EMJM.',
       target_start: 'September 2027',
-      opens_text: 'Confirmed: DreamApply opens 1 October 2026 (00:00 CET).',
+      opens_text: 'OPEN: DreamApply opened 1 October 2026. Rechecked gem-msc.eu/apply-to-gem on 1 Oct 2026 — deadline still 15 Jan 2027.',
       deadline_text:
         'Confirmed: 15 January 2027, 23:59 CET. Complete applications by this date are automatically considered for EMJM — no separate scholarship form.',
       tuition_text:
@@ -40,7 +40,7 @@ const PROGRAMMES: SeedRec[] = [
         'First/2nd upper BSc, transcript, IELTS/TOEFL before deadline, passport, official GEM CV template (max 2 pages), financial plan in euros. English test after deadline not accepted.',
       watch_outs:
         'Max 8 students per track. Certified graduation docs by 31 July 2027. Interview invitations normally in February.',
-      last_checked: '28 Sep 2026',
+      last_checked: '1 Oct 2026',
     },
   },
   {
@@ -81,7 +81,7 @@ const PROGRAMMES: SeedRec[] = [
         'Geospatial or related bachelor, English proof, CV, motivation, refs. EO/GI knowledge, geospatial work experience, and programming strengthen the portfolio.',
       watch_outs:
         'Do not confuse with PLUS MSc Applied Geoinformatics (self-funded Salzburg degree). Different portal and deadlines.',
-      last_checked: '28 Sep 2026',
+      last_checked: '1 Oct 2026',
     },
   },
   {
@@ -107,9 +107,9 @@ const PROGRAMMES: SeedRec[] = [
     funding_scheme: 'emjm',
     extra: {
       apply:
-        'YES — application for admission + EMJM opens 1 October 2026 for the Sep 2027 start. Select Erasmus Mundus scholarship in the funding question on the form.',
+        'OPEN NOW (1 Oct 2026) for Sep 2027. Select Erasmus Mundus scholarship in the funding question. Pakistan (Partner Country) deadline 3 Jan 2027.',
       target_start: 'September 2027',
-      opens_text: 'Confirmed on groundwatermaster.eu: opens 1 October 2026.',
+      opens_text: 'Stated open date 1 October 2026. Deadlines on how-to-apply still 3 Jan 2027 (Partner) / 7 Feb 2027 (Programme). Rechecked 1 Oct 2026.',
       deadline_text:
         'Confirmed: Partner Countries (Pakistan) 3 January 2027, 23:59 CET. Programme Countries 7 February 2027. English test may upload by 1 Feb 2027 if the rest of the file was in by 3 Jan.',
       tuition_text:
@@ -121,7 +121,7 @@ const PROGRAMMES: SeedRec[] = [
       prepare: 'BSc in relevant field, English test, CV, motivation, refs via IHE Delft / programme portal.',
       watch_outs:
         'Partner-country deadline is earlier (3 Jan) than GEM (15 Jan). Do not miss it if this is a primary target.',
-      last_checked: '28 Sep 2026',
+      last_checked: '1 Oct 2026',
     },
   },
   {
@@ -179,7 +179,7 @@ export async function seedErasmusEmjmUpdates(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM / CDE / GroundwatCH / Cartography sites, 28 Sep 2026',
+    source: 'Official GEM / CDE / GroundwatCH / Cartography sites, 1 Oct 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }
