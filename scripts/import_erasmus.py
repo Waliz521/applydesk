@@ -44,7 +44,7 @@ DATES = {
         "scholarships": True,
     },
     "WAVES": {
-        "opens": "2026-10-01",
+        "opens": None,  # call not published; do not invent 1 Oct
         "scholarship": None,
         "starts": "2027-09-01",
         "status": "tba",
@@ -59,9 +59,10 @@ DATES = {
     },
     "FloodRISK": {
         "opens": "2026-10-01",
-        "scholarship": "2027-01-05",
+        "scholarship": "2027-01-03",  # Partner Countries; Programme Countries 7 Feb 2027
+        "self_funded": "2027-04-30",
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "Cartography": {

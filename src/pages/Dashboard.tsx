@@ -14,6 +14,7 @@ import { isEposProgramme } from '@/lib/funding'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
+import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
@@ -40,6 +41,7 @@ export function DashboardPage() {
   const hasAustria = catalogues.some((c) => c.slug === 'austria')
   const hasNetherlands = catalogues.some((c) => c.slug === 'netherlands')
   const hasHongKong = catalogues.some((c) => c.slug === 'hong-kong')
+  const hasFrance = catalogues.some((c) => c.slug === 'france')
 
   async function loadDashboard() {
     const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
@@ -103,13 +105,15 @@ export function DashboardPage() {
       const { data: sentinels } = await supabase
         .from('programmes')
         .select('slug')
-        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg'])
+        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg', 'uge-geomatique-m1', 'paris-cite-frs'])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
       const needAustria = !cats.some((c) => c.slug === 'austria') || !slugs.has('oead-busek')
       const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
       const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
-      if (needPoland || needAustria || needNetherlands || needHongKong) setSeeding(true)
+      const needFrance =
+        !cats.some((c) => c.slug === 'france') || !slugs.has('uge-geomatique-m1') || !slugs.has('paris-cite-frs')
+      if (needPoland || needAustria || needNetherlands || needHongKong || needFrance) setSeeding(true)
       if (needPoland) {
         const result = await seedPolandCatalogue({
           userId: user.id,
@@ -162,6 +166,19 @@ export function DashboardPage() {
         }
         notes.push(`Hong Kong catalogue added (${result.count} programmes).`)
       }
+      if (needFrance) {
+        const result = await seedFranceCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`France catalogue added (${result.count} programmes).`)
+      }
       const cartography = await seedCartographyProgramme({ userId: user.id })
       if (cancelled) return
       if (cartography.error) {
@@ -202,6 +219,16 @@ export function DashboardPage() {
         if (hk.error) {
           setSeeding(false)
           setError(hk.error)
+          return
+        }
+        const fr = await seedFranceCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (fr.error) {
+          setSeeding(false)
+          setError(fr.error)
           return
         }
       }
@@ -269,6 +296,18 @@ export function DashboardPage() {
       }
       notes.push(`Hong Kong catalogue added (${result.count} programmes).`)
     }
+    if (!hasFrance) {
+      const result = await seedFranceCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`France catalogue added (${result.count} programmes).`)
+    }
     const cartography = await seedCartographyProgramme({ userId: user.id, force: true })
     if (cartography.error) {
       setSeeding(false)
@@ -289,7 +328,9 @@ export function DashboardPage() {
     const austria = cats.find((c) => c.slug === 'austria')
     const netherlands = cats.find((c) => c.slug === 'netherlands')
     const hongKong = cats.find((c) => c.slug === 'hong-kong')
-    if (!hasHongKong && hongKong) setCatalogueId(hongKong.id)
+    const france = cats.find((c) => c.slug === 'france')
+    if (!hasFrance && france) setCatalogueId(france.id)
+    else if (!hasHongKong && hongKong) setCatalogueId(hongKong.id)
     else if (!hasNetherlands && netherlands) setCatalogueId(netherlands.id)
     else if (!hasAustria && austria) setCatalogueId(austria.id)
   }
@@ -374,6 +415,14 @@ export function DashboardPage() {
               GEM sits in Erasmus Mundus.
             </p>
           ) : null}
+          {selectedCatalogue?.slug === 'france' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> is a French public Master Géomatique (M1), chosen inside Études en France.
+              File deadline <span className="font-medium">18 November 2026</span>. The Géomatique degrees are French-taught. Paris Cité FRS is French in year 1 and English in year 2. Green{' '}
+              <span className="font-medium">Full university grant</span> is France Excellence Eiffel — the university nominates you by{' '}
+              <span className="font-medium">6 January 2027</span>. You cannot apply to Eiffel yourself. Public non-EU tuition is €3,950/year unless waived.
+            </p>
+          ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (
             <p className="mt-2 text-sm text-slate-600">
               Violet <span className="font-medium">Partial</span> is MPhil/PhD with PGS, IPFS, or dept studentship (supervisor-first). Green{' '}
@@ -385,21 +434,33 @@ export function DashboardPage() {
             <p className="mt-2 text-sm text-slate-600">
               Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
               Pakistan is eligible. <span className="font-medium">GEM</span> opens 1 Oct 2026 (deadline 15 Jan 2027).{' '}
-              <span className="font-medium">GroundwatCH</span> Partner deadline 3 Jan 2027. <span className="font-medium">CDE</span> worldwide call Nov 2026–mid Jan 2027.{' '}
-              Grey <span className="font-medium">Self-funded</span> includes Cartography (no EMJM after 2025).
+              <span className="font-medium">GroundwatCH</span> and <span className="font-medium">FloodRISK</span> Partner deadline 3 Jan 2027 (confirmed).{' '}
+              <span className="font-medium">CDE</span> worldwide call Nov 2026–mid Jan 2027 (exact day not published).{' '}
+              <span className="font-medium">WAVES</span> has no call yet. Grey <span className="font-medium">Self-funded</span> includes Cartography (no EMJM after 2025).
             </p>
           ) : null}
         </div>
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
 
-      {(!hasPoland || !hasAustria || !hasNetherlands || !hasHongKong) && !loading ? (
+      {(!hasPoland || !hasAustria || !hasNetherlands || !hasHongKong || !hasFrance) && !loading ? (
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            {[!hasPoland && 'Poland', !hasAustria && 'Austria', !hasNetherlands && 'Netherlands', !hasHongKong && 'Hong Kong']
+            {[
+              !hasPoland && 'Poland',
+              !hasAustria && 'Austria',
+              !hasNetherlands && 'Netherlands',
+              !hasHongKong && 'Hong Kong',
+              !hasFrance && 'France',
+            ]
               .filter(Boolean)
               .join(' and ')}{' '}
-            {(!hasPoland ? 1 : 0) + (!hasAustria ? 1 : 0) + (!hasNetherlands ? 1 : 0) + (!hasHongKong ? 1 : 0) > 1
+            {(!hasPoland ? 1 : 0) +
+              (!hasAustria ? 1 : 0) +
+              (!hasNetherlands ? 1 : 0) +
+              (!hasHongKong ? 1 : 0) +
+              (!hasFrance ? 1 : 0) >
+            1
               ? 'are not in this dropdown yet.'
               : 'is not in this dropdown yet.'}{' '}
             They have to be written into the database once (deploy only updates the app).

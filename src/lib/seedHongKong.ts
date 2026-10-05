@@ -19,7 +19,7 @@ const PROGRAMMES: SeedRec[] = [
     scholarship: '2026-12-01',
     self_funded: '2027-05-31',
     starts: '2027-09-01',
-    date_status: 'expected',
+    date_status: 'confirmed',
     scholarships: true,
     funding_scheme: 'partial',
     extra: {
@@ -58,7 +58,7 @@ const PROGRAMMES: SeedRec[] = [
     scholarship: '2026-12-01',
     self_funded: '2027-05-31',
     starts: '2027-09-01',
-    date_status: 'expected',
+    date_status: 'confirmed',
     scholarships: true,
     funding_scheme: 'partial',
     extra: {
@@ -127,14 +127,14 @@ const PROGRAMMES: SeedRec[] = [
     scholarship: '2026-12-01',
     self_funded: null,
     starts: '2027-09-01',
-    date_status: 'expected',
+    date_status: 'confirmed',
     scholarships: true,
     funding_scheme: 'full',
     extra: {
       apply: 'YES — if pursuing PhD at HKU or PolyU with supervisor support.',
       target_start: 'Fellowship tied to Sep 2027 PhD admission',
-      opens_text: 'EXPECTED 1 Sep 2026 — same window as university HKPFS nomination.',
-      deadline_text: 'EXPECTED 1 Dec 2026 for 2027/28 intake — confirm PolyU GS + HKU Grad School.',
+      opens_text: 'OPEN since 1 September 2026. Initial application deadline confirmed.',
+      deadline_text: 'CONFIRMED 1 December 2026, 12:00 noon HKT (RGC). PolyU and HKU full applications the same day, 23:59 HKT.',
       tuition_text: 'Fee waiver plus stipend. PolyU quotes HK$344,400/year for 2027/28 HKPFS awardees (~HK$28,700/month). Results around May 2027.',
       self_funded_text: 'N/A — this row is the fellowship only.',
       scholarships_text:

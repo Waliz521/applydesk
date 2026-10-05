@@ -9,6 +9,7 @@ import { addProgrammeToTracker } from '@/lib/tracker'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
+import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
@@ -92,6 +93,7 @@ export function CataloguePage() {
           active?.slug === 'austria' ||
           active?.slug === 'netherlands' ||
           active?.slug === 'hong-kong' ||
+          active?.slug === 'france' ||
           active?.slug === 'erasmus-mundus') &&
         funding !== 'all' &&
         fundingScheme(p, active?.name) !== funding
@@ -228,6 +230,30 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
+  async function loadFranceList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedFranceCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`France list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'france')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
   async function loadCartography() {
     setSeeding(true)
     setError(null)
@@ -287,7 +313,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, the Netherlands, and Hong Kong mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, the Netherlands, Hong Kong, and France mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -347,6 +373,16 @@ export function CataloguePage() {
             {seeding ? 'Adding Hong Kong…' : 'Add Hong Kong catalogue'}
           </button>
         ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'france') ? (
+          <button
+            type="button"
+            onClick={() => void loadFranceList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding France…' : 'Add France catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -398,6 +434,16 @@ export function CataloguePage() {
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
                       {seeding ? 'Updating…' : 'Load / refresh Hong Kong list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'france' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadFranceList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh France list'}
                     </button>
                   ) : null}
                   {active.slug === 'erasmus-mundus' ? (
@@ -525,6 +571,30 @@ export function CataloguePage() {
                     ['self_funded', 'Self-funded (tuition)'],
                     ['partial', 'Partial scholarship'],
                     ['full', 'Full university grant'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'france' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All France'],
+                    ['self_funded', 'Géomatique M1 (tuition)'],
+                    ['full', 'Eiffel nomination'],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -691,6 +761,14 @@ export function CataloguePage() {
               Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. Violet <FundingBadge scheme="partial" /> NL
               Scholarship, ITC Excellence, Wageningen Excellence. Green <FundingBadge scheme="full" /> Eric Bleumink (Groningen only).
               Orange Knowledge is closed. GEM is under Erasmus Mundus.
+            </p>
+          ) : null}
+
+          {active.slug === 'france' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> is a master’s inside Études en France. Deadline 18 November 2026. Géomatique degrees are French-taught. Paris Cité FRS is French in year 1 and English in year 2.
+              Public non-EU tuition is €3,950/year unless waived. Green <FundingBadge scheme="full" /> is France Excellence Eiffel — the university
+              nominates you by 6 January 2027. You cannot apply to Eiffel yourself.
             </p>
           ) : null}
 

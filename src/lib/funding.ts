@@ -26,6 +26,7 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     cat.includes('austria') ||
     cat.includes('netherlands') ||
     cat.includes('hong kong') ||
+    cat.includes('france') ||
     cat.includes('self-funded')
   ) {
     if (slug.includes('nawa') || acronym === 'nawa') return 'nawa'
@@ -40,7 +41,7 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     ) {
       return 'partial'
     }
-    if (slug.includes('bleumink')) return 'full'
+    if (slug.includes('bleumink') || slug.includes('eiffel')) return 'full'
     if (slug.includes('geods')) return 'self_funded'
     if (slug.includes('rpg') || slug.includes('geog-rpg') || slug.includes('lsgs')) return 'partial'
     return 'self_funded'
@@ -112,7 +113,7 @@ export function fundingDetail(scheme: FundingScheme): string | null {
     case 'emjm':
       return 'Erasmus Mundus Joint Master (EMJM). Apply on each programme website (no single EU form). Pakistan is a Partner Country and is eligible. Typical award: €1,400/month for up to 24 months (€33,600) plus tuition/participation covered; travel/installation rules vary by consortium. No two-year work rule. Geographic caps apply (usually ≤10% of awards to one nationality across editions). Cartography has no EMJM after 2025 — self-funded only. Confirm visa proof-of-funds with the host that issues the first visa.'
     case 'self_funded':
-      return 'You pay tuition (amount on the card). This is not a full Erasmus Mundus or DAAD EPOS award. Visa proof-of-funds still applies: Austria and Poland want bank evidence and often first-year tuition shown; the Netherlands invoices first-year tuition and living before IND; a German first semester usually means a blocked account.'
+      return 'You pay tuition (amount on the card). This is not a full Erasmus Mundus or DAAD EPOS award. Visa proof-of-funds still applies: Austria and Poland want bank evidence and often first-year tuition shown; the Netherlands invoices first-year tuition and living before IND; a German first semester usually means a blocked account. A French public master’s is the non-EU rate on the card unless that university waives it; the visa interview still wants living-cost proof unless a full award such as Eiffel is already in the offer.'
     case 'nawa':
       return 'Banach NAWA is a Polish government master’s scholarship, applied on the NAWA portal, separate from university admission. Pakistan was not on the 2026/27 country list (call closed 8 May 2026). Watch the next spring announcement before treating it as open to you.'
     case 'oead':
@@ -120,7 +121,7 @@ export function fundingDetail(scheme: FundingScheme): string | null {
     case 'partial':
       return 'Partial award only. It does not replace tuition + living the way Erasmus Mundus or DAAD EPOS can. Read the card for the remaining amount you must still pay, and for visa proof-of-funds. Apply to the university (or the named portal) after or with admission — not as a standalone government fellowship unless the card says so.'
     case 'full':
-      return 'University-funded full master’s (tuition + living). Not Erasmus Mundus and not DAAD. There is usually no separate scholarship form — complete the master’s admission by the date on the card and wait to be nominated. Places are few.'
+      return 'Full award covering tuition and living when you are selected. Not Erasmus Mundus and not DAAD. You do not file this with the funder yourself — the university nominates you. Read the card: some nominations come only after admission. France Excellence Eiffel is earlier — the university must send it by 6 January 2027, before Campus France results in April.'
     default:
       return null
   }

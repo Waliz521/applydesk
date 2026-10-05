@@ -13,6 +13,8 @@ export type SeedRec = {
   website: string
   apply_url: string
   fit_notes: string
+  /** Defaults to English. Set this for French-taught degrees. */
+  language?: string
   cycle_label: string
   opens: string | null
   scholarship: string | null
@@ -113,7 +115,7 @@ export async function upsertSeedProgrammes(opts: {
       consortium: rec.coordinator,
       countries: rec.countries,
       duration: rec.duration,
-      language: 'English',
+      language: rec.language ?? 'English',
       website: rec.website,
       apply_url: rec.apply_url,
       degree_level: 'masters',
