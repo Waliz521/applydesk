@@ -593,7 +593,7 @@ export function CataloguePage() {
                 {(
                   [
                     ['all', 'All France'],
-                    ['self_funded', 'Géomatique M1 (tuition)'],
+                    ['self_funded', 'Master’s (tuition)'],
                     ['full', 'Eiffel nomination'],
                   ] as const
                 ).map(([id, label]) => (
@@ -766,7 +766,7 @@ export function CataloguePage() {
 
           {active.slug === 'france' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> is a master’s inside Études en France. Deadline 18 November 2026. Géomatique degrees are French-taught. Paris Cité FRS is French in year 1 and English in year 2.
+              Grey <FundingBadge scheme="self_funded" /> is an English-taught master’s that accepts IELTS and does not ask for a French certificate. Grenoble IMAGERS closes 15 April 2027, Nantes EPS closes 15 March 2027, and Aix-Marseille IMG is inside Études en France (18 November 2026).
               Public non-EU tuition is €3,950/year unless waived. Green <FundingBadge scheme="full" /> is France Excellence Eiffel — the university
               nominates you by 6 January 2027. You cannot apply to Eiffel yourself.
             </p>

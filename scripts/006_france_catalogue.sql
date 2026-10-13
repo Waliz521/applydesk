@@ -8,7 +8,7 @@ from (
     null::uuid,
     'france',
     'France',
-    'French public GIS and remote-sensing master’s for a September 2027 start, chosen inside Études en France. File deadline 18 November 2026. Géomatique degrees are French-taught. Paris Cité Fundamentals of Remote Sensing is French in year 1 and English in year 2. Eiffel is a university nomination due 6 January 2027. Public non-EU tuition is €3,950/year unless waived.',
+    'English-taught French master’s that accept IELTS and do not ask for a French certificate: Grenoble IMAGERS (15 April 2027), Nantes Earth and Planetary Sciences (15 March 2027), and Aix-Marseille IMG (Études en France, 18 November 2026). Their stated bachelor subjects are not a GIS degree. Eiffel nomination is 6 January 2027.',
     true
   )
 ) as v(owner_user_id, slug, name, description, is_system)

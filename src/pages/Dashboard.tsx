@@ -105,14 +105,13 @@ export function DashboardPage() {
       const { data: sentinels } = await supabase
         .from('programmes')
         .select('slug')
-        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg', 'uge-geomatique-m1', 'paris-cite-frs'])
+        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg', 'grenoble-imagers'])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
       const needAustria = !cats.some((c) => c.slug === 'austria') || !slugs.has('oead-busek')
       const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
       const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
-      const needFrance =
-        !cats.some((c) => c.slug === 'france') || !slugs.has('uge-geomatique-m1') || !slugs.has('paris-cite-frs')
+      const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
       if (needPoland || needAustria || needNetherlands || needHongKong || needFrance) setSeeding(true)
       if (needPoland) {
         const result = await seedPolandCatalogue({
@@ -417,8 +416,7 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'france' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is a French public Master Géomatique (M1), chosen inside Études en France.
-              File deadline <span className="font-medium">18 November 2026</span>. The Géomatique degrees are French-taught. Paris Cité FRS is French in year 1 and English in year 2. Green{' '}
+              Dark <span className="font-medium">Self-funded · tuition</span> is an English-taught master’s that accepts IELTS and does not ask for a French certificate: Grenoble IMAGERS (15 April 2027), Nantes Earth and Planetary Sciences (15 March 2027), or Aix-Marseille IMG (Études en France, 18 November 2026). Green{' '}
               <span className="font-medium">Full university grant</span> is France Excellence Eiffel — the university nominates you by{' '}
               <span className="font-medium">6 January 2027</span>. You cannot apply to Eiffel yourself. Public non-EU tuition is €3,950/year unless waived.
             </p>
