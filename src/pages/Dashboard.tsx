@@ -416,9 +416,7 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'france' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is an English-taught master’s that accepts IELTS and does not ask for a French certificate: Grenoble IMAGERS (15 April 2027), Nantes Earth and Planetary Sciences (15 March 2027), or Aix-Marseille IMG (Études en France, 18 November 2026). Green{' '}
-              <span className="font-medium">Full university grant</span> is France Excellence Eiffel — the university nominates you by{' '}
-              <span className="font-medium">6 January 2027</span>. You cannot apply to Eiffel yourself. Public non-EU tuition is €3,950/year unless waived.
+              The France list is three programmes: Grenoble IMAGERS (own form until 15 April 2027, and the Études en France cart until 18 November 2026), Nantes Earth and Planetary Sciences (Nantes form), and Aix-Marseille IMG (Études en France only, 18 November 2026).
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (

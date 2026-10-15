@@ -594,7 +594,6 @@ export function CataloguePage() {
                   [
                     ['all', 'All France'],
                     ['self_funded', 'Master’s (tuition)'],
-                    ['full', 'Eiffel nomination'],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -766,9 +765,7 @@ export function CataloguePage() {
 
           {active.slug === 'france' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> is an English-taught master’s that accepts IELTS and does not ask for a French certificate. Grenoble IMAGERS closes 15 April 2027, Nantes EPS closes 15 March 2027, and Aix-Marseille IMG is inside Études en France (18 November 2026).
-              Public non-EU tuition is €3,950/year unless waived. Green <FundingBadge scheme="full" /> is France Excellence Eiffel — the university
-              nominates you by 6 January 2027. You cannot apply to Eiffel yourself.
+              The France list is the three programmes in the Études en France cart. Grenoble IMAGERS also has its own form, open until 15 April 2027. Nantes is filed on the Nantes form. Aix-Marseille IMG is filed only here, and the cart locks on 18 November 2026.
             </p>
           ) : null}
 

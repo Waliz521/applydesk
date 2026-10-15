@@ -8,7 +8,7 @@ from (
     null::uuid,
     'france',
     'France',
-    'English-taught French master’s that accept IELTS and do not ask for a French certificate: Grenoble IMAGERS (15 April 2027), Nantes Earth and Planetary Sciences (15 March 2027), and Aix-Marseille IMG (Études en France, 18 November 2026). Their stated bachelor subjects are not a GIS degree. Eiffel nomination is 6 January 2027.',
+    'Three master’s from the Études en France cart: Grenoble IMAGERS (own form to 15 April 2027, cart by 18 November 2026), Nantes Earth and Planetary Sciences (Nantes form), and Aix-Marseille IMG (Études en France only, 18 November 2026).',
     true
   )
 ) as v(owner_user_id, slug, name, description, is_system)
