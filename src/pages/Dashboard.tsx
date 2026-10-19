@@ -18,7 +18,7 @@ import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
-import { addProgrammeToTracker } from '@/lib/tracker'
+import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker'
 import { supabase } from '@/lib/supabase'
 import type { Application, Catalogue, OpenRow, Programme, ProgrammeCycle } from '@/lib/types'
 
@@ -376,6 +376,30 @@ export function DashboardPage() {
     setNotice(result.already ? `${row.programme.acronym} is already in your tracker.` : `Added ${row.programme.acronym} to tracker.`)
   }
 
+  async function untrack(row: OpenRow) {
+    if (!user) return
+    setBusyId(row.programme.id)
+    setNotice(null)
+    const result = await removeProgrammeFromTracker({
+      userId: user.id,
+      programmeId: row.programme.id,
+    })
+    setBusyId(null)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    if (result.removed) {
+      setTracked((prev) => {
+        const next = new Set(prev)
+        next.delete(row.programme.id)
+        return next
+      })
+      setAppCount((n) => Math.max(0, n - 1))
+      setNotice(`Removed ${row.programme.acronym ?? row.programme.name} from tracker.`)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -498,6 +522,7 @@ export function DashboardPage() {
         tracked={tracked}
         busyId={busyId}
         onTrack={track}
+        onUntrack={untrack}
         filters={
           <CycleFilterBar
             filters={openFilters}
@@ -515,6 +540,7 @@ export function DashboardPage() {
         tracked={tracked}
         busyId={busyId}
         onTrack={track}
+        onUntrack={untrack}
         filters={
           <CycleFilterBar
             filters={upcomingFilters}
@@ -532,6 +558,7 @@ export function DashboardPage() {
         tracked={tracked}
         busyId={busyId}
         onTrack={track}
+        onUntrack={untrack}
       />
     </div>
   )
@@ -545,6 +572,7 @@ function CycleSection({
   tracked,
   busyId,
   onTrack,
+  onUntrack,
   filters,
 }: {
   title: string
@@ -554,6 +582,7 @@ function CycleSection({
   tracked: Set<string>
   busyId: string | null
   onTrack: (row: OpenRow) => void
+  onUntrack?: (row: OpenRow) => void
   filters?: React.ReactNode
 }) {
   return (
@@ -578,6 +607,7 @@ function CycleSection({
               tracked={tracked.has(row.programme.id)}
               tracking={busyId === row.programme.id}
               onTrack={() => onTrack(row)}
+              onUntrack={onUntrack ? () => onUntrack(row) : undefined}
             />
           ))}
         </div>

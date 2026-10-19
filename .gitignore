@@ -14,12 +14,12 @@ dist-ssr
 .env.*
 !.env.example
 *.local
-legacy/Credentials.txt
 __pycache__/
 *.pyc
 .venv/
 venv/
 scholarships_export.csv
+private/
 
 # Editor directories and files
 .vscode/*

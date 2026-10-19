@@ -29,6 +29,7 @@ export function ProgrammeCard({
   catalogueName,
   openState,
   onTrack,
+  onUntrack,
   tracking,
   tracked,
 }: {
@@ -37,6 +38,7 @@ export function ProgrammeCard({
   catalogueName?: string
   openState?: string
   onTrack?: () => void
+  onUntrack?: () => void
   tracking?: boolean
   tracked?: boolean
 }) {
@@ -122,14 +124,25 @@ export function ProgrammeCard({
             </a>
           ) : null}
           {onTrack ? (
-            <button
-              type="button"
-              disabled={tracking || tracked}
-              onClick={onTrack}
-              className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-100 disabled:text-emerald-800"
-            >
-              {tracked ? 'In tracker' : tracking ? 'Adding…' : 'Add to tracker'}
-            </button>
+            tracked && onUntrack ? (
+              <button
+                type="button"
+                disabled={tracking}
+                onClick={onUntrack}
+                className="shrink-0 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+              >
+                {tracking ? 'Removing…' : 'Remove from tracker'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={tracking || tracked}
+                onClick={onTrack}
+                className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-100 disabled:text-emerald-800"
+              >
+                {tracked ? 'In tracker' : tracking ? 'Adding…' : 'Add to tracker'}
+              </button>
+            )
           ) : (
             <Link to="/catalogue" className="shrink-0 text-sm font-medium text-sky hover:underline">
               Open in catalogue

@@ -58,3 +58,23 @@ export async function addProgrammeToTracker(input: {
   })
   return { error: error?.message ?? null, already: false }
 }
+
+export async function removeProgrammeFromTracker(input: {
+  userId: string
+  programmeId: string
+}): Promise<{ error: string | null; removed: boolean }> {
+  const { data, error: selectError } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('user_id', input.userId)
+    .eq('programme_id', input.programmeId)
+  if (selectError) return { error: selectError.message, removed: false }
+  if (!data?.length) return { error: null, removed: false }
+
+  const { error } = await supabase
+    .from('applications')
+    .delete()
+    .eq('user_id', input.userId)
+    .eq('programme_id', input.programmeId)
+  return { error: error?.message ?? null, removed: !error }
+}

@@ -67,6 +67,12 @@ export function ApplicationsPage() {
     else await reload()
   }
 
+  async function removeRow(id: string) {
+    const { error: deleteError } = await supabase.from('applications').delete().eq('id', id)
+    if (deleteError) setError(deleteError.message)
+    else await reload()
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -142,6 +148,7 @@ export function ApplicationsPage() {
                 <th className="px-4 py-3">Deadline</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Link</th>
+                <th className="px-4 py-3 w-24"> </th>
               </tr>
             </thead>
             <tbody>
@@ -188,6 +195,15 @@ export function ApplicationsPage() {
                       ) : (
                         '—'
                       )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => void removeRow(row.id)}
+                        className="text-sm font-medium text-red-700 hover:underline"
+                      >
+                        Remove
+                      </button>
                     </td>
                   </tr>
                 )

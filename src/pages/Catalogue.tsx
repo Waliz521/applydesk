@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { fundingScheme, isEposProgramme } from '@/lib/funding'
 import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
-import { addProgrammeToTracker } from '@/lib/tracker'
+import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
@@ -306,6 +306,29 @@ export function CataloguePage() {
     }
     setTracked((prev) => new Set(prev).add(programme.id))
     setNotice(result.already ? 'Already in your tracker.' : `Added ${programme.acronym ?? programme.name} to tracker.`)
+  }
+
+  async function untrack(programme: Programme) {
+    if (!user) return
+    setBusyId(programme.id)
+    setNotice(null)
+    const result = await removeProgrammeFromTracker({
+      userId: user.id,
+      programmeId: programme.id,
+    })
+    setBusyId(null)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    if (result.removed) {
+      setTracked((prev) => {
+        const next = new Set(prev)
+        next.delete(programme.id)
+        return next
+      })
+      setNotice(`Removed ${programme.acronym ?? programme.name} from tracker.`)
+    }
   }
 
   return (
@@ -715,6 +738,7 @@ export function CataloguePage() {
                   tracked={tracked.has(p.id)}
                   tracking={busyId === p.id}
                   onTrack={() => void track(p)}
+                  onUntrack={() => void untrack(p)}
                 />
               ))}
             </div>

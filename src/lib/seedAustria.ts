@@ -14,20 +14,20 @@ const PROGRAMMES: SeedRec[] = [
     apply_url: 'https://www.plus.ac.at/geoinformatik/education/agi/students/admission/?lang=en',
     fit_notes:
       'Best English GIS master’s in Austria. Z_GIS: spatial analysis, geo-application development, SDI, modelling. BS GIS / cartography / geomatics is admitted without extra coursework.',
-    cycle_label: '2027/28 intake',
-    opens: '2027-05-01',
+    cycle_label: '2027 summer intake',
+    opens: '2025-10-01',
     scholarship: null,
-    self_funded: '2027-08-10',
-    starts: '2027-10-01',
-    date_status: 'expected',
+    self_funded: '2027-01-10',
+    starts: '2027-03-01',
+    date_status: 'confirmed',
     scholarships: false,
     funding_scheme: 'self_funded',
     extra: {
-      apply: 'Watch — next clean start is October 2027. Non-EU winter 2026/27 docs were due 10 Aug 2026.',
-      target_start: '1 October 2027 (winter). Summer start is possible if you can legalise documents by 10 January.',
-      opens_text: 'PLUS master’s applications run each semester. Winter pre-registration usually from early summer.',
+      apply: 'YES — Sommersemester 2027: complete file by 10 Jan 2027 (non-EU). Studienabteilung contact form + Z_GIS preselection. Winter 2027/28: non-EU docs by 10 Aug 2026 was prior intake.',
+      target_start: '1 March 2027 (summer). Next winter: 1 October 2027.',
+      opens_text: 'Summer intake: apply from the previous October. Winter: from ~May before the October start.',
       deadline_text:
-        'EXPECTED 10 August 2027 for non-EU complete legalised documents (winter 2027/28). Summer 2027: 10 January 2027. Recheck plus.ac.at dates.',
+        '10 January 2027 for non-EU complete documents (summer SS 2027). Winter 2027/28 non-EU: 10 August 2027. plus.ac.at/studium/important-dates-and-deadlines',
       tuition_text: '€726.72 / semester + ÖH ~€25 · ~€3,000 total (~Rs 9.6 lac). Living in Salzburg is the real cost.',
       self_funded_text:
         'Self-funded. Austrian student visa wants proof of funds (monthly rate on oead.at) and often tuition shown. No German blocked account.',
@@ -37,7 +37,7 @@ const PROGRAMMES: SeedRec[] = [
         'English C1 (IELTS Academic 6.5 / TOEFL iBT 95). Legalised degree + transcript + passport (Pakistan: HEC/MOFA + Austrian mission). Internship is compulsory in the curriculum.',
       watch_outs:
         'Document legalisation is the bottleneck, not the fee. CDE (Erasmus) is a different application from this residential AGI degree.',
-      last_checked: '14 Sep 2026',
+      last_checked: '20 Oct 2026',
     },
   },
   {
