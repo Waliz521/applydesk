@@ -1,4 +1,39 @@
 import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { supabase } from '@/lib/supabase'
+
+export const PLUS_AGI_SLUG = 'plus-applied-geoinformatics'
+
+function plusAgiSeedExpectation(): { opens: string; label: string; selfFunded: string } {
+  const rec = PROGRAMMES.find((p) => p.slug === PLUS_AGI_SLUG)!
+  return {
+    opens: rec.opens!,
+    label: rec.cycle_label,
+    selfFunded: rec.self_funded!,
+  }
+}
+
+/** True when PLUS-AGI cycle dates in Supabase still match old winter-2027 seed (or row missing). */
+export async function austriaSeedNeedsRefresh(): Promise<boolean> {
+  const expected = plusAgiSeedExpectation()
+  const { data, error } = await supabase
+    .from('programmes')
+    .select('cycles:programme_cycles(application_opens_on, label, self_funded_deadline)')
+    .eq('slug', PLUS_AGI_SLUG)
+    .maybeSingle()
+  if (error || !data) return true
+  const cycles = (data.cycles ?? []) as {
+    application_opens_on: string | null
+    label: string
+    self_funded_deadline: string | null
+  }[]
+  if (cycles.length === 0) return true
+  const cycle = cycles.find((c) => c.label === expected.label) ?? cycles[0]
+  return (
+    cycle.application_opens_on !== expected.opens ||
+    cycle.label !== expected.label ||
+    cycle.self_funded_deadline !== expected.selfFunded
+  )
+}
 
 const PROGRAMMES: SeedRec[] = [
   {
@@ -211,6 +246,6 @@ export async function seedAustriaCatalogue(opts?: {
   return upsertSeedProgrammes({
     catalogueId: created.catalogueId,
     programmes: PROGRAMMES,
-    source: 'PLUS / Z_GIS / TU Wien / OeAD / AAI Salzburg pages, 14 Sep 2026',
+    source: 'PLUS / Z_GIS / TU Wien / OeAD / AAI Salzburg pages, 20 Oct 2026',
   })
 }

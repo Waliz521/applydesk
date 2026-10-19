@@ -11,7 +11,7 @@ import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
-import { seedAustriaCatalogue } from '@/lib/seedAustria'
+import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedFranceCatalogue } from '@/lib/seedFrance'
@@ -105,10 +105,22 @@ export function DashboardPage() {
       const { data: sentinels } = await supabase
         .from('programmes')
         .select('slug')
-        .in('slug', ['oead-busek', 'itc-mgeo', 'eric-bleumink', 'polyu-lsgs-rpg', 'grenoble-imagers'])
+        .in('slug', [
+          'oead-busek',
+          'plus-applied-geoinformatics',
+          'itc-mgeo',
+          'eric-bleumink',
+          'polyu-lsgs-rpg',
+          'grenoble-imagers',
+        ])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
-      const needAustria = !cats.some((c) => c.slug === 'austria') || !slugs.has('oead-busek')
+      const austriaStale = cats.some((c) => c.slug === 'austria') && (await austriaSeedNeedsRefresh())
+      const needAustria =
+        !cats.some((c) => c.slug === 'austria') ||
+        !slugs.has('oead-busek') ||
+        !slugs.has('plus-applied-geoinformatics') ||
+        austriaStale
       const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
       const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
       const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
