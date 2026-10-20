@@ -14,7 +14,7 @@ const PROGRAMME: SeedRec = {
   website: 'https://cartographymaster.eu/',
   apply_url: 'https://cartographymaster.eu/how-to-apply/',
   fit_notes:
-    'The missing core GIS / cartography joint master’s: maps, geovisualisation, geoinformatics. Semester 1 Munich, 2 Vienna, 3 Dresden. Matches a BS GIS + cartography concentration.',
+    'The degree is still offered. The Erasmus Mundus scholarship is not. Last funded intake started in 2025. Semester 1 Munich, 2 Vienna, 3 Dresden.',
   cycle_label: '2027 intake',
   opens: '2027-01-01',
   scholarship: null,
@@ -34,12 +34,12 @@ const PROGRAMME: SeedRec = {
     self_funded_text:
       'Self-funded only. First semester is Germany, so plan a blocked account / proof of funds for the German visa. Semester 2 in Vienna uses the Austrian student-residence rules.',
     scholarships_text:
-      'No Erasmus Mundus scholarships after the 2025 intake (programme said so in the student handbook). They still enrol self-funded students. Do not treat the EMJM badge on other cards as applying here.',
+      'Rechecked 20 Oct 2026. The programme is not cancelled. Scholarships page: they enrol students and offer no scholarships. Handbook: last Erasmus Mundus scholarship intake started in 2025.',
     prepare:
-      'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation letter (their 5 questions). Two recommendation letters. Map/visualisation portfolio strongly recommended (PDF or link to info@cartographymaster.eu).',
+      'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation letter (their 5 questions). Two recommendation letters. Map portfolio recommended. Only worth preparing if self-funded study in Germany is possible.',
     watch_outs:
-      'Still branded Erasmus Mundus, but there is no scholarship for 2026 or 2027. ITC/Twente thesis option ends after the 2026 cohort.',
-    last_checked: '28 Sep 2026',
+      'No EMJM stipend for 2026 or 2027. First semester is in Germany. ITC/Twente thesis option ends after the 2026 cohort.',
+    last_checked: '20 Oct 2026',
   },
 }
 
@@ -64,7 +64,7 @@ export async function seedCartographyProgramme(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: [PROGRAMME],
-    source: 'cartographymaster.eu handbook and apply pages, 28 Sep 2026',
+    source: 'cartographymaster.eu handbook, scholarships page, and apply pages, 20 Oct 2026',
   })
   return { ...result, added: !result.error && result.count > 0 }
 }

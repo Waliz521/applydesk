@@ -751,8 +751,8 @@ export function CataloguePage() {
               <PriorityBadge value="A-" /> water + spatial
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
-              · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM opens 1 Oct 2026 · GroundwatCH Partner
-              deadline 3 Jan 2027 · CDE Nov 2026–mid Jan 2027. Grey <FundingBadge scheme="self_funded" /> Cartography — no EMJM after 2025.
+              · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
+              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Grey <FundingBadge scheme="self_funded" /> Cartography still runs, with no EMJM scholarship after the 2025 intake.
             </p>
           ) : null}
 

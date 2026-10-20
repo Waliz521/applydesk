@@ -465,10 +465,10 @@ export function DashboardPage() {
           {selectedCatalogue?.slug === 'erasmus-mundus' ? (
             <p className="mt-2 text-sm text-slate-600">
               Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
-              Pakistan is eligible. <span className="font-medium">GEM</span> opens 1 Oct 2026 (deadline 15 Jan 2027).{' '}
-              <span className="font-medium">GroundwatCH</span> and <span className="font-medium">FloodRISK</span> Partner deadline 3 Jan 2027 (confirmed).{' '}
-              <span className="font-medium">CDE</span> worldwide call Nov 2026–mid Jan 2027 (exact day not published).{' '}
-              <span className="font-medium">WAVES</span> has no call yet. Grey <span className="font-medium">Self-funded</span> includes Cartography (no EMJM after 2025).
+              Pakistan is eligible. <span className="font-medium">GEM</span> deadline 15 Jan 2027 (no reference letter).{' '}
+              <span className="font-medium">GroundwatCH</span> and <span className="font-medium">FloodRISK</span> Partner deadline 3 Jan 2027. GroundwatCH needs two letters dated within six months. Apply to one IHE programme only.{' '}
+              <span className="font-medium">WAVES</span> scholarship deadline 15 Jan 2027 (one signed reference).{' '}
+              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Grey <span className="font-medium">Self-funded</span> Cartography still runs; its Erasmus Mundus scholarship ended with the 2025 intake.
             </p>
           ) : null}
         </div>

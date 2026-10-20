@@ -37,10 +37,10 @@ const PROGRAMMES: SeedRec[] = [
       scholarships_text:
         'EMJM: €1,400/month up to 24 months + tuition/participation covered. Top ~25 per track invited to a recorded interview (Feb–Mar 2027) — interview required to stay in scholarship contention. Results: 31 March 2027. Pakistan = Partner Country (eligible). Geographic balance applies.',
       prepare:
-        'First/2nd upper BSc, transcript, IELTS/TOEFL before deadline, passport, official GEM CV template (max 2 pages), financial plan in euros. English test after deadline not accepted.',
+        'First/2nd upper BSc, transcript, IELTS/TOEFL before deadline, passport, official GEM CV template (max 2 pages), financial plan in euros. No motivation letter and no reference letter. Do not upload documents the form did not request.',
       watch_outs:
-        'Max 8 students per track. Certified graduation docs by 31 July 2027. Interview invitations normally in February.',
-      last_checked: '1 Oct 2026',
+        'Max 8 students per track. Certified graduation docs by 31 July 2027. Interview invitations normally in February. A reference letter is not part of this file.',
+      last_checked: '20 Oct 2026',
     },
   },
   {
@@ -57,20 +57,20 @@ const PROGRAMMES: SeedRec[] = [
     fit_notes:
       'EO + GI / Digital Earth. Geospatial bachelor fits. Salzburg semester links to your Austria track, but this is a separate Erasmus application from PLUS AGI.',
     cycle_label: '2027 intake (Call 4)',
-    opens: '2026-11-01',
-    scholarship: '2027-01-15',
-    self_funded: '2027-01-15',
+    opens: '2026-11-02',
+    scholarship: '2027-01-22',
+    self_funded: '2027-01-22',
     starts: '2027-10-01',
-    date_status: 'expected',
+    date_status: 'confirmed',
     scholarships: true,
     funding_scheme: 'emjm',
     extra: {
       apply:
-        'WATCH / PREPARE — next worldwide call opens November 2026 (EMJM + self-funded). European-only rolling window is March–May (no EMJM for that window).',
+        'Call 4 opens 2 November 2026 and closes 22 January 2027, 23:59 CET. Worldwide call covers EMJM and self-funded places.',
       target_start: 'October 2027',
-      opens_text: 'Official: next call opens in November 2026 (confirmed on master-cde.eu, Aug 2026 news).',
+      opens_text: 'Confirmed on master-cde.eu: Call 4 opens 2 November 2026.',
       deadline_text:
-        'EXPECTED mid-January 2027 (programme says “until mid-January 2027”). Exact day not published yet — treat mid-Jan as planning date.',
+        'Confirmed: 22 January 2027, 23:59 CET. European-only rolling window in March–May has no EMJM scholarship.',
       tuition_text:
         'EMJM: fee waiver + €1,400/month. Best-ranked may get participation fee waiver even without full EMJM.',
       self_funded_text:
@@ -78,10 +78,10 @@ const PROGRAMMES: SeedRec[] = [
       scholarships_text:
         'EMJM €1,400/month + fee waiver for best-ranked. Pakistan eligible. Prepare certified / legalised docs early (CDE warns international applicants).',
       prepare:
-        'Geospatial or related bachelor, English proof, CV, motivation, refs. EO/GI knowledge, geospatial work experience, and programming strengthen the portfolio.',
+        'Geospatial bachelor, IELTS, Europass CV, motivation questions. Two referee contacts are required. Uploading letters is optional, and only one letter per institution is accepted.',
       watch_outs:
-        'Do not confuse with PLUS MSc Applied Geoinformatics (self-funded Salzburg degree). Different portal and deadlines.',
-      last_checked: '1 Oct 2026',
+        'Do not confuse with PLUS MSc Applied Geoinformatics (self-funded Salzburg degree). Different portal and deadlines. Hamid and Sawaid are the same university, so upload only one of their letters.',
+      last_checked: '20 Oct 2026',
     },
   },
   {
@@ -118,7 +118,8 @@ const PROGRAMMES: SeedRec[] = [
         'After scholarship deadlines, admission-only possible. Reduced tuition scholarships may open if seats remain — confirm funding by 15 April 2027.',
       scholarships_text:
         '~15 EMJM awards per year (~60 across 2024–2027 intakes). Pakistan = Partner Country. Results usually April 2027. Same online form for admission + scholarship.',
-      prepare: 'BSc in relevant field, English test, CV, motivation, refs via IHE Delft / programme portal.',
+      prepare:
+        'BSc in a relevant field, English test, CV, five motivation answers, passport. Two recommendation letters, dated within six months, from two teachers or one teacher and one employer. Referee contact details must be on the letter.',
       watch_outs:
         'Partner-country deadline is earlier (3 Jan) than GEM (15 Jan). Do not miss it if this is a primary target.',
       last_checked: '5 Oct 2026',
@@ -196,7 +197,7 @@ const PROGRAMMES: SeedRec[] = [
       scholarships_text:
         'Erasmus Mundus scholarships are open to any nationality. Recorded interviews for shortlisted candidates are in February–March 2027. Tracks: Spatial Water Sciences, Water Vulnerability Engineering, Spatial Water Governance and Policy.',
       prepare:
-        'Degree certificate and transcript, CV, motivation letter, English certificate, passport, and a reference letter. Shared first semester covers Earth observation, geostatistics, programming, and hydrology.',
+        'Degree certificate and transcript, CV, motivation letter (one page), English certificate, passport, and one signed reference letter on letterhead. Shared first semester covers Earth observation, geostatistics, programming, and hydrology.',
       watch_outs: 'Scholarship files close on 15 January 2027. A self-funded file uses the later date on the site.',
       last_checked: '15 Oct 2026',
     },
@@ -214,7 +215,7 @@ const PROGRAMMES: SeedRec[] = [
     website: 'https://cartographymaster.eu/',
     apply_url: 'https://cartographymaster.eu/how-to-apply/',
     fit_notes:
-      'Joint cartography / geovisualisation master. Still Erasmus Mundus branded, but no EMJM scholarship for 2026 or 2027 intakes.',
+      'The degree is still offered. The Erasmus Mundus scholarship is not. Last funded intake started in 2025. 2026 and 2027 students pay their own way.',
     cycle_label: '2027 intake',
     opens: '2027-01-01',
     scholarship: null,
@@ -235,12 +236,12 @@ const PROGRAMMES: SeedRec[] = [
       self_funded_text:
         'Self-funded only. First semester Germany → blocked account / proof of funds for German visa.',
       scholarships_text:
-        'No Erasmus Mundus scholarships after the 2025 intake (student handbook). Programme co-funded until end of 2027 but last EMJM-funded cohort started 2025. External DAAD / foundations only.',
+        'Rechecked 20 Oct 2026. The programme is not cancelled. Scholarships page: they enrol students and offer no scholarships. Handbook: last Erasmus Mundus scholarship intake started in 2025.',
       prepare:
-        'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation (their 5 questions). Two refs. Map portfolio recommended.',
+        'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation (their 5 questions). Two recommendation letters. Map portfolio recommended. Only worth preparing if self-funded study in Germany is possible.',
       watch_outs:
-        'Do not apply expecting an EMJM stipend. ITC/Twente thesis option ends after the 2026 cohort.',
-      last_checked: '28 Sep 2026',
+        'No EMJM stipend for 2026 or 2027. First semester is in Germany. ITC/Twente thesis option ends after the 2026 cohort.',
+      last_checked: '20 Oct 2026',
     },
   },
 ]
@@ -256,7 +257,7 @@ export async function seedErasmusEmjmUpdates(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, WAVES, and Cartography sites, 5 Oct 2026',
+    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, WAVES, and Cartography sites, 20 Oct 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }
