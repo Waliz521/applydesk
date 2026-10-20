@@ -13,6 +13,8 @@ export type CycleFamily =
   | 'poland'
   | 'hong-kong'
   | 'france'
+  | 'denmark'
+  | 'finland'
   | 'other'
 
 /** Coarse funding filter for dashboard sections. */
@@ -41,6 +43,8 @@ const FAMILY_OPTIONS: { id: CycleFamily; label: string }[] = [
   { id: 'poland', label: 'Poland' },
   { id: 'hong-kong', label: 'Hong Kong' },
   { id: 'france', label: 'France' },
+  { id: 'denmark', label: 'Denmark' },
+  { id: 'finland', label: 'Finland' },
   { id: 'other', label: 'Other' },
 ]
 
@@ -87,7 +91,9 @@ export function familyOf(row: OpenRow): CycleFamily {
     slug === 'netherlands' ||
     slug === 'poland' ||
     slug === 'hong-kong' ||
-    slug === 'france'
+    slug === 'france' ||
+    slug === 'denmark' ||
+    slug === 'finland'
   ) {
     return slug
   }

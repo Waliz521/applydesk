@@ -27,8 +27,13 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     cat.includes('netherlands') ||
     cat.includes('hong kong') ||
     cat.includes('france') ||
+    cat.includes('denmark') ||
+    cat.includes('finland') ||
     cat.includes('self-funded')
   ) {
+    if (slug.includes('dk-government') || slug.includes('fi-waiver') || slug.includes('ruc-environmental')) {
+      return 'partial'
+    }
     if (slug.includes('nawa') || acronym === 'nawa') return 'nawa'
     if (slug.includes('busek') || acronym === 'oead' || acronym === 'busek') return 'oead'
     if (slug.includes('hkpfs') || acronym === 'hkpfs') return 'full'

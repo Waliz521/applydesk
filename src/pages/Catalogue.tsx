@@ -9,6 +9,8 @@ import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
+import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
+import { seedFinlandCatalogue } from '@/lib/seedFinland'
 import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
@@ -94,6 +96,8 @@ export function CataloguePage() {
           active?.slug === 'netherlands' ||
           active?.slug === 'hong-kong' ||
           active?.slug === 'france' ||
+          active?.slug === 'denmark' ||
+          active?.slug === 'finland' ||
           active?.slug === 'erasmus-mundus') &&
         funding !== 'all' &&
         fundingScheme(p, active?.name) !== funding
@@ -254,6 +258,54 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
+  async function loadDenmarkList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedDenmarkCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Denmark list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'denmark')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
+  async function loadFinlandList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedFinlandCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Finland list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'finland')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
   async function loadCartography() {
     setSeeding(true)
     setError(null)
@@ -336,7 +388,7 @@ export function CataloguePage() {
       <div>
         <h1 className="text-2xl font-semibold text-ink">Catalogues</h1>
         <p className="mt-1 text-sm text-muted">
-          Erasmus Mundus is one family. DAAD is two tracks. Poland, Austria, the Netherlands, Hong Kong, and France mix self-funded degrees with named scholarships. Search, filter, open details, then send a programme to your tracker.
+          Erasmus Mundus is one family. DAAD is two tracks. Country catalogues mix self-funded degrees with named scholarships — including Denmark and Finland (Nordic GIS / geoinformatics). Search, filter, open details, then send a programme to your tracker.
         </p>
       </div>
 
@@ -406,6 +458,26 @@ export function CataloguePage() {
             {seeding ? 'Adding France…' : 'Add France catalogue'}
           </button>
         ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'denmark') ? (
+          <button
+            type="button"
+            onClick={() => void loadDenmarkList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Denmark…' : 'Add Denmark catalogue'}
+          </button>
+        ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'finland') ? (
+          <button
+            type="button"
+            onClick={() => void loadFinlandList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Finland…' : 'Add Finland catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -467,6 +539,26 @@ export function CataloguePage() {
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
                       {seeding ? 'Updating…' : 'Load / refresh France list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'denmark' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadDenmarkList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Denmark GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'finland' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadFinlandList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Finland GIS list'}
                     </button>
                   ) : null}
                   {active.slug === 'erasmus-mundus' ? (
@@ -617,6 +709,54 @@ export function CataloguePage() {
                   [
                     ['all', 'All France'],
                     ['self_funded', 'Master’s (tuition)'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'denmark' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Denmark'],
+                    ['self_funded', 'Self-funded (tuition)'],
+                    ['partial', 'Danish gov / partial'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFunding(id)}
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {active.slug === 'finland' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-medium text-muted">Funding type</span>
+                {(
+                  [
+                    ['all', 'All Finland'],
+                    ['self_funded', 'Self-funded (tuition)'],
+                    ['partial', 'Tuition waiver'],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -798,6 +938,21 @@ export function CataloguePage() {
               Violet <FundingBadge scheme="partial" /> HKU/PolyU MPhil/PhD with PGS, IPFS, or supervisor studentship — email faculty first.
               Green <FundingBadge scheme="full" /> HKPFS (PhD). Grey <FundingBadge scheme="self_funded" /> taught MSc GeoDS (~HK$250k). Planning
               notes: <span className="font-medium">hong-kong-universities.md</span> in the repo.
+            </p>
+          ) : null}
+
+          {active.slug === 'denmark' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> KU Geoinformatics / AU Geoscience tuition. Violet{' '}
+              <FundingBadge scheme="partial" /> Danish Government Scholarship (auto at KU/AU) or RUC Environmental Science stipend track. Pakistan
+              eligible for Danish gov pool — very competitive.
+            </p>
+          ) : null}
+
+          {active.slug === 'finland' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              Grey <FundingBadge scheme="self_funded" /> Aalto Geoinformatics / Helsinki Geography fees. Violet{' '}
+              <FundingBadge scheme="partial" /> tuition waivers only — Migri still wants ~€9,600 living proof unless living aid is documented.
             </p>
           ) : null}
         </div>

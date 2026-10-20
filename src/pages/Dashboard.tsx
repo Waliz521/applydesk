@@ -14,6 +14,8 @@ import { isEposProgramme } from '@/lib/funding'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
+import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
+import { seedFinlandCatalogue } from '@/lib/seedFinland'
 import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
@@ -42,6 +44,8 @@ export function DashboardPage() {
   const hasNetherlands = catalogues.some((c) => c.slug === 'netherlands')
   const hasHongKong = catalogues.some((c) => c.slug === 'hong-kong')
   const hasFrance = catalogues.some((c) => c.slug === 'france')
+  const hasDenmark = catalogues.some((c) => c.slug === 'denmark')
+  const hasFinland = catalogues.some((c) => c.slug === 'finland')
 
   async function loadDashboard() {
     const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
@@ -112,6 +116,8 @@ export function DashboardPage() {
           'eric-bleumink',
           'polyu-lsgs-rpg',
           'grenoble-imagers',
+          'ku-geography-geoinformatics',
+          'aalto-geoinformatics',
         ])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
@@ -124,7 +130,11 @@ export function DashboardPage() {
       const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
       const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
       const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
-      if (needPoland || needAustria || needNetherlands || needHongKong || needFrance) setSeeding(true)
+      const needDenmark = !cats.some((c) => c.slug === 'denmark') || !slugs.has('ku-geography-geoinformatics')
+      const needFinland = !cats.some((c) => c.slug === 'finland') || !slugs.has('aalto-geoinformatics')
+      if (needPoland || needAustria || needNetherlands || needHongKong || needFrance || needDenmark || needFinland) {
+        setSeeding(true)
+      }
       if (needPoland) {
         const result = await seedPolandCatalogue({
           userId: user.id,
@@ -190,6 +200,32 @@ export function DashboardPage() {
         }
         notes.push(`France catalogue added (${result.count} programmes).`)
       }
+      if (needDenmark) {
+        const result = await seedDenmarkCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Denmark catalogue added (${result.count} programmes).`)
+      }
+      if (needFinland) {
+        const result = await seedFinlandCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Finland catalogue added (${result.count} programmes).`)
+      }
       const cartography = await seedCartographyProgramme({ userId: user.id })
       if (cancelled) return
       if (cartography.error) {
@@ -240,6 +276,26 @@ export function DashboardPage() {
         if (fr.error) {
           setSeeding(false)
           setError(fr.error)
+          return
+        }
+        const dk = await seedDenmarkCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (dk.error) {
+          setSeeding(false)
+          setError(dk.error)
+          return
+        }
+        const fi = await seedFinlandCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (fi.error) {
+          setSeeding(false)
+          setError(fi.error)
           return
         }
       }
@@ -319,6 +375,30 @@ export function DashboardPage() {
       }
       notes.push(`France catalogue added (${result.count} programmes).`)
     }
+    if (!hasDenmark) {
+      const result = await seedDenmarkCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Denmark catalogue added (${result.count} programmes).`)
+    }
+    if (!hasFinland) {
+      const result = await seedFinlandCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Finland catalogue added (${result.count} programmes).`)
+    }
     const cartography = await seedCartographyProgramme({ userId: user.id, force: true })
     if (cartography.error) {
       setSeeding(false)
@@ -340,7 +420,11 @@ export function DashboardPage() {
     const netherlands = cats.find((c) => c.slug === 'netherlands')
     const hongKong = cats.find((c) => c.slug === 'hong-kong')
     const france = cats.find((c) => c.slug === 'france')
-    if (!hasFrance && france) setCatalogueId(france.id)
+    const denmark = cats.find((c) => c.slug === 'denmark')
+    const finland = cats.find((c) => c.slug === 'finland')
+    if (!hasFinland && finland) setCatalogueId(finland.id)
+    else if (!hasDenmark && denmark) setCatalogueId(denmark.id)
+    else if (!hasFrance && france) setCatalogueId(france.id)
     else if (!hasHongKong && hongKong) setCatalogueId(hongKong.id)
     else if (!hasNetherlands && netherlands) setCatalogueId(netherlands.id)
     else if (!hasAustria && austria) setCatalogueId(austria.id)
@@ -462,6 +546,20 @@ export function DashboardPage() {
               <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k) — not the funded research path.
             </p>
           ) : null}
+          {selectedCatalogue?.slug === 'denmark' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> is non-EU fees (KU ~€17k/year). Violet{' '}
+              <span className="font-medium">Partial</span> is Danish Government Scholarship or RUC fee waiver + stipend — Pakistan eligible, few seats.
+              No German blocked account; residence permit still needs subsistence unless the grant covers living.
+            </p>
+          ) : null}
+          {selectedCatalogue?.slug === 'finland' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Dark <span className="font-medium">Self-funded · tuition</span> is ~€13–17k/year. Violet{' '}
+              <span className="font-medium">Partial</span> is university tuition waivers only — no national living grant for Pakistan. Migri expects ~€9,600
+              living funds year 1 unless documented living aid.
+            </p>
+          ) : null}
           {selectedCatalogue?.slug === 'erasmus-mundus' ? (
             <p className="mt-2 text-sm text-slate-600">
               Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
@@ -475,7 +573,14 @@ export function DashboardPage() {
         <CatalogueSelect catalogues={catalogues} value={catalogueId} onChange={setCatalogueId} />
       </div>
 
-      {(!hasPoland || !hasAustria || !hasNetherlands || !hasHongKong || !hasFrance) && !loading ? (
+      {(!hasPoland ||
+        !hasAustria ||
+        !hasNetherlands ||
+        !hasHongKong ||
+        !hasFrance ||
+        !hasDenmark ||
+        !hasFinland) &&
+      !loading ? (
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
             {[
@@ -484,6 +589,8 @@ export function DashboardPage() {
               !hasNetherlands && 'Netherlands',
               !hasHongKong && 'Hong Kong',
               !hasFrance && 'France',
+              !hasDenmark && 'Denmark',
+              !hasFinland && 'Finland',
             ]
               .filter(Boolean)
               .join(' and ')}{' '}
@@ -491,7 +598,9 @@ export function DashboardPage() {
               (!hasAustria ? 1 : 0) +
               (!hasNetherlands ? 1 : 0) +
               (!hasHongKong ? 1 : 0) +
-              (!hasFrance ? 1 : 0) >
+              (!hasFrance ? 1 : 0) +
+              (!hasDenmark ? 1 : 0) +
+              (!hasFinland ? 1 : 0) >
             1
               ? 'are not in this dropdown yet.'
               : 'is not in this dropdown yet.'}{' '}
