@@ -12,7 +12,6 @@ import { useAuth } from '@/context/AuthContext'
 import { cycleState } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
-import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
 import { seedFinlandCatalogue } from '@/lib/seedFinland'
@@ -226,18 +225,6 @@ export function DashboardPage() {
         }
         notes.push(`Finland catalogue added (${result.count} programmes).`)
       }
-      const cartography = await seedCartographyProgramme({ userId: user.id })
-      if (cancelled) return
-      if (cartography.error) {
-        // Non-admins cannot insert catalogue rows — ignore RLS noise on live.
-        if (profile?.is_admin) {
-          setSeeding(false)
-          setError(cartography.error)
-          return
-        }
-      } else if (cartography.added) {
-        notes.push('Cartography M.Sc. added to Erasmus Mundus.')
-      }
       // EMJM date refresh writes programme_cycles — only admins pass RLS.
       if (profile?.is_admin) {
         const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true, isAdmin: true })
@@ -399,13 +386,6 @@ export function DashboardPage() {
       }
       notes.push(`Finland catalogue added (${result.count} programmes).`)
     }
-    const cartography = await seedCartographyProgramme({ userId: user.id, force: true })
-    if (cartography.error) {
-      setSeeding(false)
-      setError(cartography.error)
-      return
-    }
-    if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
     const emjm = await seedErasmusEmjmUpdates({
       userId: user.id,
       force: true,
@@ -570,7 +550,7 @@ export function DashboardPage() {
               Pakistan is eligible. <span className="font-medium">GEM</span> deadline 15 Jan 2027 (no reference letter).{' '}
               <span className="font-medium">GroundwatCH</span> and <span className="font-medium">FloodRISK</span> Partner deadline 3 Jan 2027. GroundwatCH needs two letters dated within six months. Apply to one IHE programme only.{' '}
               <span className="font-medium">WAVES</span> scholarship deadline 15 Jan 2027 (one signed reference).{' '}
-              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Grey <span className="font-medium">Self-funded</span> Cartography still runs; its Erasmus Mundus scholarship ended with the 2025 intake.
+              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship are not listed.
             </p>
           ) : null}
         </div>

@@ -7,7 +7,6 @@ import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
-import { seedCartographyProgramme } from '@/lib/seedCartography'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
 import { seedFinlandCatalogue } from '@/lib/seedFinland'
@@ -306,7 +305,7 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
-  async function loadCartography() {
+  async function refreshEmjm() {
     setSeeding(true)
     setError(null)
     setNotice(null)
@@ -315,23 +314,16 @@ export function CataloguePage() {
       force: true,
       isAdmin: Boolean(profile?.is_admin),
     })
-    // Keep legacy Cartography-only seed as fallback if Erasmus catalogue exists but slugs differ
+    setSeeding(false)
     if (result.error) {
-      const carto = await seedCartographyProgramme({ userId: user?.id, force: true })
-      setSeeding(false)
-      if (carto.error) {
-        setError(carto.error)
-        return
-      }
-      setNotice(carto.added ? 'Cartography M.Sc. added to Erasmus Mundus.' : 'Cartography M.Sc. refreshed.')
-    } else {
-      setSeeding(false)
-      setNotice(
-        result.updated
-          ? `EMJM details refreshed (${result.count}): GEM, CDE, GroundwatCH, Cartography.`
-          : 'EMJM programmes already up to date.',
-      )
+      setError(result.error)
+      return
     }
+    setNotice(
+      result.updated
+        ? `EMJM details refreshed (${result.count}): GEM, CDE, GroundwatCH, WAVES.`
+        : 'EMJM programmes already up to date.',
+    )
     if (!activeId) return
     const { data } = await supabase
       .from('programmes')
@@ -565,11 +557,11 @@ export function CataloguePage() {
                   {active.slug === 'erasmus-mundus' ? (
                     <button
                       type="button"
-                      onClick={() => void loadCartography()}
+                      onClick={() => void refreshEmjm()}
                       disabled={seeding}
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
-                      {seeding ? 'Updating…' : 'Refresh EMJM dates (GEM / CDE / GroundwatCH / Cartography)'}
+                      {seeding ? 'Updating…' : 'Refresh EMJM dates (GEM / CDE / GroundwatCH / WAVES)'}
                     </button>
                   ) : null}
                   <button
@@ -893,7 +885,7 @@ export function CataloguePage() {
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
               · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. MERGED has no 2027 Erasmus Mundus scholarship. Grey <FundingBadge scheme="self_funded" /> Cartography still runs, with no EMJM scholarship after the 2025 intake.
+              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship, including Cartography, are not listed.
             </p>
           ) : null}
 
@@ -915,8 +907,7 @@ export function CataloguePage() {
           {active.slug === 'austria' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
               Grey <FundingBadge scheme="self_funded" /> statutory tuition. Rose <FundingBadge scheme="oead" /> Erhard Busek (no new
-              call planned). Violet <FundingBadge scheme="partial" /> One World after arrival, or Ernst Mach (not a master’s). CDE /
-              Cartography are under Erasmus Mundus.
+              call planned). Violet <FundingBadge scheme="partial" /> One World after arrival, or Ernst Mach (not a master’s). CDE is under Erasmus Mundus.
             </p>
           ) : null}
 

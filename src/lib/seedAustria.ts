@@ -107,7 +107,7 @@ const PROGRAMMES: SeedRec[] = [
       self_funded_text:
         'Self-funded. Residence permit needs proof of funds. No German blocked account. Enrol in person after the admission letter.',
       scholarships_text:
-        'No EMJM. Cartography M.Sc. (semester 2 at TU Wien) is in the Erasmus catalogue and has no EM award after 2025. Watch OeAD Busek if a new call appears. Pakistan is not on the automatic least-developed-country tuition waiver; confirm any developing-country fee rule in writing.',
+        'No EMJM. Watch OeAD Busek if a new call appears. Pakistan is not on the automatic least-developed-country tuition waiver; confirm any developing-country fee rule in writing.',
       prepare:
         'TISS guest account + admission documents. English proof (rectorate rules). BS GIS may get bridging math/physics/geodesy exams (max 30 ECTS). No German required.',
       watch_outs:
@@ -150,7 +150,7 @@ const PROGRAMMES: SeedRec[] = [
       prepare:
         'Unconditional admission to a 2-year English master’s at a participating Austrian university, then wait for that university’s nomination.',
       watch_outs:
-        'Do not confuse this with Ernst Mach (short research stay, not a master’s). CDE / Cartography are separate Erasmus applications.',
+        'Do not confuse this with Ernst Mach (short research stay, not a master’s). CDE is a separate Erasmus application.',
       last_checked: '14 Sep 2026',
     },
   },
@@ -228,7 +228,7 @@ const PROGRAMMES: SeedRec[] = [
 ]
 
 const DESCRIPTION =
-  'Austrian GIS / geoinformation master’s in English, plus the scholarships that actually exist for Pakistan. Statutory tuition is on the degree cards. Erhard Busek (OeAD) is the full master’s grant — no new call planned. One World is a Salzburg living stipend after arrival. Ernst Mach is a short stay, not a degree. CDE and Cartography M.Sc. sit in the Erasmus Mundus catalogue.'
+  'Austrian GIS / geoinformation master’s in English, plus the scholarships that actually exist for Pakistan. Statutory tuition is on the degree cards. Erhard Busek (OeAD) is the full master’s grant — no new call planned. One World is a Salzburg living stipend after arrival. Ernst Mach is a short stay, not a degree. CDE sits in the Erasmus Mundus catalogue.'
 
 export async function seedAustriaCatalogue(opts?: {
   userId?: string

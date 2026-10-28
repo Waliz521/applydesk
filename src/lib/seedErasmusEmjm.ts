@@ -203,48 +203,6 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '15 Oct 2026',
     },
   },
-  {
-    slug: 'cartography',
-    acronym: 'Cartography',
-    name: 'Cartography M.Sc.',
-    official_title: 'Erasmus Mundus Master of Science in Cartography: Mapping for a Sustainable World',
-    priority: 'A',
-    coordinator:
-      'Technical University of Munich (DE), coordinator — with TU Wien (AT) and TU Dresden (DE). University of Twente / ITC is not in the 2027 thesis rotation.',
-    countries: ['Germany', 'Austria'],
-    duration: '24 months / 4 semesters / 120 ECTS',
-    website: 'https://cartographymaster.eu/',
-    apply_url: 'https://cartographymaster.eu/how-to-apply/',
-    fit_notes:
-      'The degree is still offered. The Erasmus Mundus scholarship is not. Last funded intake started in 2025. 2026 and 2027 students pay their own way.',
-    cycle_label: '2027 intake',
-    opens: '2027-01-01',
-    scholarship: null,
-    self_funded: '2027-05-31',
-    starts: '2027-10-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply:
-        'WATCH — 2026 intake closed. 2027 portal expected 1 Jan–31 May 2027 via TUMonline. Self-funded only.',
-      target_start: '1 October 2027',
-      opens_text: 'Application opens 1 January every year via TUMonline. International applicants also need a uni-assist VPD.',
-      deadline_text:
-        'EXPECTED 31 May 2027 (same window as 2026). Recheck cartographymaster.eu/how-to-apply.',
-      tuition_text:
-        'No EMJM award. Non-EU fees mainly TUM semester contribution + TU Wien €726.72 + TU Dresden ~€338 · roughly €1,450 total. Munich living + German blocked account dominate cost.',
-      self_funded_text:
-        'Self-funded only. First semester Germany → blocked account / proof of funds for German visa.',
-      scholarships_text:
-        'Rechecked 20 Oct 2026. The programme is not cancelled. Scholarships page: they enrol students and offer no scholarships. Handbook: last Erasmus Mundus scholarship intake started in 2025.',
-      prepare:
-        'uni-assist VPD + TUMonline. IELTS/TOEFL. CV. Motivation (their 5 questions). Two recommendation letters. Map portfolio recommended. Only worth preparing if self-funded study in Germany is possible.',
-      watch_outs:
-        'No EMJM stipend for 2026 or 2027. First semester is in Germany. ITC/Twente thesis option ends after the 2026 cohort.',
-      last_checked: '20 Oct 2026',
-    },
-  },
 ]
 
 const FACT_CYCLES: Record<string, Record<string, string | boolean | null>> = {
@@ -343,7 +301,7 @@ async function patchCheckedFacts(): Promise<string | null> {
 }
 
 /** No Erasmus Mundus scholarship for the 2027 intake. Cards are removed, not relabelled. */
-const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar'] as const
+const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography'] as const
 
 async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
   const { data: rows, error: lookupError } = await supabase
@@ -382,7 +340,7 @@ export async function seedErasmusEmjmUpdates(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, WAVES, and Cartography sites, 28 Oct 2026',
+    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, and WAVES sites, 28 Oct 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }
