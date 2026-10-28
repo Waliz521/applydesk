@@ -240,7 +240,7 @@ export function DashboardPage() {
       }
       // EMJM date refresh writes programme_cycles — only admins pass RLS.
       if (profile?.is_admin) {
-        const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true })
+        const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true, isAdmin: true })
         if (cancelled) return
         if (emjm.error) {
           setSeeding(false)
@@ -406,7 +406,11 @@ export function DashboardPage() {
       return
     }
     if (cartography.added) notes.push('Cartography M.Sc. added to Erasmus Mundus.')
-    const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true })
+    const emjm = await seedErasmusEmjmUpdates({
+      userId: user.id,
+      force: true,
+      isAdmin: Boolean(profile?.is_admin),
+    })
     if (emjm.error) {
       setSeeding(false)
       setError(emjm.error)

@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase'
 import { findCatalogueBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 
 /** Confirmed or officially announced EMJM details for the 2027 intake (checked 28 Sep 2026). */
@@ -246,18 +247,142 @@ const PROGRAMMES: SeedRec[] = [
   },
 ]
 
+const FACT_CYCLES: Record<string, Record<string, string | boolean | null>> = {
+  geotech: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
+  sufonama: { application_opens_on: '2026-11-01', scholarship_deadline: '2027-01-15', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
+  mespom: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
+  'msc-ef': { application_opens_on: '2026-12-02', scholarship_deadline: '2027-01-13', starts_on: '2027-08-01', date_status: 'confirmed', scholarships_available: true },
+}
+
+const FACT_EXTRAS: Record<string, Record<string, string>> = {
+  geotech: {
+    funding_scheme: 'emjm',
+    opens_text: 'Scholarship applications are open.',
+    deadline_text: 'Confirmed: 7 January 2027, 18:00 CET, for the Erasmus Mundus scholarship.',
+    scholarships_text: 'Erasmus Mundus scholarships are open. The programme page lists about 19 partner-country awards and about 2 programme-country awards per edition.',
+    prepare: 'Two recommenders. The portal emails them and they must upload before 7 January 2027, 18:00 CET. Public motivation video of at most 2 minutes. European CV with no gaps over the last 5.5 years.',
+    last_checked: '28 Oct 2026',
+  },
+  sufonama: {
+    funding_scheme: 'emjm',
+    opens_text: 'Applicants outside the EU, EEA, and Switzerland apply from November 2026.',
+    deadline_text: 'Confirmed: 15 January 2027, 23:59 CET.',
+    scholarships_text: 'Erasmus Mundus scholarship. No application fee. Two signed letters on letterhead are required for the scholarship, at least one from a teacher.',
+    prepare: 'Europass CV, motivation letter of about 500 words, and two recommendation letters if you apply for the scholarship.',
+    last_checked: '28 Oct 2026',
+  },
+  mespom: {
+    funding_scheme: 'emjm',
+    opens_text: 'The 2027–2029 CEU application is open.',
+    deadline_text: 'Scholarship deadline 7 January 2027. Referees have 7 days after you submit.',
+    scholarships_text: 'Erasmus Mundus scholarship. Two recommendation letters through the CEU form. The portal emails the referees.',
+    prepare: 'Two referees who can reply within 7 days of submission. Letters are collected by the form, not uploaded as PDFs.',
+    last_checked: '28 Oct 2026',
+  },
+  'msc-ef': {
+    funding_scheme: 'emjm',
+    opens_text: 'Confirmed: the call opens 2 December 2026.',
+    deadline_text: 'Confirmed: 13 January 2027. Motivation video by 20 January 2027, 23:59 Helsinki time.',
+    scholarships_text: 'Erasmus Mundus scholarship. The admission file does not ask for a recommendation letter.',
+    prepare: 'Degree, transcript, English certificate, CV, passport, and a 3-minute motivation video. No recommendation letter.',
+    last_checked: '28 Oct 2026',
+  },
+  'hk-hkpfs': {
+    scholarships_text: '400 awards for 2027/28. Stipend HK$344,400 per year plus HK$14,400 travel, for up to 3 years. Results May 2027. PhD only.',
+    last_checked: '28 Oct 2026',
+  },
+}
+
+const FACT_NOTES: Record<string, string> = {
+  geotech: 'Confirmed: 7 January 2027, 18:00 CET, for the Erasmus Mundus scholarship.',
+  sufonama: 'Confirmed: 15 January 2027, 23:59 CET. Applicants outside the EU apply from November 2026.',
+  mespom: 'Scholarship deadline 7 January 2027. Referees have 7 days after you submit.',
+  'msc-ef': 'Confirmed: 13 January 2027. Motivation video by 20 January 2027, 23:59 Helsinki time.',
+}
+
+async function patchCheckedFacts(): Promise<string | null> {
+  const slugs = [...new Set([...Object.keys(FACT_CYCLES), ...Object.keys(FACT_EXTRAS)])]
+  const { data: rows, error } = await supabase.from('programmes').select('id, slug, extra').in('slug', slugs)
+  if (error) return error.message
+  for (const row of rows ?? []) {
+    const slug = row.slug as string
+    const cyclePatch = FACT_CYCLES[slug]
+    const extraPatch = FACT_EXTRAS[slug]
+    if (cyclePatch) {
+      const { data: cycles, error: cycleError } = await supabase
+        .from('programme_cycles')
+        .select('id, extra_dates')
+        .eq('programme_id', row.id)
+      if (cycleError) return cycleError.message
+      for (const cycle of cycles ?? []) {
+        const previous = (cycle.extra_dates ?? {}) as Record<string, string | null>
+        const { error: updateError } = await supabase
+          .from('programme_cycles')
+          .update({
+            ...cyclePatch,
+            extra_dates: {
+              ...previous,
+              deadline_text: FACT_NOTES[slug] ?? previous.deadline_text ?? null,
+              opens_text: extraPatch?.opens_text ?? previous.opens_text ?? null,
+            },
+          })
+          .eq('id', cycle.id)
+        if (updateError) return updateError.message
+      }
+    }
+    if (extraPatch) {
+      const previous = (row.extra ?? {}) as Record<string, unknown>
+      const { error: updateError } = await supabase
+        .from('programmes')
+        .update({ extra: { ...previous, ...extraPatch } })
+        .eq('id', row.id)
+      if (updateError) return updateError.message
+    }
+  }
+  return null
+}
+
+/** No Erasmus Mundus scholarship for the 2027 intake. Cards are removed, not relabelled. */
+const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar'] as const
+
+async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
+  const { data: rows, error: lookupError } = await supabase
+    .from('programmes')
+    .select('id, slug')
+    .eq('catalogue_id', catalogueId)
+    .in('slug', [...RETIRED_SLUGS])
+  if (lookupError) return lookupError.message
+  const ids = (rows ?? []).map((row) => row.id as string)
+  if (ids.length === 0) return null
+
+  const { error: appError } = await supabase.from('applications').delete().in('programme_id', ids)
+  if (appError) return appError.message
+  const { error: cycleError } = await supabase.from('programme_cycles').delete().in('programme_id', ids)
+  if (cycleError) return cycleError.message
+  const { error: programmeError } = await supabase.from('programmes').delete().in('id', ids)
+  return programmeError?.message ?? null
+}
+
 export async function seedErasmusEmjmUpdates(opts?: {
   userId?: string
   force?: boolean
+  isAdmin?: boolean
 }): Promise<{ error: string | null; count: number; updated: boolean }> {
   const found = await findCatalogueBySlug('erasmus-mundus', opts?.userId)
   if (found.error) return { error: found.error, count: 0, updated: false }
   if (!found.catalogueId) return { error: null, count: 0, updated: false }
 
+  if (opts?.isAdmin) {
+    const removed = await retireProgrammesWithoutScholarship(found.catalogueId)
+    if (removed) return { error: removed, count: 0, updated: false }
+    const patched = await patchCheckedFacts()
+    if (patched) return { error: patched, count: 0, updated: false }
+  }
+
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, WAVES, and Cartography sites, 20 Oct 2026',
+    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, WAVES, and Cartography sites, 28 Oct 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }

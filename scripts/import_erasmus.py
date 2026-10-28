@@ -30,24 +30,24 @@ DATES = {
         "scholarships": True,
     },
     "CDE": {
-        "opens": "2026-11-01",
-        "scholarship": "2027-01-15",  # mid-January 2027 — exact day TBA
+        "opens": "2026-11-02",
+        "scholarship": "2027-01-22",
         "starts": "2027-10-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "GeoTech": {
-        "opens": "2026-11-01",
-        "scholarship": "2027-01-15",
+        "opens": "2026-10-01",
+        "scholarship": "2027-01-07",
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "WAVES": {
-        "opens": None,  # call not published; do not invent 1 Oct
-        "scholarship": None,
-        "starts": "2027-09-01",
-        "status": "tba",
+        "opens": "2026-10-13",
+        "scholarship": "2027-01-15",
+        "starts": "2027-10-01",
+        "status": "confirmed",
         "scholarships": True,
     },
     "GroundwatCH": {
@@ -84,7 +84,7 @@ DATES = {
         "opens": "2026-11-01",
         "scholarship": "2027-01-15",
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "MSc EF": {
@@ -95,10 +95,10 @@ DATES = {
         "scholarships": True,
     },
     "MESPOM": {
-        "opens": "2026-11-01",
+        "opens": "2026-10-01",
         "scholarship": "2027-01-07",
         "starts": "2027-09-01",
-        "status": "expected",
+        "status": "confirmed",
         "scholarships": True,
     },
     "QuBiD": {
@@ -123,11 +123,11 @@ DATES = {
         "scholarships": True,
     },
     "MERGED": {
-        "opens": "2026-11-15",
-        "scholarship": "2027-01-15",
-        "starts": "2027-09-01",
-        "status": "expected",
-        "scholarships": True,
+        "opens": None,
+        "scholarship": None,
+        "starts": None,
+        "status": "tba",
+        "scholarships": False,
     },
     "IMETE": {
         "opens": None,
@@ -320,10 +320,19 @@ def main() -> None:
     rows = read_rows()
     print(f"{len(rows)} programmes in Excel", flush=True)
 
+    retired = {"merged", "imete", "coasthazar"}
     imported = 0
     for rec in rows:
         acronym = str(rec["Acronym"]).strip()
         slug = slugify(acronym)
+        if slug in retired:
+            row = existing.get(slug)
+            if row:
+                db.request("DELETE", "/applications", params={"programme_id": f"eq.{row['id']}"})
+                db.request("DELETE", "/programme_cycles", params={"programme_id": f"eq.{row['id']}"})
+                db.request("DELETE", "/programmes", params={"id": f"eq.{row['id']}"})
+                print(f"  {acronym:12} removed — no 2027 Erasmus Mundus scholarship", flush=True)
+            continue
         dates = DATES.get(acronym, {})
         coordinator = str(rec.get("Coordinator / consortium") or "")
         website = str(rec.get("Official website") or "") or None

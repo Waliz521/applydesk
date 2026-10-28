@@ -313,6 +313,7 @@ export function CataloguePage() {
     const result = await seedErasmusEmjmUpdates({
       userId: user?.id,
       force: true,
+      isAdmin: Boolean(profile?.is_admin),
     })
     // Keep legacy Cartography-only seed as fallback if Erasmus catalogue exists but slugs differ
     if (result.error) {
@@ -892,7 +893,7 @@ export function CataloguePage() {
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
               · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Grey <FundingBadge scheme="self_funded" /> Cartography still runs, with no EMJM scholarship after the 2025 intake.
+              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. MERGED has no 2027 Erasmus Mundus scholarship. Grey <FundingBadge scheme="self_funded" /> Cartography still runs, with no EMJM scholarship after the 2025 intake.
             </p>
           ) : null}
 

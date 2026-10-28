@@ -36,7 +36,7 @@ const PROGRAMMES: SeedRec[] = [
       prepare:
         'BS geospatial/GIS or related. IELTS/TOEFL per PolyU GS. Research proposal + CV for supervisor email before portal submission. HKPFS: initial RGC form first, then PolyU quoting the reference number.',
       watch_outs:
-        'GS Ambassador Programme is for current students only. Do not apply to RPG without contacting LSGS faculty first. Jan 2027 window has closed.',
+        'GS Ambassador Programme is for current students only. Contacting an LSGS professor is advised. An application can be submitted if no supervisor has agreed yet. Jan 2027 window has closed.',
       last_checked: '1 Oct 2026',
     },
   },
@@ -121,7 +121,7 @@ const PROGRAMMES: SeedRec[] = [
     website: 'https://www.gradsch.hku.hk/prospective_students/fees_scholarships_and_financial_support/hong_kong_phd_fellowship_scheme',
     apply_url: 'https://www.polyu.edu.hk/gs/prospective-students/',
     fit_notes:
-      'Top funded PhD route in HK. Apply through the university RPG application — not a standalone RGC portal for candidates. Pakistan eligible. ~300 awards per year across all HK institutions.',
+      'Top funded PhD route in HK. Apply through the university RPG application and the RGC initial form. Pakistan eligible. 400 awards for 2027/28. Results announced May 2027.',
     cycle_label: '2027/28 fellowship cycle',
     opens: '2026-09-01',
     scholarship: '2026-12-01',
@@ -138,7 +138,7 @@ const PROGRAMMES: SeedRec[] = [
       tuition_text: 'Fee waiver plus stipend. PolyU quotes HK$344,400/year for 2027/28 HKPFS awardees (~HK$28,700/month). Results around May 2027.',
       self_funded_text: 'N/A — this row is the fellowship only.',
       scholarships_text:
-        'Presidential/ university top-ups may apply for awardees. MPhil candidates are not HKPFS-eligible — PhD only.',
+        '400 awards for 2027/28. Stipend HK$344,400 per year plus HK$14,400 travel, for up to 3 years. Results May 2027. PhD only.',
       prepare: 'Strong proposal, grades, research output. Supervisor must support nomination in the RPG form.',
       watch_outs: 'Extremely competitive. Have PGS / dept backup if not shortlisted.',
       last_checked: '1 Oct 2026',
