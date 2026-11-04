@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { DateStatusBadge, FundingBadge, OpenBadge, PriorityBadge } from '@/components/Badges'
+import {
+  DateStatusBadge,
+  FundingBadge,
+  OpenBadge,
+  PriorityBadge,
+  TrackerStatusBadge,
+} from '@/components/Badges'
+import { isAppliedStatus } from '@/lib/applicationStatus'
 import { countriesInvolved } from '@/lib/countries'
 import { deadlineFieldLabel, fundingDetail, fundingScheme, tuitionText } from '@/lib/funding'
 import { applyByDate, cycleState, daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
@@ -30,8 +37,10 @@ export function ProgrammeCard({
   openState,
   onTrack,
   onUntrack,
+  onMarkApplied,
   tracking,
   tracked,
+  trackerStatus,
 }: {
   programme: Programme
   cycle?: ProgrammeCycle | null
@@ -39,8 +48,10 @@ export function ProgrammeCard({
   openState?: string
   onTrack?: () => void
   onUntrack?: () => void
+  onMarkApplied?: () => void
   tracking?: boolean
   tracked?: boolean
+  trackerStatus?: string | null
 }) {
   const [open, setOpen] = useState(false)
   const cy = cycle ?? latestCycle(programme)
@@ -84,6 +95,7 @@ export function ProgrammeCard({
             <FundingBadge scheme={scheme} />
             <OpenBadge state={state} />
             {cy ? <DateStatusBadge status={cy.date_status} /> : null}
+            {tracked ? <TrackerStatusBadge status={trackerStatus ?? 'watching'} /> : null}
           </div>
         </div>
 
@@ -125,14 +137,26 @@ export function ProgrammeCard({
           ) : null}
           {onTrack ? (
             tracked && onUntrack ? (
-              <button
-                type="button"
-                disabled={tracking}
-                onClick={onUntrack}
-                className="shrink-0 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
-              >
-                {tracking ? 'Removing…' : 'Remove from tracker'}
-              </button>
+              <>
+                {onMarkApplied && !isAppliedStatus(trackerStatus) ? (
+                  <button
+                    type="button"
+                    disabled={tracking}
+                    onClick={onMarkApplied}
+                    className="shrink-0 rounded-lg bg-violet-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-violet-800 disabled:opacity-60"
+                  >
+                    {tracking ? 'Saving…' : 'Mark applied'}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  disabled={tracking}
+                  onClick={onUntrack}
+                  className="shrink-0 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {tracking ? 'Removing…' : 'Remove from tracker'}
+                </button>
+              </>
             ) : (
               <button
                 type="button"

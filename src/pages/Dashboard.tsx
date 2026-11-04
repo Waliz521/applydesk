@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { CatalogueSelect } from '@/components/CatalogueSelect'
 import {
   applyCycleFilters,
@@ -9,6 +10,7 @@ import {
 } from '@/components/CycleFilterBar'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
+import { isAppliedStatus, pickAppliedStatusId } from '@/lib/applicationStatus'
 import { cycleState } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
@@ -29,8 +31,11 @@ export function DashboardPage() {
   const [catalogues, setCatalogues] = useState<Catalogue[]>([])
   const [catalogueId, setCatalogueId] = useState('all')
   const [tracked, setTracked] = useState<Set<string>>(new Set())
-  const [appCount, setAppCount] = useState(0)
-  const [inProgress, setInProgress] = useState(0)
+  const [trackerStatusByProgramme, setTrackerStatusByProgramme] = useState<Map<string, string>>(
+    () => new Map(),
+  )
+  const [appliedCount, setAppliedCount] = useState(0)
+  const [pendingCount, setPendingCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -86,14 +91,23 @@ export function DashboardPage() {
     setRows(mapped)
     setCatalogues((catsRes.data ?? []) as Catalogue[])
     const apps = (appsRes.data ?? []) as Pick<Application, 'id' | 'status_id' | 'programme_id'>[]
-    setAppCount(apps.length)
-    setTracked(new Set(apps.map((a) => a.programme_id).filter(Boolean) as string[]))
-    const progressIds = new Set(
-      (statusesRes.data ?? [])
-        .filter((s) => s.slug === 'in_progress' || s.slug === 'watching')
-        .map((s) => s.id),
+    const statusById = new Map(
+      ((statusesRes.data ?? []) as { id: string; slug: string }[]).map((s) => [s.id, s.slug]),
     )
-    setInProgress(apps.filter((a) => a.status_id && progressIds.has(a.status_id)).length)
+    const statusMap = new Map<string, string>()
+    let applied = 0
+    let pending = 0
+    for (const app of apps) {
+      if (!app.programme_id) continue
+      const slug = (app.status_id && statusById.get(app.status_id)) || 'watching'
+      statusMap.set(app.programme_id, slug)
+      if (isAppliedStatus(slug)) applied += 1
+      else pending += 1
+    }
+    setTrackerStatusByProgramme(statusMap)
+    setTracked(new Set(statusMap.keys()))
+    setAppliedCount(applied)
+    setPendingCount(pending)
     setLoading(false)
     return (catsRes.data ?? []) as Catalogue[]
   }
@@ -431,6 +445,44 @@ export function DashboardPage() {
     [upcoming, upcomingFilters],
   )
 
+  const rowByProgramme = useMemo(() => {
+    const map = new Map<string, OpenRow>()
+    for (const row of rows) {
+      if (!map.has(row.programme.id)) map.set(row.programme.id, row)
+    }
+    return map
+  }, [rows])
+
+  const appliedRows = useMemo(() => {
+    const out: OpenRow[] = []
+    for (const [programmeId, slug] of trackerStatusByProgramme) {
+      if (!isAppliedStatus(slug)) continue
+      const row = rowByProgramme.get(programmeId)
+      if (row) out.push(row)
+    }
+    out.sort((a, b) => {
+      const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
+      const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
+      return da.localeCompare(db)
+    })
+    return out
+  }, [trackerStatusByProgramme, rowByProgramme])
+
+  const pendingRows = useMemo(() => {
+    const out: OpenRow[] = []
+    for (const [programmeId, slug] of trackerStatusByProgramme) {
+      if (isAppliedStatus(slug)) continue
+      const row = rowByProgramme.get(programmeId)
+      if (row) out.push(row)
+    }
+    out.sort((a, b) => {
+      const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
+      const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
+      return da.localeCompare(db)
+    })
+    return out
+  }, [trackerStatusByProgramme, rowByProgramme])
+
   useEffect(() => {
     setOpenFilters(DEFAULT_CYCLE_FILTERS)
     setUpcomingFilters(DEFAULT_CYCLE_FILTERS)
@@ -451,8 +503,15 @@ export function DashboardPage() {
       setError(result.error)
       return
     }
-    setTracked((prev) => new Set(prev).add(row.programme.id))
-    setAppCount((n) => n + (result.already ? 0 : 1))
+    if (!result.already) {
+      setTracked((prev) => new Set(prev).add(row.programme.id))
+      setTrackerStatusByProgramme((prev) => {
+        const next = new Map(prev)
+        next.set(row.programme.id, 'watching')
+        return next
+      })
+      setPendingCount((n) => n + 1)
+    }
     setNotice(result.already ? `${row.programme.acronym} is already in your tracker.` : `Added ${row.programme.acronym} to tracker.`)
   }
 
@@ -460,6 +519,7 @@ export function DashboardPage() {
     if (!user) return
     setBusyId(row.programme.id)
     setNotice(null)
+    const wasApplied = isAppliedStatus(trackerStatusByProgramme.get(row.programme.id))
     const result = await removeProgrammeFromTracker({
       userId: user.id,
       programmeId: row.programme.id,
@@ -475,9 +535,57 @@ export function DashboardPage() {
         next.delete(row.programme.id)
         return next
       })
-      setAppCount((n) => Math.max(0, n - 1))
+      setTrackerStatusByProgramme((prev) => {
+        const next = new Map(prev)
+        next.delete(row.programme.id)
+        return next
+      })
+      if (wasApplied) setAppliedCount((n) => Math.max(0, n - 1))
+      else setPendingCount((n) => Math.max(0, n - 1))
       setNotice(`Removed ${row.programme.acronym ?? row.programme.name} from tracker.`)
     }
+  }
+
+  async function markApplied(row: OpenRow) {
+    if (!user) return
+    setBusyId(row.programme.id)
+    setNotice(null)
+    const { data: statuses, error: statusError } = await supabase
+      .from('application_statuses')
+      .select('id, slug')
+    if (statusError) {
+      setBusyId(null)
+      setError(statusError.message)
+      return
+    }
+    const statusId = pickAppliedStatusId(statuses ?? [])
+    if (!statusId) {
+      setBusyId(null)
+      setError('No “submitted” or “applied” status exists in the database. Add one in application_statuses.')
+      return
+    }
+    const today = new Date().toISOString().slice(0, 10)
+    const { error: updateError } = await supabase
+      .from('applications')
+      .update({ status_id: statusId, applied_on: today })
+      .eq('user_id', user.id)
+      .eq('programme_id', row.programme.id)
+    setBusyId(null)
+    if (updateError) {
+      setError(updateError.message)
+      return
+    }
+    const wasApplied = isAppliedStatus(trackerStatusByProgramme.get(row.programme.id))
+    setTrackerStatusByProgramme((prev) => {
+      const next = new Map(prev)
+      next.set(row.programme.id, 'submitted')
+      return next
+    })
+    if (!wasApplied) {
+      setAppliedCount((n) => n + 1)
+      setPendingCount((n) => Math.max(0, n - 1))
+    }
+    setNotice(`Marked ${row.programme.acronym ?? row.programme.name} as applied.`)
   }
 
   return (
@@ -601,19 +709,73 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Open now" value={loading ? '…' : String(filteredOpen.length)} tone="emerald" />
         <Stat label="Opening soon" value={loading ? '…' : String(filteredUpcoming.length)} tone="amber" />
         <Stat
-          label="In your tracker"
-          value={loading ? '…' : String(appCount)}
-          hint={inProgress ? `${inProgress} watching / in progress` : 'Add from a card'}
+          label="Applied"
+          value={loading ? '…' : String(appliedCount)}
+          hint={
+            loading
+              ? undefined
+              : appliedCount
+                ? 'Forms already filed'
+                : 'Mark submitted programmes below'
+          }
+          tone="violet"
+        />
+        <Stat
+          label="Still to apply"
+          value={loading ? '…' : String(pendingCount)}
+          hint={
+            loading
+              ? undefined
+              : pendingCount
+                ? `${pendingCount} tracked · not filed yet`
+                : appliedCount
+                  ? 'Tracker is clear'
+                  : 'Add programmes from a card'
+          }
           tone="sky"
         />
       </section>
 
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       {notice ? <p className="text-sm text-emerald-800">{notice}</p> : null}
+
+      <CycleSection
+        title="Applied"
+        empty="Nothing marked as applied yet. Use Mark applied on a tracked card, or set status to Submitted on the Tracker page."
+        loading={loading}
+        rows={appliedRows}
+        tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
+        busyId={busyId}
+        onTrack={track}
+        onUntrack={untrack}
+        onMarkApplied={markApplied}
+        footer={
+          <p className="mt-2 text-xs text-muted">
+            Change status anytime on the{' '}
+            <Link to="/applications" className="font-medium text-sky hover:underline">
+              Tracker
+            </Link>{' '}
+            page.
+          </p>
+        }
+      />
+      <CycleSection
+        title="Still to apply"
+        empty="No tracked programmes left to file. Add open calls below, then mark them applied when you submit."
+        loading={loading}
+        rows={pendingRows}
+        tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
+        busyId={busyId}
+        onTrack={track}
+        onUntrack={untrack}
+        onMarkApplied={markApplied}
+      />
 
       <CycleSection
         title="Open now"
@@ -625,9 +787,11 @@ export function DashboardPage() {
         loading={loading}
         rows={filteredOpen}
         tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
+        onMarkApplied={markApplied}
         filters={
           <CycleFilterBar
             filters={openFilters}
@@ -643,9 +807,11 @@ export function DashboardPage() {
         loading={false}
         rows={filteredUpcoming}
         tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
+        onMarkApplied={markApplied}
         filters={
           <CycleFilterBar
             filters={upcomingFilters}
@@ -661,9 +827,11 @@ export function DashboardPage() {
         loading={false}
         rows={watch}
         tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
+        onMarkApplied={markApplied}
       />
     </div>
   )
@@ -675,20 +843,26 @@ function CycleSection({
   loading,
   rows,
   tracked,
+  trackerStatusByProgramme,
   busyId,
   onTrack,
   onUntrack,
+  onMarkApplied,
   filters,
+  footer,
 }: {
   title: string
   empty: string
   loading: boolean
   rows: OpenRow[]
   tracked: Set<string>
+  trackerStatusByProgramme: Map<string, string>
   busyId: string | null
   onTrack: (row: OpenRow) => void
   onUntrack?: (row: OpenRow) => void
+  onMarkApplied?: (row: OpenRow) => void
   filters?: React.ReactNode
+  footer?: React.ReactNode
 }) {
   return (
     <section>
@@ -704,19 +878,22 @@ function CycleSection({
         <div className="grid items-start gap-3 md:grid-cols-2">
           {rows.map((row) => (
             <ProgrammeCard
-              key={row.id}
+              key={`${title}-${row.id}`}
               programme={row.programme}
               cycle={row}
               catalogueName={row.catalogue.name}
               openState={row.open_state}
               tracked={tracked.has(row.programme.id)}
+              trackerStatus={trackerStatusByProgramme.get(row.programme.id) ?? null}
               tracking={busyId === row.programme.id}
               onTrack={() => onTrack(row)}
               onUntrack={onUntrack ? () => onUntrack(row) : undefined}
+              onMarkApplied={onMarkApplied ? () => onMarkApplied(row) : undefined}
             />
           ))}
         </div>
       )}
+      {footer}
     </section>
   )
 }
@@ -730,11 +907,24 @@ function Stat({
   label: string
   value: string
   hint?: string
-  tone: 'emerald' | 'amber' | 'sky'
+  tone: 'emerald' | 'amber' | 'sky' | 'violet'
 }) {
   const ring =
-    tone === 'emerald' ? 'border-emerald-200 bg-emerald-50' : tone === 'amber' ? 'border-amber-200 bg-amber-50' : 'border-sky/30 bg-sky/10'
-  const num = tone === 'emerald' ? 'text-emerald-800' : tone === 'amber' ? 'text-amber-800' : 'text-sky-dark'
+    tone === 'emerald'
+      ? 'border-emerald-200 bg-emerald-50'
+      : tone === 'amber'
+        ? 'border-amber-200 bg-amber-50'
+        : tone === 'violet'
+          ? 'border-violet-200 bg-violet-50'
+          : 'border-sky/30 bg-sky/10'
+  const num =
+    tone === 'emerald'
+      ? 'text-emerald-800'
+      : tone === 'amber'
+        ? 'text-amber-800'
+        : tone === 'violet'
+          ? 'text-violet-900'
+          : 'text-sky-dark'
   return (
     <div className={`rounded-2xl border p-5 shadow-sm ${ring}`}>
       <p className="text-sm text-muted">{label}</p>
