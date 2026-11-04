@@ -10,7 +10,6 @@ import {
 } from '@/components/CycleFilterBar'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
-import { isAppliedStatus, pickAppliedStatusId } from '@/lib/applicationStatus'
 import { cycleState } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
@@ -35,7 +34,6 @@ export function DashboardPage() {
     () => new Map(),
   )
   const [appliedCount, setAppliedCount] = useState(0)
-  const [pendingCount, setPendingCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -95,19 +93,14 @@ export function DashboardPage() {
       ((statusesRes.data ?? []) as { id: string; slug: string }[]).map((s) => [s.id, s.slug]),
     )
     const statusMap = new Map<string, string>()
-    let applied = 0
-    let pending = 0
     for (const app of apps) {
       if (!app.programme_id) continue
-      const slug = (app.status_id && statusById.get(app.status_id)) || 'watching'
+      const slug = (app.status_id && statusById.get(app.status_id)) || 'submitted'
       statusMap.set(app.programme_id, slug)
-      if (isAppliedStatus(slug)) applied += 1
-      else pending += 1
     }
     setTrackerStatusByProgramme(statusMap)
     setTracked(new Set(statusMap.keys()))
-    setAppliedCount(applied)
-    setPendingCount(pending)
+    setAppliedCount(statusMap.size)
     setLoading(false)
     return (catsRes.data ?? []) as Catalogue[]
   }
@@ -432,9 +425,13 @@ export function DashboardPage() {
     () => (catalogueId === 'all' ? rows : rows.filter((r) => r.catalogue.id === catalogueId)),
     [rows, catalogueId],
   )
-  const openRows = useMemo(() => visibleRows.filter((r) => r.open_state === 'open'), [visibleRows])
-  const upcoming = useMemo(() => visibleRows.filter((r) => r.open_state === 'upcoming'), [visibleRows])
-  const watch = useMemo(() => visibleRows.filter((r) => r.open_state === 'unknown'), [visibleRows])
+  const browseRows = useMemo(
+    () => visibleRows.filter((r) => !tracked.has(r.programme.id)),
+    [visibleRows, tracked],
+  )
+  const openRows = useMemo(() => browseRows.filter((r) => r.open_state === 'open'), [browseRows])
+  const upcoming = useMemo(() => browseRows.filter((r) => r.open_state === 'upcoming'), [browseRows])
+  const watch = useMemo(() => browseRows.filter((r) => r.open_state === 'unknown'), [browseRows])
   const selectedCatalogue = catalogues.find((c) => c.id === catalogueId)
 
   const openMonths = useMemo(() => monthsFromRows(openRows), [openRows])
@@ -455,8 +452,7 @@ export function DashboardPage() {
 
   const appliedRows = useMemo(() => {
     const out: OpenRow[] = []
-    for (const [programmeId, slug] of trackerStatusByProgramme) {
-      if (!isAppliedStatus(slug)) continue
+    for (const programmeId of tracked) {
       const row = rowByProgramme.get(programmeId)
       if (row) out.push(row)
     }
@@ -466,22 +462,7 @@ export function DashboardPage() {
       return da.localeCompare(db)
     })
     return out
-  }, [trackerStatusByProgramme, rowByProgramme])
-
-  const pendingRows = useMemo(() => {
-    const out: OpenRow[] = []
-    for (const [programmeId, slug] of trackerStatusByProgramme) {
-      if (isAppliedStatus(slug)) continue
-      const row = rowByProgramme.get(programmeId)
-      if (row) out.push(row)
-    }
-    out.sort((a, b) => {
-      const da = a.scholarship_deadline || a.self_funded_deadline || '9999'
-      const db = b.scholarship_deadline || b.self_funded_deadline || '9999'
-      return da.localeCompare(db)
-    })
-    return out
-  }, [trackerStatusByProgramme, rowByProgramme])
+  }, [tracked, rowByProgramme])
 
   useEffect(() => {
     setOpenFilters(DEFAULT_CYCLE_FILTERS)
@@ -507,19 +488,22 @@ export function DashboardPage() {
       setTracked((prev) => new Set(prev).add(row.programme.id))
       setTrackerStatusByProgramme((prev) => {
         const next = new Map(prev)
-        next.set(row.programme.id, 'watching')
+        next.set(row.programme.id, 'submitted')
         return next
       })
-      setPendingCount((n) => n + 1)
+      setAppliedCount((n) => n + 1)
     }
-    setNotice(result.already ? `${row.programme.acronym} is already in your tracker.` : `Added ${row.programme.acronym} to tracker.`)
+    setNotice(
+      result.already
+        ? `${row.programme.acronym} is already in Applied.`
+        : `Moved ${row.programme.acronym} to Applied.`,
+    )
   }
 
   async function untrack(row: OpenRow) {
     if (!user) return
     setBusyId(row.programme.id)
     setNotice(null)
-    const wasApplied = isAppliedStatus(trackerStatusByProgramme.get(row.programme.id))
     const result = await removeProgrammeFromTracker({
       userId: user.id,
       programmeId: row.programme.id,
@@ -540,52 +524,9 @@ export function DashboardPage() {
         next.delete(row.programme.id)
         return next
       })
-      if (wasApplied) setAppliedCount((n) => Math.max(0, n - 1))
-      else setPendingCount((n) => Math.max(0, n - 1))
-      setNotice(`Removed ${row.programme.acronym ?? row.programme.name} from tracker.`)
+      setAppliedCount((n) => Math.max(0, n - 1))
+      setNotice(`Removed ${row.programme.acronym ?? row.programme.name} from Applied.`)
     }
-  }
-
-  async function markApplied(row: OpenRow) {
-    if (!user) return
-    setBusyId(row.programme.id)
-    setNotice(null)
-    const { data: statuses, error: statusError } = await supabase
-      .from('application_statuses')
-      .select('id, slug')
-    if (statusError) {
-      setBusyId(null)
-      setError(statusError.message)
-      return
-    }
-    const statusId = pickAppliedStatusId(statuses ?? [])
-    if (!statusId) {
-      setBusyId(null)
-      setError('No “submitted” or “applied” status exists in the database. Add one in application_statuses.')
-      return
-    }
-    const today = new Date().toISOString().slice(0, 10)
-    const { error: updateError } = await supabase
-      .from('applications')
-      .update({ status_id: statusId, applied_on: today })
-      .eq('user_id', user.id)
-      .eq('programme_id', row.programme.id)
-    setBusyId(null)
-    if (updateError) {
-      setError(updateError.message)
-      return
-    }
-    const wasApplied = isAppliedStatus(trackerStatusByProgramme.get(row.programme.id))
-    setTrackerStatusByProgramme((prev) => {
-      const next = new Map(prev)
-      next.set(row.programme.id, 'submitted')
-      return next
-    })
-    if (!wasApplied) {
-      setAppliedCount((n) => n + 1)
-      setPendingCount((n) => Math.max(0, n - 1))
-    }
-    setNotice(`Marked ${row.programme.acronym ?? row.programme.name} as applied.`)
   }
 
   return (
@@ -709,73 +650,19 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-3">
         <Stat label="Open now" value={loading ? '…' : String(filteredOpen.length)} tone="emerald" />
         <Stat label="Opening soon" value={loading ? '…' : String(filteredUpcoming.length)} tone="amber" />
         <Stat
           label="Applied"
           value={loading ? '…' : String(appliedCount)}
-          hint={
-            loading
-              ? undefined
-              : appliedCount
-                ? 'Forms already filed'
-                : 'Mark submitted programmes below'
-          }
+          hint={loading ? undefined : appliedCount ? 'In your tracker' : 'Add from Open now'}
           tone="violet"
-        />
-        <Stat
-          label="Still to apply"
-          value={loading ? '…' : String(pendingCount)}
-          hint={
-            loading
-              ? undefined
-              : pendingCount
-                ? `${pendingCount} tracked · not filed yet`
-                : appliedCount
-                  ? 'Tracker is clear'
-                  : 'Add programmes from a card'
-          }
-          tone="sky"
         />
       </section>
 
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       {notice ? <p className="text-sm text-emerald-800">{notice}</p> : null}
-
-      <CycleSection
-        title="Applied"
-        empty="Nothing marked as applied yet. Use Mark applied on a tracked card, or set status to Submitted on the Tracker page."
-        loading={loading}
-        rows={appliedRows}
-        tracked={tracked}
-        trackerStatusByProgramme={trackerStatusByProgramme}
-        busyId={busyId}
-        onTrack={track}
-        onUntrack={untrack}
-        onMarkApplied={markApplied}
-        footer={
-          <p className="mt-2 text-xs text-muted">
-            Change status anytime on the{' '}
-            <Link to="/applications" className="font-medium text-sky hover:underline">
-              Tracker
-            </Link>{' '}
-            page.
-          </p>
-        }
-      />
-      <CycleSection
-        title="Still to apply"
-        empty="No tracked programmes left to file. Add open calls below, then mark them applied when you submit."
-        loading={loading}
-        rows={pendingRows}
-        tracked={tracked}
-        trackerStatusByProgramme={trackerStatusByProgramme}
-        busyId={busyId}
-        onTrack={track}
-        onUntrack={untrack}
-        onMarkApplied={markApplied}
-      />
 
       <CycleSection
         title="Open now"
@@ -791,7 +678,6 @@ export function DashboardPage() {
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
-        onMarkApplied={markApplied}
         filters={
           <CycleFilterBar
             filters={openFilters}
@@ -811,7 +697,6 @@ export function DashboardPage() {
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
-        onMarkApplied={markApplied}
         filters={
           <CycleFilterBar
             filters={upcomingFilters}
@@ -831,7 +716,26 @@ export function DashboardPage() {
         busyId={busyId}
         onTrack={track}
         onUntrack={untrack}
-        onMarkApplied={markApplied}
+      />
+      <CycleSection
+        title="Applied"
+        empty="Nothing in Applied yet. Add a programme from Open now and it moves here."
+        loading={loading}
+        rows={appliedRows}
+        tracked={tracked}
+        trackerStatusByProgramme={trackerStatusByProgramme}
+        busyId={busyId}
+        onTrack={track}
+        onUntrack={untrack}
+        footer={
+          <p className="mt-2 text-xs text-muted">
+            Tracker details live on the{' '}
+            <Link to="/applications" className="font-medium text-sky hover:underline">
+              Tracker
+            </Link>{' '}
+            page.
+          </p>
+        }
       />
     </div>
   )
@@ -847,7 +751,6 @@ function CycleSection({
   busyId,
   onTrack,
   onUntrack,
-  onMarkApplied,
   filters,
   footer,
 }: {
@@ -860,10 +763,10 @@ function CycleSection({
   busyId: string | null
   onTrack: (row: OpenRow) => void
   onUntrack?: (row: OpenRow) => void
-  onMarkApplied?: (row: OpenRow) => void
   filters?: React.ReactNode
   footer?: React.ReactNode
 }) {
+  const appliedSection = title === 'Applied'
   return (
     <section>
       <h2 className="mb-3 text-lg font-semibold">
@@ -884,11 +787,14 @@ function CycleSection({
               catalogueName={row.catalogue.name}
               openState={row.open_state}
               tracked={tracked.has(row.programme.id)}
-              trackerStatus={trackerStatusByProgramme.get(row.programme.id) ?? null}
+              trackerStatus={
+                appliedSection
+                  ? 'submitted'
+                  : (trackerStatusByProgramme.get(row.programme.id) ?? null)
+              }
               tracking={busyId === row.programme.id}
               onTrack={() => onTrack(row)}
               onUntrack={onUntrack ? () => onUntrack(row) : undefined}
-              onMarkApplied={onMarkApplied ? () => onMarkApplied(row) : undefined}
             />
           ))}
         </div>

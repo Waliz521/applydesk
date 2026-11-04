@@ -154,7 +154,7 @@ export function ProgrammeCard({
                   onClick={onUntrack}
                   className="shrink-0 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
                 >
-                  {tracking ? 'Removing…' : 'Remove from tracker'}
+                  {tracking ? 'Removing…' : 'Remove from Applied'}
                 </button>
               </>
             ) : (
@@ -164,7 +164,7 @@ export function ProgrammeCard({
                 onClick={onTrack}
                 className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-100 disabled:text-emerald-800"
               >
-                {tracked ? 'In tracker' : tracking ? 'Adding…' : 'Add to tracker'}
+                {tracked ? 'In Applied' : tracking ? 'Adding…' : 'Add to Applied'}
               </button>
             )
           ) : (

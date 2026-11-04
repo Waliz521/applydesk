@@ -40,7 +40,11 @@ export async function addProgrammeToTracker(input: {
   if (existing && existing.length > 0) return { error: null, already: true }
 
   const { data: statuses } = await supabase.from('application_statuses').select('id, slug')
+  const applied =
+    statuses?.find((s) => s.slug === 'submitted') ??
+    statuses?.find((s) => s.slug === 'applied')
   const watching = statuses?.find((s) => s.slug === 'watching') ?? statuses?.[0]
+  const status = applied ?? watching
   const { error } = await supabase.from('applications').insert({
     user_id: input.userId,
     programme_id: input.programme.id,
@@ -53,7 +57,8 @@ export async function addProgrammeToTracker(input: {
     scholarship_name: trackerScholarshipName(input.programme),
     portal_url: input.programme.apply_url || input.programme.website,
     deadline: applyByDate(input.cycle) ?? null,
-    status_id: watching?.id ?? null,
+    status_id: status?.id ?? null,
+    applied_on: applied ? new Date().toISOString().slice(0, 10) : null,
     notes: input.programme.fit_notes,
   })
   return { error: error?.message ?? null, already: false }
