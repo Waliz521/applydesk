@@ -207,7 +207,7 @@ const PROGRAMMES: SeedRec[] = [
 
 const FACT_CYCLES: Record<string, Record<string, string | boolean | null>> = {
   geotech: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
-  sufonama: { application_opens_on: '2026-11-01', scholarship_deadline: '2027-01-15', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
+  sufonama: { application_opens_on: '2026-11-15', scholarship_deadline: '2027-01-15', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
   mespom: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
   'msc-ef': { application_opens_on: '2026-12-02', scholarship_deadline: '2027-01-13', starts_on: '2027-08-01', date_status: 'confirmed', scholarships_available: true },
 }
@@ -223,11 +223,11 @@ const FACT_EXTRAS: Record<string, Record<string, string>> = {
   },
   sufonama: {
     funding_scheme: 'emjm',
-    opens_text: 'Applicants outside the EU, EEA, and Switzerland apply from November 2026.',
-    deadline_text: 'Confirmed: 15 January 2027, 23:59 CET.',
+    opens_text: 'Outside EU/EEA/Switzerland: portal opens 15 November 2026, 23:59 CET. EU/EEA/Switzerland: 16 January 2027.',
+    deadline_text: 'Outside EU/EEA/Switzerland: 15 January 2027, 23:59 CET. EU/EEA/Switzerland: 1 March 2027, 23:59 CET.',
     scholarships_text: 'Erasmus Mundus scholarship. No application fee. Two signed letters on letterhead are required for the scholarship, at least one from a teacher.',
     prepare: 'Europass CV, motivation letter of about 500 words, and two recommendation letters if you apply for the scholarship.',
-    last_checked: '28 Oct 2026',
+    last_checked: '5 Nov 2026',
   },
   mespom: {
     funding_scheme: 'emjm',
@@ -253,7 +253,7 @@ const FACT_EXTRAS: Record<string, Record<string, string>> = {
 
 const FACT_NOTES: Record<string, string> = {
   geotech: 'Confirmed: 7 January 2027, 18:00 CET, for the Erasmus Mundus scholarship.',
-  sufonama: 'Confirmed: 15 January 2027, 23:59 CET. Applicants outside the EU apply from November 2026.',
+  sufonama: 'Confirmed: non-EU portal opens 15 November 2026; scholarship deadline 15 January 2027, 23:59 CET (sufonama-em.eu).',
   mespom: 'Scholarship deadline 7 January 2027. Referees have 7 days after you submit.',
   'msc-ef': 'Confirmed: 13 January 2027. Motivation video by 20 January 2027, 23:59 Helsinki time.',
 }
