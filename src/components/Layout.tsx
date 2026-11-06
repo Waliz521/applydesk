@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 
-const STORAGE_KEY = 'applydesk.sidebar.collapsed'
+const STORAGE_KEY = 'applydesk.sidebar.collapsed.v2'
 
 const links = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
@@ -13,9 +13,9 @@ const links = [
 
 function readCollapsed() {
   try {
-    return localStorage.getItem(STORAGE_KEY) === '1'
+    return localStorage.getItem(STORAGE_KEY) !== '0'
   } catch {
-    return false
+    return true
   }
 }
 
