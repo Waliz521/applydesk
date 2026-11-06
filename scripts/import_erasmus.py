@@ -87,11 +87,11 @@ DATES = {
         "scholarships": True,
     },
     "MESPOM": {
-        "opens": "2026-10-01",
-        "scholarship": "2027-01-07",
-        "starts": "2027-09-01",
+        "opens": None,
+        "scholarship": None,
+        "starts": None,
         "status": "confirmed",
-        "scholarships": True,
+        "scholarships": False,
     },
     "QuBiD": {
         "opens": None,
@@ -312,7 +312,7 @@ def main() -> None:
     rows = read_rows()
     print(f"{len(rows)} programmes in Excel", flush=True)
 
-    retired = {"merged", "imete", "coasthazar", "cartography"}
+    retired = {"merged", "imete", "coasthazar", "cartography", "mespom"}
     imported = 0
     for rec in rows:
         acronym = str(rec["Acronym"]).strip()

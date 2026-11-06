@@ -208,7 +208,6 @@ const PROGRAMMES: SeedRec[] = [
 const FACT_CYCLES: Record<string, Record<string, string | boolean | null>> = {
   geotech: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
   sufonama: { application_opens_on: '2026-11-15', scholarship_deadline: '2027-01-15', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
-  mespom: { application_opens_on: '2026-10-01', scholarship_deadline: '2027-01-07', starts_on: '2027-09-01', date_status: 'confirmed', scholarships_available: true },
   'msc-ef': { application_opens_on: '2026-12-02', scholarship_deadline: '2027-01-13', starts_on: '2027-08-01', date_status: 'confirmed', scholarships_available: true },
 }
 
@@ -229,14 +228,6 @@ const FACT_EXTRAS: Record<string, Record<string, string>> = {
     prepare: 'Europass CV, motivation letter of about 500 words, and two recommendation letters if you apply for the scholarship.',
     last_checked: '5 Nov 2026',
   },
-  mespom: {
-    funding_scheme: 'emjm',
-    opens_text: 'The 2027–2029 CEU application is open.',
-    deadline_text: 'Scholarship deadline 7 January 2027. Referees have 7 days after you submit.',
-    scholarships_text: 'Erasmus Mundus scholarship. Two recommendation letters through the CEU form. The portal emails the referees.',
-    prepare: 'Two referees who can reply within 7 days of submission. Letters are collected by the form, not uploaded as PDFs.',
-    last_checked: '28 Oct 2026',
-  },
   'msc-ef': {
     funding_scheme: 'emjm',
     opens_text: 'Confirmed: the call opens 2 December 2026.',
@@ -254,7 +245,6 @@ const FACT_EXTRAS: Record<string, Record<string, string>> = {
 const FACT_NOTES: Record<string, string> = {
   geotech: 'Confirmed: 7 January 2027, 18:00 CET, for the Erasmus Mundus scholarship.',
   sufonama: 'Confirmed: non-EU portal opens 15 November 2026; scholarship deadline 15 January 2027, 23:59 CET (sufonama-em.eu).',
-  mespom: 'Scholarship deadline 7 January 2027. Referees have 7 days after you submit.',
   'msc-ef': 'Confirmed: 13 January 2027. Motivation video by 20 January 2027, 23:59 Helsinki time.',
 }
 
@@ -301,7 +291,7 @@ async function patchCheckedFacts(): Promise<string | null> {
 }
 
 /** No Erasmus Mundus scholarship for the 2027 intake. Cards are removed, not relabelled. */
-const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography'] as const
+const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom'] as const
 
 async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
   const { data: rows, error: lookupError } = await supabase
