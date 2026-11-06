@@ -885,7 +885,7 @@ export function CataloguePage() {
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
               · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship, including Cartography and MESPOM, are not listed.
+              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
             </p>
           ) : null}
 

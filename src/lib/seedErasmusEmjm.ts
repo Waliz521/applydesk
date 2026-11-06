@@ -291,7 +291,7 @@ async function patchCheckedFacts(): Promise<string | null> {
 }
 
 /** No Erasmus Mundus scholarship for the 2027 intake. Cards are removed, not relabelled. */
-const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom'] as const
+const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom', 'imrd'] as const
 
 async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
   const { data: rows, error: lookupError } = await supabase

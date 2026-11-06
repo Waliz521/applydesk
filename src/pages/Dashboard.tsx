@@ -599,7 +599,7 @@ export function DashboardPage() {
               Pakistan is eligible. <span className="font-medium">GEM</span> deadline 15 Jan 2027 (no reference letter).{' '}
               <span className="font-medium">GroundwatCH</span> and <span className="font-medium">FloodRISK</span> Partner deadline 3 Jan 2027. GroundwatCH needs two letters dated within six months. Apply to one IHE programme only.{' '}
               <span className="font-medium">WAVES</span> scholarship deadline 15 Jan 2027 (one signed reference).{' '}
-              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship are not listed. MESPOM is one of them: CEU Admissions confirmed on 6 Nov 2026 that 2027–2029 has no EMJM funding.
+              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship are not listed. That includes MESPOM (CEU Admissions, 6 Nov 2026) and IMRD, whose current fees page charges tuition and does not publish a 2027 EMJM award.
             </p>
           ) : null}
         </div>
