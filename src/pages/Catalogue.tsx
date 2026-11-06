@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { ChoiceBar } from '@/components/ChoiceBar'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { FundingBadge, PriorityBadge } from '@/components/Badges'
 import { useAuth } from '@/context/AuthContext'
@@ -18,6 +19,56 @@ import { supabase } from '@/lib/supabase'
 import type { Catalogue, Programme, ProgrammeCycle } from '@/lib/types'
 
 const PRIORITY_FILTERS = ['all', 'A', 'A-', 'B', 'C'] as const
+
+const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; label: string }[]> = {
+  daad: [
+    { id: 'all', label: 'All DAAD (shown)' },
+    { id: 'study_scholarship', label: 'Not EPOS' },
+  ],
+  poland: [
+    { id: 'all', label: 'All Poland' },
+    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'nawa', label: 'NAWA scholarship' },
+  ],
+  austria: [
+    { id: 'all', label: 'All Austria' },
+    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'oead', label: 'OeAD · Busek' },
+    { id: 'partial', label: 'Partial / other' },
+  ],
+  netherlands: [
+    { id: 'all', label: 'All Netherlands' },
+    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'partial', label: 'Partial scholarship' },
+    { id: 'full', label: 'Full university grant' },
+  ],
+  france: [
+    { id: 'all', label: 'All France' },
+    { id: 'full', label: 'France Excellence Climate' },
+    { id: 'self_funded', label: 'Master’s (tuition)' },
+  ],
+  denmark: [
+    { id: 'all', label: 'All Denmark' },
+    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'partial', label: 'Danish gov / partial' },
+  ],
+  finland: [
+    { id: 'all', label: 'All Finland' },
+    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'partial', label: 'Tuition waiver' },
+  ],
+  'hong-kong': [
+    { id: 'all', label: 'All Hong Kong' },
+    { id: 'partial', label: 'RPG / PGS / IPFS' },
+    { id: 'full', label: 'HKPFS (PhD)' },
+    { id: 'self_funded', label: 'Taught MSc (tuition)' },
+  ],
+  'erasmus-mundus': [
+    { id: 'all', label: 'All Erasmus' },
+    { id: 'emjm', label: 'EMJM scholarship' },
+    { id: 'self_funded', label: 'No EM award (tuition)' },
+  ],
+}
 
 export function CataloguePage() {
   const { user, profile } = useAuth()
@@ -385,22 +436,16 @@ export function CataloguePage() {
         </p>
       </div>
 
+      <ChoiceBar
+        wrap
+        options={catalogues.map((c) => ({ id: c.id, label: c.name }))}
+        value={activeId ?? ''}
+        onChange={(id) => {
+          setActiveId(id)
+          setFunding('all')
+        }}
+      />
       <div className="flex flex-wrap gap-2">
-        {catalogues.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => {
-              setActiveId(c.id)
-              setFunding('all')
-            }}
-            className={`rounded-full px-3 py-1.5 text-sm ${
-              c.id === activeId ? 'bg-navy text-white' : 'bg-white text-slate-600 ring-1 ring-line hover:bg-slate-50'
-            }`}
-          >
-            {c.name}
-          </button>
-        ))}
         {canEdit && !catalogues.some((c) => c.slug === 'poland') ? (
           <button
             type="button"
@@ -567,7 +612,7 @@ export function CataloguePage() {
                   <button
                     type="button"
                     onClick={() => setShowForm((v) => !v)}
-                    className="rounded-lg bg-sky px-3 py-2 text-sm font-semibold text-white"
+                    className="rounded-lg bg-navy px-3 py-2 text-sm font-semibold text-white hover:bg-navy/90"
                   >
                     {showForm ? 'Close' : 'Add programme'}
                   </button>
@@ -575,245 +620,28 @@ export function CataloguePage() {
               ) : null}
             </div>
 
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-4 space-y-3">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search GEM, water, ITC, forest…"
-                className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-sky"
+                className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-navy"
               />
-              <div className="flex flex-wrap gap-1.5">
-                {PRIORITY_FILTERS.map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setPriority(p)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      priority === p ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {p === 'all' ? 'All' : p}
-                  </button>
-                ))}
-              </div>
+              <ChoiceBar
+                label="Priority"
+                options={PRIORITY_FILTERS.map((p) => ({ id: p, label: p === 'all' ? 'All' : p }))}
+                value={priority}
+                onChange={(id) => setPriority(id as (typeof PRIORITY_FILTERS)[number])}
+              />
+              {FUNDING_OPTIONS[active.slug] ? (
+                <ChoiceBar
+                  label="Funding type"
+                  options={FUNDING_OPTIONS[active.slug]}
+                  value={funding}
+                  onChange={(id) => setFunding(id as 'all' | FundingScheme)}
+                />
+              ) : null}
             </div>
-
-            {active.slug === 'daad' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All DAAD (shown)'],
-                    ['study_scholarship', 'Not EPOS'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'poland' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Poland'],
-                    ['self_funded', 'Self-funded (tuition)'],
-                    ['nawa', 'NAWA scholarship'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'austria' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Austria'],
-                    ['self_funded', 'Self-funded (tuition)'],
-                    ['oead', 'OeAD · Busek'],
-                    ['partial', 'Partial / other'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'netherlands' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Netherlands'],
-                    ['self_funded', 'Self-funded (tuition)'],
-                    ['partial', 'Partial scholarship'],
-                    ['full', 'Full university grant'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'france' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All France'],
-                    ['self_funded', 'Master’s (tuition)'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'denmark' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Denmark'],
-                    ['self_funded', 'Self-funded (tuition)'],
-                    ['partial', 'Danish gov / partial'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'finland' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Finland'],
-                    ['self_funded', 'Self-funded (tuition)'],
-                    ['partial', 'Tuition waiver'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'hong-kong' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Hong Kong'],
-                    ['partial', 'RPG / PGS / IPFS'],
-                    ['full', 'HKPFS (PhD)'],
-                    ['self_funded', 'Taught MSc (tuition)'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {active.slug === 'erasmus-mundus' ? (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-medium text-muted">Funding type</span>
-                {(
-                  [
-                    ['all', 'All Erasmus'],
-                    ['emjm', 'EMJM scholarship'],
-                    ['self_funded', 'No EM award (tuition)'],
-                  ] as const
-                ).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFunding(id)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      funding === id ? 'bg-ink text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
 
             {showForm && canEdit ? (
               <form onSubmit={(e) => void addProgramme(e)} className="mt-4 grid gap-3 md:grid-cols-2">
@@ -861,7 +689,7 @@ export function CataloguePage() {
               No programmes match this filter.
             </p>
           ) : (
-            <div className="grid items-start gap-3 md:grid-cols-2">
+            <div className="grid items-stretch gap-3 md:grid-cols-2">
               {visible.map((p) => (
                 <ProgrammeCard
                   key={p.id}
@@ -921,7 +749,7 @@ export function CataloguePage() {
 
           {active.slug === 'france' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              The France list is the three programmes in the Études en France cart. Grenoble IMAGERS also has its own form, open until 15 April 2027. Nantes is filed on the Nantes form. Aix-Marseille IMG is filed only here, and the cart locks on 18 November 2026.
+              France Excellence Pakistan Climate Change is IMT PM3E and Avignon MAFEN only. Both lock in the Études en France cart on 18 November 2026, and PM3E also needs the IMT form. IMG and the other France cards are not on that scholarship.
             </p>
           ) : null}
 

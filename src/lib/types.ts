@@ -21,6 +21,7 @@ export type ProgrammeExtra = {
   watch_outs?: string | null
   last_checked?: string | null
   funding_scheme?: FundingScheme | null
+  funding_label?: string | null
   work_years_required?: boolean | null
 }
 

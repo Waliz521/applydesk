@@ -7,6 +7,9 @@ const TUITION =
 const SCHOLARSHIP =
   'No automatic scholarship with the degree. Ask the university’s international office to nominate you for France Excellence Eiffel. Their file to Campus France is due 6 January 2027. Eiffel is a living stipend for 12–24 months, and only if the university places the degree under ecological transition, mathematics and digital sciences, or engineering.'
 
+const CLIMATE =
+  'France Excellence Pakistan – Climate Change, the embassy award for this programme only. It covers tuition, a monthly living allowance, one return ticket, social security, French classes before departure, and reimbursement of the Études en France fee after the award. Pakistani nationality, age 28 or under at application, a four-year HEC bachelor with CGPA at least 3.0/4, and no more than two years since the bachelor. File the Études en France cart by 18 November 2026. IMG and Grenoble are not on this list.'
+
 /** Removed from this catalogue: French-certificate degrees, and the Eiffel scholarship card. */
 const RETIRED_SLUGS = [
   'uge-geomatique-m1',
@@ -20,6 +23,88 @@ const RETIRED_SLUGS = [
 ] as const
 
 const PROGRAMMES: SeedRec[] = [
+  {
+    slug: 'imt-pm3e',
+    acronym: 'PM3E',
+    name: 'Project management for environmental and energy engineering',
+    official_title:
+      'MSc Process and Bioprocess Engineering — track Project Management for Environmental and Energy Engineering',
+    priority: 'A',
+    coordinator: 'IMT Atlantique — Nantes',
+    countries: ['France'],
+    duration: '2 years (M1, Bac+4)',
+    website: 'https://www.imt-atlantique.fr/en/study/masters/msc/pbpe-pm3e',
+    apply_url: 'https://www.imt-atlantique.fr/en/study/masters/msc/pbpe-pm3e/apply',
+    language: 'English',
+    fit_notes:
+      'On the 2027 France Excellence Pakistan Climate Change list. Fully English, Nantes, September start. The embassy award needs both the Études en France cart and the IMT application before 18 November 2026. M1 asks for a science or engineering bachelor, preferably mechanical, chemical, energy, or environmental engineering, with mathematics, chemistry, physics, and fluids. A GIS bachelor is outside that list. IELTS 6.5 is the floor they print.',
+    cycle_label: 'Sep 2027 · France Excellence',
+    opens: '2026-10-01',
+    scholarship: '2026-11-18',
+    self_funded: '2027-04-30',
+    starts: '2027-09-01',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'full',
+    extra: {
+      funding_label: 'France Excellence',
+      apply: 'OPEN. Études en France (Bac+4) and the IMT form. Campus France says only files on both platforms are eligible for this scholarship. The IMT page itself stays open until 30 April 2027, which is too late for the embassy award.',
+      target_start: 'September 2027',
+      opens_text: 'Campus France Pakistan opened the 2027 candidature on 1 October 2026. The IMT September 2027 round opened in October 2026.',
+      deadline_text:
+        'France Excellence Pakistan Climate Change closes 18 November 2026. The IMT selection form closes 30 April 2027.',
+      tuition_text: '€9,000 a year on the IMT page. The climate award covers tuition if you are selected.',
+      self_funded_text:
+        'Without the embassy award the fee is €9,000 a year. The IMT page does not offer an Eiffel nomination on this MSc. The school form can still be filed until 30 April 2027.',
+      scholarships_text: CLIMATE,
+      prepare:
+        'CV, motivation letter on environment and energy projects, transcripts, bachelor certificate, IELTS, TOEFL, TOEIC, Cambridge, or Duolingo, and reference letters. IELTS 6.5, TOEFL iBT 80, TOEIC 750, or Duolingo 120. French is not required.',
+      watch_outs:
+        'Preferred backgrounds are mechanical, chemical, energy, environmental, civil, or electrical engineering. A GIS bachelor does not meet that list. Two years, with a 5- to 6-month internship. Confirmed on the Campus France Pakistan climate page and the IMT apply page, 7 November 2026.',
+      last_checked: '7 Nov 2026',
+    },
+  },
+  {
+    slug: 'avignon-mafen',
+    acronym: 'MAFEN',
+    name: 'Agriculture, food, environment and nutrition',
+    official_title: 'Master in Agriculture, Food Sciences, Environment and Nutrition',
+    priority: 'A',
+    coordinator: 'Avignon Université — Implanteus Graduate School',
+    countries: ['France'],
+    duration: '2 years (M1, Bac+4)',
+    website: 'https://implanteus.univ-avignon.fr/en/master-in-agriculture-food-sciences-environment-and-nutrition-mafen/',
+    apply_url: 'https://etudesenfrance.diplomatie.gouv.fr/mon-espace-etudiant',
+    language: 'English',
+    fit_notes:
+      'On the 2027 France Excellence Pakistan Climate Change list. Research master, taught in English, at Avignon. Campus France says apply only through Études en France. The school page admits an M1 student with a bachelor in chemistry or biology. A GIS bachelor is outside that list. The jury may check English in an interview.',
+    cycle_label: 'Sep 2027 · France Excellence',
+    opens: '2026-10-01',
+    scholarship: '2026-11-18',
+    self_funded: '2026-11-18',
+    starts: '2027-09-01',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'full',
+    extra: {
+      funding_label: 'France Excellence',
+      apply: 'OPEN. Études en France only (Bac+4). There is no second university form. Choose the Agronomy option or the Food and Health Sciences option in the motivation letter.',
+      target_start: 'September 2027',
+      opens_text: 'Campus France Pakistan opened the 2027 candidature on 1 October 2026.',
+      deadline_text:
+        'France Excellence Pakistan Climate Change, and the Études en France cart, close on 18 November 2026. The file fee is due by 30 November 2026.',
+      tuition_text:
+        'Avignon says it covers most of the €3,879 non-EU fee. The student rate printed for 2025–26 is €254 a year plus CVEC €105. They say 2026–27 may change slightly. The climate award covers tuition if you are selected.',
+      self_funded_text:
+        'There is no separate self-funded deadline. The only application route is Études en France, which locks on 18 November 2026.',
+      scholarships_text: CLIMATE,
+      prepare:
+        'Bachelor transcripts, CV, motivation letter, and a document showing English. The school asks for chemistry or biology. HEC-attested degree and transcript, and IBCC matric and intermediate, for the Pakistan file.',
+      watch_outs:
+        'M1 entry on the Avignon page is a bachelor in chemistry or biology, with fundamentals in chemistry, biochemistry, or biology. A GIS bachelor does not meet that wording. Two research internships, about 10 months in total. Confirmed on the Campus France Pakistan climate page and the Implanteus page, 7 November 2026.',
+      last_checked: '7 Nov 2026',
+    },
+  },
   {
     slug: 'grenoble-imagers',
     acronym: 'IMAGERS',
@@ -172,7 +257,7 @@ export async function seedFranceCatalogue(opts: {
     slug: 'france',
     name: 'France',
     description:
-      'Three master’s from the Études en France cart: Grenoble IMAGERS (own form to 15 April 2027, cart by 18 November 2026), Nantes Earth and Planetary Sciences (Nantes form), and Aix-Marseille IMG (Études en France only, 18 November 2026).',
+      'Études en France master’s. France Excellence Pakistan Climate Change is IMT PM3E and Avignon MAFEN, cart by 18 November 2026. Grenoble IMAGERS, Nantes Earth and Planetary Sciences, and Aix-Marseille IMG are not on that scholarship.',
     userId: opts.userId,
     isAdmin: opts.isAdmin,
   })
@@ -187,6 +272,6 @@ export async function seedFranceCatalogue(opts: {
     catalogueId,
     programmes: PROGRAMMES,
     source:
-      'Grenoble IMAGERS, Nantes EPS, Aix-Marseille IMG, confirmed in Études en France, 15 Oct 2026',
+      'Campus France Pakistan climate call, IMT PM3E, and Avignon MAFEN, 7 Nov 2026; Grenoble IMAGERS, Nantes EPS, and Aix-Marseille IMG, 15 Oct 2026',
   })
 }

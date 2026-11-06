@@ -10,7 +10,7 @@ import {
 } from '@/components/CycleFilterBar'
 import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
-import { cycleState } from '@/lib/dates'
+import { applyByDate, cycleState, daysUntil, formatDate } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
@@ -33,7 +33,6 @@ export function DashboardPage() {
   const [trackerStatusByProgramme, setTrackerStatusByProgramme] = useState<Map<string, string>>(
     () => new Map(),
   )
-  const [appliedCount, setAppliedCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -100,7 +99,6 @@ export function DashboardPage() {
     }
     setTrackerStatusByProgramme(statusMap)
     setTracked(new Set(statusMap.keys()))
-    setAppliedCount(statusMap.size)
     setLoading(false)
     return (catsRes.data ?? []) as Catalogue[]
   }
@@ -464,6 +462,13 @@ export function DashboardPage() {
     return out
   }, [tracked, rowByProgramme])
 
+  const openFact = useMemo(() => callFact(filteredOpen, 'close'), [filteredOpen])
+  const upcomingFact = useMemo(() => callFact(filteredUpcoming, 'open'), [filteredUpcoming])
+  const appliedFact = useMemo(
+    () => appliedFactFor(appliedRows, trackerStatusByProgramme),
+    [appliedRows, trackerStatusByProgramme],
+  )
+
   useEffect(() => {
     setOpenFilters(DEFAULT_CYCLE_FILTERS)
     setUpcomingFilters(DEFAULT_CYCLE_FILTERS)
@@ -491,7 +496,6 @@ export function DashboardPage() {
         next.set(row.programme.id, 'submitted')
         return next
       })
-      setAppliedCount((n) => n + 1)
     }
     setNotice(
       result.already
@@ -524,7 +528,6 @@ export function DashboardPage() {
         next.delete(row.programme.id)
         return next
       })
-      setAppliedCount((n) => Math.max(0, n - 1))
       setNotice(`Removed ${row.programme.acronym ?? row.programme.name} from Applied.`)
     }
   }
@@ -569,7 +572,7 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'france' ? (
             <p className="mt-2 text-sm text-slate-600">
-              The France list is three programmes: Grenoble IMAGERS (own form until 15 April 2027, and the Études en France cart until 18 November 2026), Nantes Earth and Planetary Sciences (Nantes form), and Aix-Marseille IMG (Études en France only, 18 November 2026).
+              France Excellence Pakistan Climate Change covers IMT PM3E and Avignon MAFEN. The Études en France cart locks on 18 November 2026, and PM3E also needs the IMT form. IMG, Grenoble, and Nantes are separate and are not on that scholarship.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (
@@ -649,14 +652,27 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Open now" value={loading ? '…' : String(filteredOpen.length)} tone="emerald" />
-        <Stat label="Opening soon" value={loading ? '…' : String(filteredUpcoming.length)} tone="amber" />
+      <section className="grid gap-3 sm:grid-cols-3">
+        <Stat
+          label="Open now"
+          value={loading ? '…' : String(filteredOpen.length)}
+          fact={loading ? 'Checking open calls' : openFact.fact}
+          caption={loading ? '' : openFact.caption}
+          fill={loading ? 0 : openFact.fill}
+        />
+        <Stat
+          label="Opening soon"
+          value={loading ? '…' : String(filteredUpcoming.length)}
+          fact={loading ? 'Checking upcoming calls' : upcomingFact.fact}
+          caption={loading ? '' : upcomingFact.caption}
+          fill={loading ? 0 : upcomingFact.fill}
+        />
         <Stat
           label="Applied"
-          value={loading ? '…' : String(appliedCount)}
-          hint={loading ? undefined : appliedCount ? 'In your tracker' : 'Add from Open now'}
-          tone="violet"
+          value={loading ? '…' : String(appliedRows.length)}
+          fact={loading ? 'Checking the tracker' : appliedFact.fact}
+          caption={loading ? '' : appliedFact.caption}
+          fill={loading ? 0 : appliedFact.fill}
         />
       </section>
 
@@ -777,7 +793,7 @@ function CycleSection({
       ) : rows.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line bg-white p-6 text-sm text-muted">{empty}</p>
       ) : (
-        <div className="grid items-start gap-3 md:grid-cols-2">
+        <div className="grid items-stretch gap-3 md:grid-cols-2">
           {rows.map((row) => (
             <ProgrammeCard
               key={`${title}-${row.id}`}
@@ -803,38 +819,91 @@ function CycleSection({
   )
 }
 
+const FILED = new Set(['submitted', 'applied', 'accepted', 'offer', 'enrolled', 'won'])
+
+function callFact(rows: OpenRow[], kind: 'close' | 'open'): { fact: string; caption: string; fill: number } {
+  const dated = rows
+    .map((row) => {
+      const date = kind === 'close' ? applyByDate(row) : row.application_opens_on
+      const days = daysUntil(date)
+      return date && days !== null && days >= 0 ? { row, date, days } : null
+    })
+    .filter((item): item is { row: OpenRow; date: string; days: number } => item !== null)
+    .sort((a, b) => a.days - b.days)
+  const next = dated[0]
+  if (!next) {
+    return {
+      fact: rows.length ? 'No dated deadline yet' : kind === 'close' ? 'No open calls' : 'Nothing opening soon',
+      caption: '',
+      fill: 0,
+    }
+  }
+  const name = next.row.programme.acronym || next.row.programme.name
+  const soon = dated.filter((item) => item.days <= 30).length
+  const window = kind === 'close' ? 90 : 120
+  const lead = kind === 'close' ? `${next.days} days to the next close` : `Opens in ${next.days} days`
+  return {
+    fact: `${name} · ${formatDate(next.date)}`,
+    caption: soon > 1 ? `${lead} · ${soon} within 30 days` : lead,
+    fill: Math.min(100, Math.max(8, Math.round((1 - next.days / window) * 100))),
+  }
+}
+
+function appliedFactFor(
+  rows: OpenRow[],
+  statuses: Map<string, string>,
+): { fact: string; caption: string; fill: number } {
+  if (rows.length === 0) {
+    return { fact: 'Nothing in the tracker', caption: 'Add a programme from Open now', fill: 0 }
+  }
+  let filed = 0
+  for (const row of rows) {
+    const slug = (statuses.get(row.programme.id) ?? '').toLowerCase()
+    if (FILED.has(slug)) filed += 1
+  }
+  const rest = rows.length - filed
+  const next = rows
+    .map((row) => {
+      const date = applyByDate(row)
+      const days = daysUntil(date)
+      return date && days !== null && days >= 0 ? { row, date, days } : null
+    })
+    .filter((item): item is { row: OpenRow; date: string; days: number } => item !== null)
+    .sort((a, b) => a.days - b.days)[0]
+  const nextName = next ? next.row.programme.acronym || next.row.programme.name : ''
+  return {
+    fact: rest === 0 ? 'All marked submitted' : `${filed} submitted · ${rest} still open`,
+    caption: next ? `Nearest deadline · ${nextName} · ${formatDate(next.date)}` : 'No dated deadline in the tracker',
+    fill: Math.round((filed / rows.length) * 100),
+  }
+}
+
 function Stat({
   label,
   value,
-  hint,
-  tone,
+  fact,
+  caption,
+  fill,
 }: {
   label: string
   value: string
-  hint?: string
-  tone: 'emerald' | 'amber' | 'sky' | 'violet'
+  fact: string
+  caption: string
+  fill: number
 }) {
-  const ring =
-    tone === 'emerald'
-      ? 'border-emerald-200 bg-emerald-50'
-      : tone === 'amber'
-        ? 'border-amber-200 bg-amber-50'
-        : tone === 'violet'
-          ? 'border-violet-200 bg-violet-50'
-          : 'border-sky/30 bg-sky/10'
-  const num =
-    tone === 'emerald'
-      ? 'text-emerald-800'
-      : tone === 'amber'
-        ? 'text-amber-800'
-        : tone === 'violet'
-          ? 'text-violet-900'
-          : 'text-sky-dark'
   return (
-    <div className={`rounded-2xl border p-5 shadow-sm ${ring}`}>
-      <p className="text-sm text-muted">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold ${num}`}>{value}</p>
-      {hint ? <p className="mt-1 text-xs text-muted">{hint}</p> : null}
-    </div>
+    <article className="rounded-xl border border-line bg-white px-4 py-3.5 shadow-[inset_3px_0_0_0_var(--color-gold)]">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-navy/70">{label}</p>
+        <p className="text-2xl font-semibold tabular-nums text-navy">{value}</p>
+      </div>
+      <p className="mt-2 truncate text-sm text-ink" title={fact}>
+        {fact}
+      </p>
+      <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-navy/10" aria-hidden="true">
+        <div className="h-full rounded-full bg-gold" style={{ width: `${fill}%` }} />
+      </div>
+      <p className="mt-1.5 min-h-4 truncate text-xs text-muted">{caption}</p>
+    </article>
   )
 }

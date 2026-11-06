@@ -66,7 +66,7 @@ export function ProgrammeCard({
   const countries = countriesInvolved(programme)
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
       <div
         className={`h-1.5 shrink-0 ${
           programme.priority === 'A'
@@ -92,7 +92,7 @@ export function ProgrammeCard({
           </div>
           <div className="flex max-w-[40%] shrink-0 flex-wrap justify-end gap-1.5">
             <PriorityBadge value={programme.priority} />
-            <FundingBadge scheme={scheme} />
+            <FundingBadge scheme={scheme} label={programme.extra?.funding_label ?? undefined} />
             <OpenBadge state={state} />
             {cy ? <DateStatusBadge status={cy.date_status} /> : null}
             {tracked ? <TrackerStatusBadge status={trackerStatus ?? 'watching'} /> : null}
@@ -124,7 +124,7 @@ export function ProgrammeCard({
           {programme.fit_notes || '\u00a0'}
         </p>
 
-        <div className="mt-4 flex flex-nowrap items-center gap-2">
+        <div className="mt-auto flex flex-nowrap items-center gap-2 pt-4">
           {href ? (
             <a
               href={href}

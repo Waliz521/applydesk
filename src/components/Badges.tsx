@@ -21,9 +21,9 @@ export function OpenBadge({ state }: { state: string }) {
   return <Badge className={openStateClass(state)}>{label}</Badge>
 }
 
-export function FundingBadge({ scheme }: { scheme: FundingScheme | null }) {
+export function FundingBadge({ scheme, label }: { scheme: FundingScheme | null; label?: string }) {
   if (!scheme || scheme === 'none') return null
-  return <Badge className={fundingClass(scheme)}>{fundingLabel(scheme)}</Badge>
+  return <Badge className={fundingClass(scheme)}>{label || fundingLabel(scheme)}</Badge>
 }
 
 export function DateStatusBadge({ status }: { status: string | null | undefined }) {

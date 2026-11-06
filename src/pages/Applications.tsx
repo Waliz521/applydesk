@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
 import type { Application, ApplicationStatus, Catalogue } from '@/lib/types'
+
+type SortKey = 'university' | 'programme' | 'deadline' | 'status' | 'link'
+type Sort = { key: SortKey; dir: 'asc' | 'desc' }
 
 export function ApplicationsPage() {
   const { user } = useAuth()
@@ -10,6 +13,7 @@ export function ApplicationsPage() {
   const [statuses, setStatuses] = useState<ApplicationStatus[]>([])
   const [catalogues, setCatalogues] = useState<Catalogue[]>([])
   const [filter, setFilter] = useState('all')
+  const [sort, setSort] = useState<Sort>({ key: 'deadline', dir: 'asc' })
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
 
@@ -30,10 +34,20 @@ export function ApplicationsPage() {
   }, [])
 
   const statusById = useMemo(() => new Map(statuses.map((s) => [s.id, s])), [statuses])
-  const visible = rows.filter((r) => {
-    if (filter === 'all') return true
-    return statusById.get(r.status_id ?? '')?.slug === filter
-  })
+  const visible = useMemo(() => {
+    const filtered = rows.filter((r) => {
+      if (filter === 'all') return true
+      return statusById.get(r.status_id ?? '')?.slug === filter
+    })
+    const dir = sort.dir === 'asc' ? 1 : -1
+    return filtered.sort((a, b) => compareRows(a, b, sort.key, dir, statusById))
+  }, [rows, filter, sort, statusById])
+
+  function toggleSort(key: SortKey) {
+    setSort((current) =>
+      current.key === key ? { key, dir: current.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' },
+    )
+  }
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -83,7 +97,7 @@ export function ApplicationsPage() {
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-lg bg-sky px-4 py-2 text-sm font-semibold text-white hover:bg-sky-dark"
+          className="rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy/90"
         >
           {showForm ? 'Close' : 'Add application'}
         </button>
@@ -115,40 +129,49 @@ export function ApplicationsPage() {
             Notes
             <textarea name="notes" rows={2} className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm" />
           </label>
-          <button type="submit" className="rounded-lg bg-sky px-4 py-2 text-sm font-semibold text-white md:col-span-2">
+          <button type="submit" className="rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy/90 md:col-span-2">
             Save to tracker
           </button>
         </form>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        <FilterChip active={filter === 'all'} onClick={() => setFilter('all')}>
+      <div
+        className="grid grid-cols-3 gap-1.5 rounded-xl border border-line bg-white p-1.5 shadow-[inset_3px_0_0_0_var(--color-gold)] min-[1100px]:grid-cols-[repeat(var(--filter-cols),minmax(0,1fr))]"
+        style={{ '--filter-cols': Math.max(statuses.length + 1, 1) } as CSSProperties}
+      >
+        <FilterChip active={filter === 'all'} color="var(--color-gold)" onClick={() => setFilter('all')}>
           All
         </FilterChip>
         {statuses.map((s) => (
-          <FilterChip key={s.id} active={filter === s.slug} onClick={() => setFilter(s.slug)}>
+          <FilterChip key={s.id} active={filter === s.slug} color={s.color} onClick={() => setFilter(s.slug)}>
             {s.label}
           </FilterChip>
         ))}
       </div>
 
+      <p className="text-xs text-muted">
+        The bar on the left is the status colour. Deadline text is red within 21 days, or already past, and amber from 22 to 45 days.
+      </p>
+
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
 
       {visible.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center text-sm text-muted">
-          Nothing in the tracker yet. Add an application, or start from a catalogue programme later.
+          {rows.length === 0
+            ? 'Nothing in the tracker yet. Add an application, or start from a catalogue programme later.'
+            : 'No applications with this status.'}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-line bg-white">
+        <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-[inset_3px_0_0_0_var(--color-gold)]">
           <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="border-b border-line bg-slate-50 text-xs uppercase tracking-wide text-muted">
+            <thead className="border-b border-line text-[11px] font-semibold uppercase tracking-wider text-navy/70">
               <tr>
-                <th className="px-4 py-3">University</th>
-                <th className="px-4 py-3">Programme</th>
-                <th className="px-4 py-3">Deadline</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Link</th>
-                <th className="px-4 py-3 w-24"> </th>
+                <SortHeader label="University" sortKey="university" sort={sort} onSort={toggleSort} />
+                <SortHeader label="Programme" sortKey="programme" sort={sort} onSort={toggleSort} />
+                <SortHeader label="Deadline" sortKey="deadline" sort={sort} onSort={toggleSort} />
+                <SortHeader label="Status" sortKey="status" sort={sort} onSort={toggleSort} />
+                <SortHeader label="Link" sortKey="link" sort={sort} onSort={toggleSort} />
+                <th className="w-24 px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -189,7 +212,7 @@ export function ApplicationsPage() {
                     </td>
                     <td className="px-4 py-3">
                       {row.portal_url ? (
-                        <a href={row.portal_url} target="_blank" rel="noreferrer" className="text-sky hover:underline">
+                        <a href={row.portal_url} target="_blank" rel="noreferrer" className="font-medium text-navy hover:underline">
                           Open
                         </a>
                       ) : (
@@ -216,6 +239,60 @@ export function ApplicationsPage() {
   )
 }
 
+function compareRows(
+  a: Application,
+  b: Application,
+  key: SortKey,
+  dir: number,
+  statusById: Map<string, ApplicationStatus>,
+): number {
+  if (key === 'university') return compareText(a.university, b.university, dir)
+  if (key === 'programme') return compareText(a.program_name, b.program_name, dir)
+  if (key === 'link') return compareText(a.portal_url, b.portal_url, dir)
+  if (key === 'status') {
+    const order = (row: Application) => statusById.get(row.status_id ?? '')?.sort_order ?? 999
+    return (order(a) - order(b)) * dir
+  }
+  return compareText(a.deadline, b.deadline, dir)
+}
+
+function compareText(a: string | null, b: string | null, dir: number): number {
+  const left = (a ?? '').trim()
+  const right = (b ?? '').trim()
+  if (!left && !right) return 0
+  if (!left) return 1
+  if (!right) return -1
+  return left.localeCompare(right, undefined, { sensitivity: 'base' }) * dir
+}
+
+function SortHeader({
+  label,
+  sortKey,
+  sort,
+  onSort,
+}: {
+  label: string
+  sortKey: SortKey
+  sort: Sort
+  onSort: (key: SortKey) => void
+}) {
+  const active = sort.key === sortKey
+  return (
+    <th className="p-0" aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        className="inline-flex w-full items-center gap-1 px-4 py-3 text-left uppercase tracking-wider hover:text-navy"
+      >
+        {label}
+        <span className={active ? 'text-gold' : 'text-navy/25'} aria-hidden="true">
+          {active ? (sort.dir === 'asc' ? '↑' : '↓') : '↕'}
+        </span>
+      </button>
+    </th>
+  )
+}
+
 function Field({ name, label, required }: { name: string; label: string; required?: boolean }) {
   return (
     <label className="text-sm font-medium">
@@ -231,10 +308,12 @@ function Field({ name, label, required }: { name: string; label: string; require
 
 function FilterChip({
   active,
+  color,
   onClick,
   children,
 }: {
   active: boolean
+  color?: string | null
   onClick: () => void
   children: string
 }) {
@@ -242,8 +321,16 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full px-3 py-1.5 text-sm ${active ? 'bg-sky text-white' : 'bg-white text-slate-600 ring-1 ring-line'}`}
+      aria-pressed={active}
+      className={`flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs leading-snug ${
+        active ? 'bg-navy font-medium text-white' : 'text-navy/80 hover:bg-navy/5'
+      }`}
     >
+      <span
+        className={`size-2 shrink-0 rounded-full ${active ? 'ring-2 ring-white/40' : ''}`}
+        style={{ background: color || 'var(--color-navy)' }}
+        aria-hidden="true"
+      />
       {children}
     </button>
   )
