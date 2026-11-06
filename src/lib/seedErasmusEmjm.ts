@@ -122,85 +122,8 @@ const PROGRAMMES: SeedRec[] = [
       prepare:
         'BSc in a relevant field, English test, CV, five motivation answers, passport. Two recommendation letters, dated within six months, from two teachers or one teacher and one employer. Referee contact details must be on the letter.',
       watch_outs:
-        'Partner-country deadline is earlier (3 Jan) than GEM (15 Jan). Do not miss it if this is a primary target.',
-      last_checked: '5 Oct 2026',
-    },
-  },
-  {
-    slug: 'floodrisk',
-    acronym: 'FloodRISK',
-    name: 'Flood Risk Management',
-    official_title: 'EMJM Flood Risk Management',
-    priority: 'A-',
-    coordinator: 'IHE Delft (NL) with TU Dresden (DE), UPC Barcelona (ES), and University of Ljubljana (SI)',
-    countries: ['Netherlands', 'Germany', 'Spain', 'Slovenia'],
-    duration: '24 months',
-    website: 'https://www.floodriskmaster.org/',
-    apply_url: 'https://www.floodriskmaster.org/howtoapply',
-    fit_notes:
-      'Flood risk, water, and spatial planning. Uses GIS and Earth observation. Same IHE Delft application pattern as GroundwatCH.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-01',
-    scholarship: '2027-01-03',
-    self_funded: '2027-04-30',
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'emjm',
-    extra: {
-      apply:
-        'OPEN. Partner Country (Pakistan) scholarship deadline 3 January 2027, 23:59 CET. Apply on the FloodRISK / IHE form and select the Erasmus Mundus scholarship.',
-      target_start: 'September 2027',
-      opens_text: '2027 scholarship deadlines are published on floodriskmaster.org (apply, how to apply, and scholarships). Rechecked 5 Oct 2026.',
-      deadline_text:
-        'Confirmed: Partner Countries 3 January 2027, 23:59 CET. Programme Countries and IPA 7 February 2027, 23:59 CET. English test may arrive by 1 February 2027 if the rest of the file was in by 3 January. Results beginning of April 2027.',
-      tuition_text: 'EMJM covers the participation fee. Reduced-fee scholarship (€3,000 instead of €18,000 excl. VAT) deadline 15 April 2027.',
-      self_funded_text:
-        'Files after the scholarship deadline can still be considered for admission if submitted with financial confirmation by 30 April 2027, 23:59 CET. No visa required for Germany: 31 July 2027.',
-      scholarships_text:
-        'EMJM for 2024–2027 intakes (about 70 scholarships across four years, plus a few targeted-region awards). Pakistan counts as a Partner Country. Same form for admission and scholarship.',
-      prepare:
-        'Relevant bachelor, grades, English test, CV, motivation, references, passport. Certified diploma can follow; scholarship holders must prove graduation by 15 August of the start year.',
-      watch_outs:
-        'Use the scholarships and how-to-apply pages. An older line on the site still mentions 5 January in one English-test note; the deadline repeated on the apply page is 3 January 2027.',
-      last_checked: '5 Oct 2026',
-    },
-  },
-  {
-    slug: 'waves',
-    acronym: 'WAVES',
-    name: 'Water Vulnerability Engineering in Spatial Sciences',
-    official_title: 'EMJM WAVES — Water Vulnerability Engineering in Spatial Sciences',
-    priority: 'A-',
-    coordinator: 'University of Twente / ITC (NL) with University of Padova (IT) and University of Ljubljana (SI)',
-    countries: ['Netherlands', 'Italy', 'Slovenia'],
-    duration: '24 months',
-    website: 'https://msc-waves.eu/',
-    apply_url: 'https://msc-waves.eu/admissions/how-to-apply',
-    fit_notes:
-      'New EMJM in spatial water science. Call is open. Do not use master-waves.eu — that is a different acoustics degree.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-13',
-    scholarship: '2027-01-15',
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'emjm',
-    extra: {
-      apply: 'OPEN. Portal opened 13 October 2026. Erasmus Mundus scholarship deadline 15 January 2027, 23:59 CET.',
-      target_start: '1 October 2027',
-      opens_text: 'Application portal opened 13 October 2026 (msc-waves.eu admissions page).',
-      deadline_text:
-        'Confirmed: 15 January 2027, 23:59 CET for the Erasmus Mundus scholarship. Self-funded applications use a later date published on msc-waves.eu.',
-      tuition_text: 'No fee to apply. EMJM scholarship amounts are on the funding page.',
-      self_funded_text: 'Self-funded and sponsored applicants have a later deadline than the scholarship date. Same academic criteria.',
-      scholarships_text:
-        'Erasmus Mundus scholarships are open to any nationality. Recorded interviews for shortlisted candidates are in February–March 2027. Tracks: Spatial Water Sciences, Water Vulnerability Engineering, Spatial Water Governance and Policy.',
-      prepare:
-        'Degree certificate and transcript, CV, motivation letter (one page), English certificate, passport, and one signed reference letter on letterhead. Shared first semester covers Earth observation, geostatistics, programming, and hydrology.',
-      watch_outs: 'Scholarship files close on 15 January 2027. A self-funded file uses the later date on the site.',
-      last_checked: '15 Oct 2026',
+        'Partner-country deadline is earlier (3 Jan) than GEM (15 Jan). IHE asks applicants to choose one Erasmus Mundus programme in a year, so FloodRISK is not listed.',
+      last_checked: '6 Nov 2026',
     },
   },
 ]
@@ -290,8 +213,11 @@ async function patchCheckedFacts(): Promise<string | null> {
   return null
 }
 
-/** No Erasmus Mundus scholarship for the 2027 intake. Cards are removed, not relabelled. */
-const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom', 'imrd'] as const
+/** Cards removed from this catalogue, not relabelled.
+ *  No 2027 EMJM scholarship: merged, imete, coasthazar, cartography, mespom, imrd.
+ *  Closed for this applicant: floodrisk (IHE asks for one EM programme; GroundwatCH is submitted),
+ *  waves (GEM is the submitted Twente application). */
+const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom', 'imrd', 'floodrisk', 'waves'] as const
 
 async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
   const { data: rows, error: lookupError } = await supabase
@@ -330,7 +256,7 @@ export async function seedErasmusEmjmUpdates(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM, CDE, GroundwatCH, FloodRISK, and WAVES sites, 28 Oct 2026',
+    source: 'Official GEM, CDE, and GroundwatCH sites, 6 Nov 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }

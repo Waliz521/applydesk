@@ -313,17 +313,20 @@ def main() -> None:
     print(f"{len(rows)} programmes in Excel", flush=True)
 
     retired = {"merged", "imete", "coasthazar", "cartography", "mespom", "imrd"}
+    # Still funded, but closed for this applicant. FloodRISK: IHE asks for one EM programme (GroundwatCH is submitted). WAVES: GEM is the submitted Twente application.
+    closed = {"floodrisk", "waves"}
     imported = 0
     for rec in rows:
         acronym = str(rec["Acronym"]).strip()
         slug = slugify(acronym)
-        if slug in retired:
+        if slug in retired or slug in closed:
             row = existing.get(slug)
             if row:
                 db.request("DELETE", "/applications", params={"programme_id": f"eq.{row['id']}"})
                 db.request("DELETE", "/programme_cycles", params={"programme_id": f"eq.{row['id']}"})
                 db.request("DELETE", "/programmes", params={"id": f"eq.{row['id']}"})
-                print(f"  {acronym:12} removed — no 2027 Erasmus Mundus scholarship", flush=True)
+                reason = "no 2027 Erasmus Mundus scholarship" if slug in retired else "closed for this applicant"
+                print(f"  {acronym:12} removed — {reason}", flush=True)
             continue
         dates = DATES.get(acronym, {})
         coordinator = str(rec.get("Coordinator / consortium") or "")

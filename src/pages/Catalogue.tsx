@@ -321,7 +321,7 @@ export function CataloguePage() {
     }
     setNotice(
       result.updated
-        ? `EMJM details refreshed (${result.count}): GEM, CDE, GroundwatCH, WAVES.`
+        ? `EMJM details refreshed (${result.count}): GEM, CDE, GroundwatCH.`
         : 'EMJM programmes already up to date.',
     )
     if (!activeId) return
@@ -561,7 +561,7 @@ export function CataloguePage() {
                       disabled={seeding}
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
-                      {seeding ? 'Updating…' : 'Refresh EMJM dates (GEM / CDE / GroundwatCH / WAVES)'}
+                      {seeding ? 'Updating…' : 'Refresh EMJM dates (GEM / CDE / GroundwatCH)'}
                     </button>
                   ) : null}
                   <button
@@ -885,7 +885,7 @@ export function CataloguePage() {
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
               · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · WAVES 15 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
+              deadline 3 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. FloodRISK and WAVES are not listed: GroundwatCH is the IHE application, and GEM is the Twente application. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
             </p>
           ) : null}
 
