@@ -20,6 +20,9 @@ const RETIRED_SLUGS = [
   'geonum-m1',
   'paris-cite-frs',
   'france-eiffel',
+  'nantes-eps',
+  'mafen',
+  'avignon-mafen',
 ] as const
 
 const PROGRAMMES: SeedRec[] = [
@@ -65,47 +68,6 @@ const PROGRAMMES: SeedRec[] = [
     },
   },
   {
-    slug: 'avignon-mafen',
-    acronym: 'MAFEN',
-    name: 'Agriculture, food, environment and nutrition',
-    official_title: 'Master in Agriculture, Food Sciences, Environment and Nutrition',
-    priority: 'A',
-    coordinator: 'Avignon Université — Implanteus Graduate School',
-    countries: ['France'],
-    duration: '2 years (M1, Bac+4)',
-    website: 'https://implanteus.univ-avignon.fr/en/master-in-agriculture-food-sciences-environment-and-nutrition-mafen/',
-    apply_url: 'https://etudesenfrance.diplomatie.gouv.fr/mon-espace-etudiant',
-    language: 'English',
-    fit_notes:
-      'On the 2027 France Excellence Pakistan Climate Change list. Research master, taught in English, at Avignon. Campus France says apply only through Études en France. The school page admits an M1 student with a bachelor in chemistry or biology. A GIS bachelor is outside that list. The jury may check English in an interview.',
-    cycle_label: 'Sep 2027 · France Excellence',
-    opens: '2026-10-01',
-    scholarship: '2026-11-18',
-    self_funded: '2026-11-18',
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'full',
-    extra: {
-      funding_label: 'France Excellence',
-      apply: 'OPEN. Études en France only (Bac+4). There is no second university form. Choose the Agronomy option or the Food and Health Sciences option in the motivation letter.',
-      target_start: 'September 2027',
-      opens_text: 'Campus France Pakistan opened the 2027 candidature on 1 October 2026.',
-      deadline_text:
-        'France Excellence Pakistan Climate Change, and the Études en France cart, close on 18 November 2026. The file fee is due by 30 November 2026.',
-      tuition_text:
-        'Avignon says it covers most of the €3,879 non-EU fee. The student rate printed for 2025–26 is €254 a year plus CVEC €105. They say 2026–27 may change slightly. The climate award covers tuition if you are selected.',
-      self_funded_text:
-        'There is no separate self-funded deadline. The only application route is Études en France, which locks on 18 November 2026.',
-      scholarships_text: CLIMATE,
-      prepare:
-        'Bachelor transcripts, CV, motivation letter, and a document showing English. The school asks for chemistry or biology. HEC-attested degree and transcript, and IBCC matric and intermediate, for the Pakistan file.',
-      watch_outs:
-        'M1 entry on the Avignon page is a bachelor in chemistry or biology, with fundamentals in chemistry, biochemistry, or biology. A GIS bachelor does not meet that wording. Two research internships, about 10 months in total. Confirmed on the Campus France Pakistan climate page and the Implanteus page, 7 November 2026.',
-      last_checked: '7 Nov 2026',
-    },
-  },
-  {
     slug: 'grenoble-imagers',
     acronym: 'IMAGERS',
     name: 'Geoscience & remote sensing (IMAGERS)',
@@ -141,47 +103,6 @@ const PROGRAMMES: SeedRec[] = [
         'IELTS, TOEFL, or TOEIC at B2. IELTS 5.5 is the floor they print. Degree must be in a data-science or engineering field they list, at least the 4th year of higher education, CGPA 3.5/4 or 4.5/5. HEC-attested degree and transcript.',
       watch_outs:
         'One-year master (signal and image processing), not a two-year GIS M1. Courses are deep learning, SAR, optical remote sensing, lidar, and GNSS. A GIS bachelor meets neither the named degree list nor the image-processing background they describe.',
-      last_checked: '15 Oct 2026',
-    },
-  },
-  {
-    slug: 'nantes-eps',
-    acronym: 'EPS',
-    name: 'Earth and planetary sciences',
-    official_title: 'Master Earth and Planetary Sciences — Graduate Programme',
-    priority: 'C',
-    coordinator: 'Nantes Université — Laboratoire de Planétologie et Géosciences',
-    countries: ['France'],
-    duration: '2 years',
-    website:
-      'https://sciences-techniques.univ-nantes.fr/formations/masters/graduate-programme-earth-and-planetary-sciences-master-level',
-    apply_url: 'https://demarches.adullact.org/commencer/nantes-gp-application',
-    language: 'English',
-    fit_notes:
-      'Taught entirely in English. Asks for English B2 (IELTS, TOEFL, TOEIC, or Cambridge). French is recommended for daily life and is not a required certificate. Entry is a bachelor in earth and planetary science, or in physics, chemistry, materials, or mathematics. A GIS bachelor is outside that list. Year 1 includes a GIS course and remote sensing.',
-    cycle_label: '2027–28 intake',
-    opens: '2026-10-01',
-    scholarship: null,
-    self_funded: '2027-03-15',
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'Listed in Études en France (Bac+4, additional procedure). The listing says the application cannot be submitted there. File it on the Nantes Adullact form.',
-      target_start: 'September 2027',
-      opens_text: 'The Études en France listing is open. The Nantes form is the application.',
-      deadline_text:
-        'The Études en France card shows 18 November 2026. The application itself is the Nantes form; the close used here is 15 March 2027.',
-      tuition_text: `${TUITION} Nantes also offers a €1,500 welcome grant for selected international students.`,
-      self_funded_text:
-        'Self-funded at the public rate unless waived. Language document is the English certificate. A French certificate is not on their document list.',
-      scholarships_text:
-        'The page points applicants to the Eiffel nomination (university file due 6 January 2027) and to a €1,500 excellence welcome grant. Neither replaces proof of living costs at the visa.',
-      prepare:
-        'CV and motivation letter in English or French, one recommendation letter, transcripts, English B2 certificate, passport. Bachelor preferentially in earth and planetary science, physics, chemistry, materials science, or mathematics.',
-      watch_outs:
-        'Geology and planetary science, with GIS and remote-sensing courses inside it. Field camps and a long internship. Updated on the Nantes page 5 October 2026.',
       last_checked: '15 Oct 2026',
     },
   },
@@ -257,7 +178,7 @@ export async function seedFranceCatalogue(opts: {
     slug: 'france',
     name: 'France',
     description:
-      'Études en France master’s. France Excellence Pakistan Climate Change is IMT PM3E and Avignon MAFEN, cart by 18 November 2026. Grenoble IMAGERS, Nantes Earth and Planetary Sciences, and Aix-Marseille IMG are not on that scholarship.',
+      'Études en France master’s. France Excellence Pakistan Climate Change is IMT PM3E only (cart by 18 November 2026). Grenoble IMAGERS and Aix-Marseille IMG are on the cart but not on that scholarship.',
     userId: opts.userId,
     isAdmin: opts.isAdmin,
   })
@@ -272,6 +193,6 @@ export async function seedFranceCatalogue(opts: {
     catalogueId,
     programmes: PROGRAMMES,
     source:
-      'Campus France Pakistan climate call, IMT PM3E, and Avignon MAFEN, 7 Nov 2026; Grenoble IMAGERS, Nantes EPS, and Aix-Marseille IMG, 15 Oct 2026',
+      'Campus France Pakistan climate call, IMT PM3E, 12 Nov 2026; Grenoble IMAGERS and Aix-Marseille IMG, 15 Oct 2026',
   })
 }

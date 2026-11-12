@@ -572,7 +572,7 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'france' ? (
             <p className="mt-2 text-sm text-slate-600">
-              France Excellence Pakistan Climate Change covers IMT PM3E and Avignon MAFEN. The Études en France cart locks on 18 November 2026, and PM3E also needs the IMT form. IMG, Grenoble, and Nantes are separate and are not on that scholarship.
+              France Excellence Pakistan Climate Change is IMT PM3E only. The Études en France cart locks on 18 November 2026, and PM3E also needs the IMT form. IMG and Grenoble are on the cart but not on that scholarship.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (

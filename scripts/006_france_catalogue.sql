@@ -8,7 +8,7 @@ from (
     null::uuid,
     'france',
     'France',
-    'Three master’s from the Études en France cart: Grenoble IMAGERS (own form to 15 April 2027, cart by 18 November 2026), Nantes Earth and Planetary Sciences (Nantes form), and Aix-Marseille IMG (Études en France only, 18 November 2026).',
+    'Grenoble IMAGERS (own form to 15 April 2027, Études en France cart by 18 November 2026) and Aix-Marseille IMG (Études en France only, 18 November 2026).',
     true
   )
 ) as v(owner_user_id, slug, name, description, is_system)

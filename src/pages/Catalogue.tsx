@@ -749,7 +749,7 @@ export function CataloguePage() {
 
           {active.slug === 'france' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              France Excellence Pakistan Climate Change is IMT PM3E and Avignon MAFEN only. Both lock in the Études en France cart on 18 November 2026, and PM3E also needs the IMT form. IMG and the other France cards are not on that scholarship.
+              France Excellence Pakistan Climate Change is IMT PM3E only. Cart and IMT form by 18 November 2026. Grenoble IMAGERS and Aix-Marseille IMG are listed for Eiffel/self-funded paths, not the climate award.
             </p>
           ) : null}
 
