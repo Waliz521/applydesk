@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { applyByDate } from '@/lib/dates'
 import { fundingScheme } from '@/lib/funding'
+import { regionFromCatalogue } from '@/lib/trackerRegion'
 import type { Programme, ProgrammeCycle } from '@/lib/types'
 
 function trackerScholarshipName(programme: Programme): string {
@@ -45,11 +46,18 @@ export async function addProgrammeToTracker(input: {
     statuses?.find((s) => s.slug === 'applied')
   const watching = statuses?.find((s) => s.slug === 'watching') ?? statuses?.[0]
   const status = applied ?? watching
+  const catalogueId = input.catalogueId ?? input.programme.catalogue_id
+  let region = (input.programme.countries ?? [])[0] ?? null
+  if (catalogueId) {
+    const { data: cat } = await supabase.from('catalogues').select('slug, name').eq('id', catalogueId).maybeSingle()
+    if (cat) region = regionFromCatalogue(cat)
+  }
   const { error } = await supabase.from('applications').insert({
     user_id: input.userId,
     programme_id: input.programme.id,
     cycle_id: input.cycle?.id ?? null,
-    catalogue_id: input.catalogueId ?? input.programme.catalogue_id,
+    catalogue_id: catalogueId,
+    country: region,
     university: input.programme.coordinator,
     program_name: input.programme.acronym
       ? `${input.programme.acronym} — ${input.programme.name}`

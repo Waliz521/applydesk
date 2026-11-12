@@ -2,9 +2,23 @@ import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
+import { regionFilterId, regionFromCatalogue, trackerRegionForRow } from '@/lib/trackerRegion'
 import type { Application, ApplicationStatus, Catalogue } from '@/lib/types'
 
-type SortKey = 'university' | 'programme' | 'deadline' | 'status' | 'link'
+const REGION_ORDER = [
+  'Erasmus Mundus',
+  'France',
+  'Netherlands',
+  'Poland',
+  'Austria',
+  'Hong Kong',
+  'Denmark',
+  'Finland',
+  'Germany (DAAD)',
+  'Other',
+]
+
+type SortKey = 'university' | 'programme' | 'country' | 'deadline' | 'status' | 'link'
 type Sort = { key: SortKey; dir: 'asc' | 'desc' }
 
 export function ApplicationsPage() {
@@ -13,6 +27,7 @@ export function ApplicationsPage() {
   const [statuses, setStatuses] = useState<ApplicationStatus[]>([])
   const [catalogues, setCatalogues] = useState<Catalogue[]>([])
   const [filter, setFilter] = useState('all')
+  const [regionFilter, setRegionFilter] = useState('all')
   const [sort, setSort] = useState<Sort>({ key: 'deadline', dir: 'asc' })
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -34,14 +49,24 @@ export function ApplicationsPage() {
   }, [])
 
   const statusById = useMemo(() => new Map(statuses.map((s) => [s.id, s])), [statuses])
+  const cataloguesById = useMemo(() => new Map(catalogues.map((c) => [c.id, c])), [catalogues])
+
+  const regionOptions = useMemo(() => {
+    const present = new Set(rows.map((r) => trackerRegionForRow(r, cataloguesById)))
+    return REGION_ORDER.filter((name) => present.has(name)).concat(
+      [...present].filter((name) => !REGION_ORDER.includes(name)).sort((a, b) => a.localeCompare(b)),
+    )
+  }, [rows, cataloguesById])
+
   const visible = useMemo(() => {
     const filtered = rows.filter((r) => {
-      if (filter === 'all') return true
-      return statusById.get(r.status_id ?? '')?.slug === filter
+      if (filter !== 'all' && statusById.get(r.status_id ?? '')?.slug !== filter) return false
+      if (regionFilter === 'all') return true
+      return regionFilterId(trackerRegionForRow(r, cataloguesById)) === regionFilter
     })
     const dir = sort.dir === 'asc' ? 1 : -1
-    return filtered.sort((a, b) => compareRows(a, b, sort.key, dir, statusById))
-  }, [rows, filter, sort, statusById])
+    return filtered.sort((a, b) => compareRows(a, b, sort.key, dir, statusById, cataloguesById))
+  }, [rows, filter, regionFilter, sort, statusById, cataloguesById])
 
   function toggleSort(key: SortKey) {
     setSort((current) =>
@@ -54,15 +79,19 @@ export function ApplicationsPage() {
     if (!user) return
     const form = new FormData(e.currentTarget)
     const status = statuses.find((s) => s.slug === 'in_progress') ?? statuses[0]
+    const catalogueId = String(form.get('catalogue_id') || '') || null
+    const cat = catalogueId ? catalogues.find((c) => c.id === catalogueId) : undefined
+    let country = String(form.get('country') || '').trim()
+    if (!country && cat) country = regionFromCatalogue(cat)
     const { error: insertError } = await supabase.from('applications').insert({
       user_id: user.id,
       university: String(form.get('university') || ''),
       program_name: String(form.get('program_name') || ''),
       scholarship_name: String(form.get('scholarship_name') || ''),
-      country: String(form.get('country') || ''),
+      country: country || null,
       portal_url: String(form.get('portal_url') || '') || null,
       deadline: String(form.get('deadline') || '') || null,
-      catalogue_id: String(form.get('catalogue_id') || '') || null,
+      catalogue_id: catalogueId,
       status_id: status?.id ?? null,
       notes: String(form.get('notes') || '') || null,
     })
@@ -92,7 +121,9 @@ export function ApplicationsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-ink">Tracker</h1>
-          <p className="mt-1 text-sm text-muted">Applications you are actually working on — not the full catalogue.</p>
+          <p className="mt-1 text-sm text-muted">
+            Applications you are working on. Filter by status or by country catalogue (France, Erasmus Mundus, and the rest).
+          </p>
         </div>
         <button
           type="button"
@@ -108,7 +139,7 @@ export function ApplicationsPage() {
           <Field name="university" label="University" required />
           <Field name="program_name" label="Programme" required />
           <Field name="scholarship_name" label="Scholarship / funding" />
-          <Field name="country" label="Country" />
+          <Field name="country" label="Country (optional if catalogue is set)" />
           <Field name="portal_url" label="Portal URL" />
           <label className="text-sm font-medium">
             Deadline
@@ -149,6 +180,23 @@ export function ApplicationsPage() {
         ))}
       </div>
 
+      {regionOptions.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          <span className="w-full text-xs font-medium text-muted">Country catalogue</span>
+          <RegionChip active={regionFilter === 'all'} onClick={() => setRegionFilter('all')}>
+            All countries
+          </RegionChip>
+          {regionOptions.map((name) => {
+            const id = regionFilterId(name)
+            return (
+              <RegionChip key={id} active={regionFilter === id} onClick={() => setRegionFilter(id)}>
+                {name}
+              </RegionChip>
+            )
+          })}
+        </div>
+      ) : null}
+
       <p className="text-xs text-muted">
         The bar on the left is the status colour. Deadline text is red within 21 days, or already past, and amber from 22 to 45 days.
       </p>
@@ -159,13 +207,16 @@ export function ApplicationsPage() {
         <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center text-sm text-muted">
           {rows.length === 0
             ? 'Nothing in the tracker yet. Add an application, or start from a catalogue programme later.'
-            : 'No applications with this status.'}
+            : filter !== 'all' || regionFilter !== 'all'
+              ? 'No applications match these filters.'
+              : 'No applications with this status.'}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-[inset_3px_0_0_0_var(--color-gold)]">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-line text-[11px] font-semibold uppercase tracking-wider text-navy/70">
               <tr>
+                <SortHeader label="Country" sortKey="country" sort={sort} onSort={toggleSort} />
                 <SortHeader label="University" sortKey="university" sort={sort} onSort={toggleSort} />
                 <SortHeader label="Programme" sortKey="programme" sort={sort} onSort={toggleSort} />
                 <SortHeader label="Deadline" sortKey="deadline" sort={sort} onSort={toggleSort} />
@@ -177,6 +228,7 @@ export function ApplicationsPage() {
             <tbody>
               {visible.map((row) => {
                 const st = statusById.get(row.status_id ?? '')
+                const region = trackerRegionForRow(row, cataloguesById)
                 const due = daysUntil(row.deadline)
                 return (
                   <tr
@@ -184,6 +236,7 @@ export function ApplicationsPage() {
                     className="border-b border-line last:border-0"
                     style={st?.color ? { boxShadow: `inset 4px 0 0 ${st.color}` } : undefined}
                   >
+                    <td className="px-4 py-3 text-slate-700">{region}</td>
                     <td className="px-4 py-3 font-medium">{row.university || '—'}</td>
                     <td className="px-4 py-3">
                       {row.program_name || '—'}
@@ -245,7 +298,15 @@ function compareRows(
   key: SortKey,
   dir: number,
   statusById: Map<string, ApplicationStatus>,
+  cataloguesById: Map<string, Catalogue>,
 ): number {
+  if (key === 'country') {
+    return compareText(
+      trackerRegionForRow(a, cataloguesById),
+      trackerRegionForRow(b, cataloguesById),
+      dir,
+    )
+  }
   if (key === 'university') return compareText(a.university, b.university, dir)
   if (key === 'programme') return compareText(a.program_name, b.program_name, dir)
   if (key === 'link') return compareText(a.portal_url, b.portal_url, dir)
@@ -303,6 +364,29 @@ function Field({ name, label, required }: { name: string; label: string; require
         className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm"
       />
     </label>
+  )
+}
+
+function RegionChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full px-3 py-1.5 text-sm ${
+        active ? 'bg-sky text-white' : 'bg-white text-slate-600 ring-1 ring-line hover:bg-slate-50'
+      }`}
+    >
+      {children}
+    </button>
   )
 }
 
