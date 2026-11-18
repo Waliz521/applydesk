@@ -159,10 +159,6 @@ const FACT_EXTRAS: Record<string, Record<string, string>> = {
     prepare: 'Degree, transcript, English certificate, CV, passport, and a 3-minute motivation video. No recommendation letter.',
     last_checked: '28 Oct 2026',
   },
-  'hk-hkpfs': {
-    scholarships_text: '400 awards for 2027/28. Stipend HK$344,400 per year plus HK$14,400 travel, for up to 3 years. Results May 2027. PhD only.',
-    last_checked: '28 Oct 2026',
-  },
 }
 
 const FACT_NOTES: Record<string, string> = {

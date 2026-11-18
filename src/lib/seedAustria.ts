@@ -1,4 +1,4 @@
-import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 import { supabase } from '@/lib/supabase'
 
 export const PLUS_AGI_SLUG = 'plus-applied-geoinformatics'
@@ -115,125 +115,16 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '14 Sep 2026',
     },
   },
-  {
-    slug: 'oead-busek',
-    acronym: 'BUSEK',
-    name: 'Erhard Busek Grant (OeAD)',
-    official_title: 'Erhard Busek Grant — two-year master’s in Austria',
-    priority: 'C',
-    coordinator: 'OeAD — Austrian Agency for Education and Internationalisation',
-    countries: ['Austria'],
-    duration: '24 months (full master’s)',
-    website: 'https://oead.at/en/study-research-teaching/overview-grants-and-scholarships/erhard-busek-grant',
-    apply_url: 'https://grants.at/',
-    fit_notes:
-      'The only Austrian government full master’s grant that listed Pakistan. STEM / English programmes. You cannot apply to OeAD yourself — PLUS or TU Wien must nominate you after unconditional admission.',
-    cycle_label: '2027/28 watch',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'tba',
-    scholarships: true,
-    funding_scheme: 'oead',
-    extra: {
-      apply: 'NO for now. OeAD says no further call is planned after the 2025/26 round. Watch oead.at / grants.at.',
-      target_start: 'October 2027 only if a new call appears',
-      opens_text: '2025/26: universities expressed interest by 15 Dec 2024; nominated students applied from Feb 2025.',
-      deadline_text: 'No 2026/27 or 2027/28 deadline published. Treat as closed until OeAD announces a new round.',
-      tuition_text:
-        'When awarded: €1,300 / month + up to €1,200 travel. Tuition waived by the host university (the grant itself does not pay tuition).',
-      self_funded_text:
-        'This row is the scholarship, not a degree. Still apply to PLUS-AGI or TUW-GEO. Without Busek you pay statutory tuition.',
-      scholarships_text:
-        'Pakistan is on the country list. Age limit 35. Direct OeAD applications are not accepted. Recheck busek-stipendium@oead.at before planning around it.',
-      prepare:
-        'Unconditional admission to a 2-year English master’s at a participating Austrian university, then wait for that university’s nomination.',
-      watch_outs:
-        'Do not confuse this with Ernst Mach (short research stay, not a master’s). CDE is a separate Erasmus application.',
-      last_checked: '14 Sep 2026',
-    },
-  },
-  {
-    slug: 'aai-one-world',
-    acronym: 'AAI',
-    name: 'One World Scholarship (Salzburg)',
-    official_title: 'One World Scholarship — Afro-Asiatic Institute Salzburg',
-    priority: 'B',
-    coordinator: 'Afro-Asiatic Institute (AAI) Salzburg',
-    countries: ['Austria'],
-    duration: 'During the master’s in Salzburg (semester months)',
-    website: 'https://aai-salzburg.at/en/studies/one-world-scholarship',
-    apply_url: 'https://aai-salzburg.at/en/studies/one-world-scholarship',
-    fit_notes:
-      'Partial living stipend if you are already a degree student in Salzburg. Fits PLUS Applied Geoinformatics. Not a visa scholarship — you must already hold a student residence permit.',
-    cycle_label: 'After arrival in Salzburg',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'tba',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'Watch — apply after PLUS admission + student residence permit. One completed Austrian semester is a strong advantage.',
-      target_start: 'While enrolled at PLUS (October–June payments)',
-      opens_text: 'AAI selects students already in Salzburg. Recheck aai-salzburg.at for the next form window.',
-      deadline_text: 'Not a pre-departure deadline. Confirm the current call on the AAI site before you travel.',
-      tuition_text: '€500 / month in semester months (Oct–Jun). PLUS may waive the €726.72 tuition while this stipend is paid.',
-      self_funded_text:
-        'You still need year-1 proof of funds and usually first tuition for the visa. This grant starts after you are in Salzburg.',
-      scholarships_text:
-        'Pakistan (Global South) is eligible. Master’s age limit 30 (35 for mothers). Development / sustainability interest expected. Joint masters only by arrangement — CDE is not guaranteed.',
-      prepare: 'PLUS admission, student visa/residence, financial-need evidence, transcript, development-interest statement.',
-      watch_outs:
-        'Not for distance/UNIGIS. Monthly AAI meetings are compulsory. Female applicants are prioritised when equally qualified.',
-      last_checked: '14 Sep 2026',
-    },
-  },
-  {
-    slug: 'oead-ernst-mach',
-    acronym: 'MACH',
-    name: 'Ernst Mach Grant (short stay)',
-    official_title: 'Ernst Mach Grant worldwide — research / exchange stay',
-    priority: 'C',
-    coordinator: 'OeAD — Ernst Mach Grant',
-    countries: ['Austria'],
-    duration: '1–9 months (not a degree)',
-    website: 'https://oead.at/en/study-research-teaching/overview-grants-and-scholarships/ernst-mach-grant',
-    apply_url: 'https://grants.at/',
-    fit_notes:
-      'Not a GIS master’s scholarship. Short incoming research stay. Listed so you do not spend a cycle treating it as a 2-year funded degree.',
-    cycle_label: '2027/28 stay',
-    opens: null,
-    scholarship: '2026-12-01',
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'NO as a master’s route. OeAD FAQ: it does not finance a complete Master’s programme.',
-      target_start: 'Not a degree start',
-      opens_text: 'Worldwide call for academic year 2027/28: deadline 1 December 2026 (confirm on grants.at).',
-      deadline_text: 'EXPECTED 1 December 2026 for 2027/28 short stays. Needs an Austrian supervisor’s consent.',
-      tuition_text: 'Monthly grant for a visit, not 24 months of PLUS/TU Wien tuition.',
-      self_funded_text: 'If you want a master’s, use PLUS-AGI / TUW-GEO (self-funded) or watch Busek.',
-      scholarships_text: 'Pakistan can be eligible for a research stay. This is not a substitute for EMJM, DAAD EPOS, or Busek.',
-      prepare: 'Only if you already have a PhD track or a visiting-researcher invitation — not for BS GIS → MSc admission.',
-      watch_outs: 'ASEA-UNINET Mach is SE Asia only. Fachhochschule Mach is a 1–2 semester exchange, not ITC-style GIS.',
-      last_checked: '14 Sep 2026',
-    },
-  },
 ]
-
 const DESCRIPTION =
-  'Austrian GIS / geoinformation master’s in English, plus the scholarships that actually exist for Pakistan. Statutory tuition is on the degree cards. Erhard Busek (OeAD) is the full master’s grant — no new call planned. One World is a Salzburg living stipend after arrival. Ernst Mach is a short stay, not a degree. CDE sits in the Erasmus Mundus catalogue.'
+  "Austrian GIS / geoinformation master's in English. PLUS Applied Geoinformatics and TU Wien Geodesy and Geoinformation. Statutory tuition is on each card. CDE sits in the Erasmus Mundus catalogue."
 
 export async function seedAustriaCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(['oead-busek', 'aai-one-world', 'oead-ernst-mach'])
+  if (removed) return { error: removed, count: 0 }
   const created = await findOrCreateCatalogue({
     slug: 'austria',
     name: 'Austria',
@@ -246,6 +137,6 @@ export async function seedAustriaCatalogue(opts?: {
   return upsertSeedProgrammes({
     catalogueId: created.catalogueId,
     programmes: PROGRAMMES,
-    source: 'PLUS / Z_GIS / TU Wien / OeAD / AAI Salzburg pages, 20 Oct 2026',
+    source: 'PLUS / Z_GIS / TU Wien pages, 20 Oct 2026',
   })
 }

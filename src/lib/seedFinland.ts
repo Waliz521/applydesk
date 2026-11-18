@@ -1,4 +1,4 @@
-import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 
 const PROGRAMMES: SeedRec[] = [
   {
@@ -73,40 +73,6 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '21 Oct 2026',
     },
   },
-  {
-    slug: 'finland-tuition-waivers',
-    acronym: 'FI-WAIVER',
-    name: 'Finnish university tuition waivers',
-    official_title: 'University tuition-fee waivers (no national master’s grant)',
-    priority: 'C',
-    coordinator: 'Finnish universities via Studyinfo.fi',
-    countries: ['Finland'],
-    duration: 'During master’s studies',
-    website: 'https://www.studyinfinland.fi/funding-your-studies/bachelors-and-masters-scholarships',
-    apply_url: 'https://www.studyinfinland.fi/funding-your-studies/bachelors-and-masters-scholarships',
-    fit_notes:
-      'Reminder row: Finland has **no government full master’s scholarship** for Pakistan — only partial/full **tuition** waivers per university. Living always Migri unless EU grant elsewhere.',
-    cycle_label: 'With Studyinfo application',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'tba',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'Apply waivers on each master’s Studyinfo application (Aalto, Helsinki, etc.).',
-      target_start: 'Autumn 2027 intakes',
-      opens_text: 'Dec–Jan application season for most English master’s.',
-      deadline_text: 'Programme-specific — typically early January.',
-      tuition_text: 'Waivers reduce tuition only; they are not cash to the student.',
-      self_funded_text: 'Plan €9,600+ living for first residence permit year (Migri) minus any **living** scholarship documented.',
-      scholarships_text: 'studyinfinland.fi: scholarships are university-managed, competitive, tuition-only unless stated otherwise.',
-      prepare: 'Rank programmes by GIS fit (Aalto first, Helsinki geography second).',
-      watch_outs: 'Agents promising “full Finland scholarship” usually mean tuition discount, not living + visa-proof package.',
-      last_checked: '21 Oct 2026',
-    },
-  },
 ]
 
 const DESCRIPTION =
@@ -116,6 +82,8 @@ export async function seedFinlandCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(['finland-tuition-waivers'])
+  if (removed) return { error: removed, count: 0 }
   const created = await findOrCreateCatalogue({
     slug: 'finland',
     name: 'Finland',

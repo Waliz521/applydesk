@@ -1,4 +1,4 @@
-import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 
 const PROGRAMMES: SeedRec[] = [
   {
@@ -109,52 +109,19 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '22 Sep 2026',
     },
   },
-  {
-    slug: 'hk-hkpfs',
-    acronym: 'HKPFS',
-    name: 'Hong Kong PhD Fellowship Scheme',
-    official_title: 'Government PhD fellowship (via HKU or PolyU nomination)',
-    priority: 'A',
-    coordinator: 'Research Grants Council — via host university Grad School',
-    countries: ['Hong Kong'],
-    duration: 'PhD funding period (typically 3–4 years)',
-    website: 'https://www.gradsch.hku.hk/prospective_students/fees_scholarships_and_financial_support/hong_kong_phd_fellowship_scheme',
-    apply_url: 'https://www.polyu.edu.hk/gs/prospective-students/',
-    fit_notes:
-      'Top funded PhD route in HK. Apply through the university RPG application and the RGC initial form. Pakistan eligible. 400 awards for 2027/28. Results announced May 2027.',
-    cycle_label: '2027/28 fellowship cycle',
-    opens: '2026-09-01',
-    scholarship: '2026-12-01',
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'full',
-    extra: {
-      apply: 'YES — if pursuing PhD at HKU or PolyU with supervisor support.',
-      target_start: 'Fellowship tied to Sep 2027 PhD admission',
-      opens_text: 'OPEN since 1 September 2026. Initial application deadline confirmed.',
-      deadline_text: 'CONFIRMED 1 December 2026, 12:00 noon HKT (RGC). PolyU and HKU full applications the same day, 23:59 HKT.',
-      tuition_text: 'Fee waiver plus stipend. PolyU quotes HK$344,400/year for 2027/28 HKPFS awardees (~HK$28,700/month). Results around May 2027.',
-      self_funded_text: 'N/A — this row is the fellowship only.',
-      scholarships_text:
-        '400 awards for 2027/28. Stipend HK$344,400 per year plus HK$14,400 travel, for up to 3 years. Results May 2027. PhD only.',
-      prepare: 'Strong proposal, grades, research output. Supervisor must support nomination in the RPG form.',
-      watch_outs: 'Extremely competitive. Have PGS / dept backup if not shortlisted.',
-      last_checked: '1 Oct 2026',
-    },
-  },
 ]
 
 export async function seedHongKongCatalogue(opts: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(['hk-hkpfs'])
+  if (removed) return { error: removed, count: 0 }
   const { error: catError, catalogueId } = await findOrCreateCatalogue({
     slug: 'hong-kong',
     name: 'Hong Kong',
     description:
-      'HKU Geography and PolyU LSGS research degrees (MPhil/PhD) plus HKPFS. Taught MSc GeoDS is self-funded (~HK$250k). Supervisor email before RPG apply. Detailed outreach notes: hong-kong-universities.md in this repo.',
+      'HKU Geography and PolyU LSGS research degrees (MPhil/PhD). Taught MSc GeoDS is self-funded (~HK$250k). Supervisor email before an RPG application. Detailed outreach notes: hong-kong-universities.md in this repo.',
     userId: opts.userId,
     isAdmin: opts.isAdmin,
   })

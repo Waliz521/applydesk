@@ -1,4 +1,4 @@
-import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 
 const PROGRAMMES: SeedRec[] = [
   {
@@ -116,42 +116,6 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '21 Oct 2026',
     },
   },
-  {
-    slug: 'dk-government-scholarship',
-    acronym: 'DK-GOV',
-    name: 'Danish Government Scholarship (non-EU)',
-    official_title: 'Danish Government Scholarships — administered by each university',
-    priority: 'B',
-    coordinator: 'Danish Ministry of Higher Education / universities (Study in Denmark)',
-    countries: ['Denmark'],
-    duration: 'Covers full master’s (when awarded)',
-    website: 'https://studyindenmark.dk/study-options/scholarships',
-    apply_url: 'https://studyindenmark.dk/study-options/scholarships',
-    fit_notes:
-      'Pakistan eligible. Not a separate portal — KU, AU, RUC, etc. nominate a few non-EU admits for tuition waiver and/or living grant. Strongest visa story when living costs are in the offer.',
-    cycle_label: 'With university admission',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'tba',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'NO separate form — apply to the master’s; RUC needs extra motivation for listed programmes.',
-      target_start: 'Aligned with your programme start',
-      opens_text: 'Follow the master’s application window (typically Nov–Jan for September).',
-      deadline_text: 'Same as admission deadline for that programme. Award notice comes with or after admission.',
-      tuition_text: 'Can be full tuition waiver ± monthly stipend (programme-dependent). Not all admits receive it.',
-      self_funded_text:
-        'Without award: tuition + proof of means for residence permit (no German Sperrkonto, but bank proof).',
-      scholarships_text:
-        'Citizens outside EU/EEA/Switzerland, admitted full-time master’s, residence permit for education. Merit-based at each university. Pakistan included.',
-      prepare: 'High grades, clear motivation, strong English. Prioritize programmes that explicitly list scholarship slots (e.g. RUC Environmental Science).',
-      watch_outs: 'Do not confuse with Swedish Institute (Pakistan not on SI list). Limited quotas per university.',
-      last_checked: '21 Oct 2026',
-    },
-  },
 ]
 
 const DESCRIPTION =
@@ -161,6 +125,8 @@ export async function seedDenmarkCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(['dk-government-scholarship'])
+  if (removed) return { error: removed, count: 0 }
   const created = await findOrCreateCatalogue({
     slug: 'denmark',
     name: 'Denmark',

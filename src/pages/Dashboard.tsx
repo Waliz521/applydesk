@@ -116,10 +116,8 @@ export function DashboardPage() {
         .from('programmes')
         .select('slug')
         .in('slug', [
-          'oead-busek',
           'plus-applied-geoinformatics',
           'itc-mgeo',
-          'eric-bleumink',
           'polyu-lsgs-rpg',
           'grenoble-imagers',
           'ku-geography-geoinformatics',
@@ -131,10 +129,9 @@ export function DashboardPage() {
       const austriaStale = cats.some((c) => c.slug === 'austria') && (await austriaSeedNeedsRefresh())
       const needAustria =
         !cats.some((c) => c.slug === 'austria') ||
-        !slugs.has('oead-busek') ||
         !slugs.has('plus-applied-geoinformatics') ||
         austriaStale
-      const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo') || !slugs.has('eric-bleumink')
+      const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo')
       const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
       const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
       const needDenmark = !cats.some((c) => c.slug === 'denmark') || !slugs.has('ku-geography-geoinformatics')
@@ -592,22 +589,17 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'poland' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> means you pay the university (cost on the card). Rose{' '}
-              <span className="font-medium">NAWA scholarship</span> is a separate government grant — Pakistan was not on the 2026/27 Banach list.
+              Dark <span className="font-medium">Self-funded · tuition</span> means you pay the university (cost on the card).
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'austria' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is statutory Austrian tuition. Rose{' '}
-              <span className="font-medium">OeAD · Busek</span> is the full master’s grant (no new call planned). Violet{' '}
-              <span className="font-medium">Partial</span> is One World (Salzburg living stipend) or Ernst Mach (short stay, not a degree).
+              Dark <span className="font-medium">Self-funded · tuition</span> is statutory Austrian tuition on the degree cards. CDE is in Erasmus Mundus.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'netherlands' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is ITC / WUR / GIMA / Delft fees (~€22k/year). Violet{' '}
-              <span className="font-medium">Partial</span> is NL Scholarship (€5,000), ITC Excellence, or Wageningen Excellence. Green{' '}
-              <span className="font-medium">Full university grant</span> is Eric Bleumink at Groningen only — not an ITC GIS scholarship.
+              Dark <span className="font-medium">Self-funded · tuition</span> is ITC / WUR / GIMA / Delft fees (~€22k/year).
               GEM sits in Erasmus Mundus.
             </p>
           ) : null}
@@ -618,23 +610,21 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Violet <span className="font-medium">Partial</span> is MPhil/PhD with PGS, IPFS, or dept studentship (supervisor-first). Green{' '}
-              <span className="font-medium">Full university grant</span> is HKPFS (PhD only, all HK universities). Dark{' '}
-              <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k) — not the funded research path.
+              Violet <span className="font-medium">Partial</span> is MPhil/PhD with a university studentship (supervisor first). Dark{' '}
+              <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k).
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'denmark' ? (
             <p className="mt-2 text-sm text-slate-600">
               Dark <span className="font-medium">Self-funded · tuition</span> is non-EU fees (KU ~€17k/year). Violet{' '}
-              <span className="font-medium">Partial</span> is Danish Government Scholarship or RUC fee waiver + stipend — Pakistan eligible, few seats.
-              No German blocked account; residence permit still needs subsistence unless the grant covers living.
+              <span className="font-medium">Partial</span> is the Roskilde Environmental Science degree, which can include a fee waiver and stipend.
+              No German blocked account; a residence permit still needs subsistence unless the offer covers living.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'finland' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is ~€13–17k/year. Violet{' '}
-              <span className="font-medium">Partial</span> is university tuition waivers only — no national living grant for Pakistan. Migri expects ~€9,600
-              living funds year 1 unless documented living aid.
+              Dark <span className="font-medium">Self-funded · tuition</span> is ~€13–17k/year. A university may waive tuition on the degree application.
+              There is no separate national living-grant card. Migri expects ~€9,600 living funds in year 1 unless documented living aid.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'australia' ? (

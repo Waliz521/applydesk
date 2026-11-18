@@ -69,6 +69,27 @@ export async function findOrCreateCatalogue(opts: {
   return { error: null, catalogueId: catalogueId ?? null }
 }
 
+/** Drop catalogue rows that are a grant, not a degree. Tracker rows stay, unlinked. */
+export async function removeProgrammesBySlug(slugs: string[]): Promise<string | null> {
+  if (slugs.length === 0) return null
+  const { data: rows, error } = await supabase.from('programmes').select('id').in('slug', slugs)
+  if (error) return error.message
+  const ids = (rows ?? []).map((row) => row.id as string)
+  if (ids.length === 0) return null
+
+  const { error: appError } = await supabase
+    .from('applications')
+    .update({ programme_id: null, cycle_id: null })
+    .in('programme_id', ids)
+  if (appError) return appError.message
+
+  const { error: cycleError } = await supabase.from('programme_cycles').delete().in('programme_id', ids)
+  if (cycleError) return cycleError.message
+
+  const { error: programmeError } = await supabase.from('programmes').delete().in('id', ids)
+  return programmeError?.message ?? null
+}
+
 export async function findCatalogueBySlug(
   slug: string,
   userId?: string,

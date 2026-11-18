@@ -29,19 +29,14 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
   poland: [
     { id: 'all', label: 'All Poland' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
-    { id: 'nawa', label: 'NAWA scholarship' },
   ],
   austria: [
     { id: 'all', label: 'All Austria' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
-    { id: 'oead', label: 'OeAD · Busek' },
-    { id: 'partial', label: 'Partial / other' },
   ],
   netherlands: [
     { id: 'all', label: 'All Netherlands' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
-    { id: 'partial', label: 'Partial scholarship' },
-    { id: 'full', label: 'Full university grant' },
   ],
   france: [
     { id: 'all', label: 'All France' },
@@ -56,7 +51,6 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
   finland: [
     { id: 'all', label: 'All Finland' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
-    { id: 'partial', label: 'Tuition waiver' },
   ],
   australia: [
     { id: 'all', label: 'All Australia' },
@@ -64,8 +58,7 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
   ],
   'hong-kong': [
     { id: 'all', label: 'All Hong Kong' },
-    { id: 'partial', label: 'RPG / PGS / IPFS' },
-    { id: 'full', label: 'HKPFS (PhD)' },
+    { id: 'partial', label: 'RPG / PGS' },
     { id: 'self_funded', label: 'Taught MSc (tuition)' },
   ],
   'erasmus-mundus': [
@@ -777,23 +770,19 @@ export function CataloguePage() {
 
           {active.slug === 'poland' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> you pay tuition (cost on the card). Rose{' '}
-              <FundingBadge scheme="nawa" /> is the Polish government scholarship — Pakistan was not eligible in 2026/27.
+              Grey <FundingBadge scheme="self_funded" /> you pay tuition (cost on the card).
             </p>
           ) : null}
 
           {active.slug === 'austria' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> statutory tuition. Rose <FundingBadge scheme="oead" /> Erhard Busek (no new
-              call planned). Violet <FundingBadge scheme="partial" /> One World after arrival, or Ernst Mach (not a master’s). CDE is under Erasmus Mundus.
+              Grey <FundingBadge scheme="self_funded" /> statutory tuition on the degree cards. CDE is under Erasmus Mundus.
             </p>
           ) : null}
 
           {active.slug === 'netherlands' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. Violet <FundingBadge scheme="partial" /> NL
-              Scholarship, ITC Excellence, Wageningen Excellence. Green <FundingBadge scheme="full" /> Eric Bleumink (Groningen only).
-              Orange Knowledge is closed. GEM is under Erasmus Mundus.
+              Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. GEM is under Erasmus Mundus.
             </p>
           ) : null}
 
@@ -805,8 +794,8 @@ export function CataloguePage() {
 
           {active.slug === 'hong-kong' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Violet <FundingBadge scheme="partial" /> HKU/PolyU MPhil/PhD with PGS, IPFS, or supervisor studentship — email faculty first.
-              Green <FundingBadge scheme="full" /> HKPFS (PhD). Grey <FundingBadge scheme="self_funded" /> taught MSc GeoDS (~HK$250k). Planning
+              Violet <FundingBadge scheme="partial" /> HKU/PolyU MPhil/PhD with a university studentship — email faculty first.
+              Grey <FundingBadge scheme="self_funded" /> taught MSc GeoDS (~HK$250k). Planning
               notes: <span className="font-medium">hong-kong-universities.md</span> in the repo.
             </p>
           ) : null}
@@ -814,15 +803,13 @@ export function CataloguePage() {
           {active.slug === 'denmark' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
               Grey <FundingBadge scheme="self_funded" /> KU Geoinformatics / AU Geoscience tuition. Violet{' '}
-              <FundingBadge scheme="partial" /> Danish Government Scholarship (auto at KU/AU) or RUC Environmental Science stipend track. Pakistan
-              eligible for Danish gov pool — very competitive.
+              <FundingBadge scheme="partial" /> Roskilde Environmental Science, which can include a fee waiver and stipend.
             </p>
           ) : null}
 
           {active.slug === 'finland' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> Aalto Geoinformatics / Helsinki Geography fees. Violet{' '}
-              <FundingBadge scheme="partial" /> tuition waivers only — Migri still wants ~€9,600 living proof unless living aid is documented.
+              Grey <FundingBadge scheme="self_funded" /> Aalto Geoinformatics / Helsinki Geography fees. Migri still wants ~€9,600 living proof unless living aid is documented.
             </p>
           ) : null}
 

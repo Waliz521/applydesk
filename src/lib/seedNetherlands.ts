@@ -1,4 +1,4 @@
-import { findOrCreateCatalogue, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
+import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, type SeedRec } from '@/lib/seedShared'
 
 const PROGRAMMES: SeedRec[] = [
   {
@@ -148,197 +148,18 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '14 Sep 2026',
     },
   },
-  {
-    slug: 'nl-scholarship',
-    acronym: 'NL',
-    name: 'NL Scholarship (Holland Scholarship)',
-    official_title: 'NL Scholarship — non-EEA master’s contribution',
-    priority: 'B',
-    coordinator: 'Dutch Ministry of Education + participating universities (Nuffic / Study in NL)',
-    countries: ['Netherlands'],
-    duration: 'First year only',
-    website: 'https://www.studyinnl.org/finances/nl-scholarship',
-    apply_url: 'https://www.utwente.nl/en/education/scholarship-finder/nl-scholarship-university-of-twente/',
-    fit_notes:
-      'National partial award for Pakistani / non-EEA students. €5,000 once in year 1. Apply through the university after (conditional) admission — not on a single Nuffic form.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-15',
-    scholarship: '2027-04-01',
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'Opens 15 Oct 2026 (not today). Twente form: 15 Oct 2026 12:00 CET – 1 Apr 2027 16:00 CET. Need a master’s application / student number first.',
-      target_start: 'September 2027',
-      opens_text: 'CONFIRMED on utwente.nl NL Scholarship page (1 Oct 2026): form opens 15 October 2026, 12:00 CET.',
-      deadline_text:
-        'CONFIRMED Twente: 1 April 2027, 16:00 CET. Results first week of May 2027. Other universities (Utrecht, WUR) set their own dates.',
-      tuition_text: '€5,000 towards year-1 costs. Does not cover ITC (~€21,700) or WUR (~€21,900) tuition, nor living.',
-      self_funded_text: 'You still need the rest of the first-year invoice for IND. Stacking with another UT scholarship is usually not allowed.',
-      scholarships_text:
-        'Pakistan is eligible. Must not already hold a Dutch degree. Orange Knowledge (OKP) is closed — this is not a replacement for a full OKP award.',
-      prepare: 'Admission letter / student number first, then the university scholarship form. IELTS 6.5 typical.',
-      watch_outs: 'Orange Tulip is country-specific and not a Pakistan GIS route. Confirm each year whether GIMA / WUR still participate.',
-      last_checked: '1 Oct 2026',
-    },
-  },
-  {
-    slug: 'itc-excellence',
-    acronym: 'ITC-EX',
-    name: 'ITC Excellence Scholarship',
-    official_title: 'ITC Excellence Scholarship Programme (partial)',
-    priority: 'A-',
-    coordinator: 'University of Twente — Faculty ITC',
-    countries: ['Netherlands'],
-    duration: '24 months (partial funding)',
-    website: 'https://www.utwente.nl/en/education/scholarship-finder/itc-excellence-scholarship-programme/',
-    apply_url: 'https://www.utwente.nl/en/itc/education/study-costs/scholarships/scholarship-finder/',
-    fit_notes:
-      'Main ITC funding for a Pakistani GIS applicant after OKP ended. Partial: they still require about €17,000 of your own money before 1 May.',
-    cycle_label: '2027 intake',
-    opens: '2026-12-01',
-    scholarship: null,
-    self_funded: '2027-05-01',
-    starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'NOT OPEN. 2026 rounds are closed. Official page (1 Oct 2026): a possible next round is expected in December — no Feb/Apr 2027 dates published yet.',
-      target_start: '1 September 2027',
-      opens_text: 'EXPECTED December 2026 (UT wording: “possible next round”). Do not treat February 2027 as confirmed.',
-      deadline_text:
-        'Not published for 2027. 2026 pattern was 1 Feb and 1 Apr, payment of own contribution 1 May. Recheck the ITC scholarship finder in December.',
-      tuition_text:
-        '2026 example: tuition €43,950 over 2 years; ITC scholarship €25,000 allowance + €32,370 fee waiver; you still pay ~€17,000 (remaining tuition + extra living + insurance + permit).',
-      self_funded_text: 'Without this award, pay the full institutional fee. UTS cannot be used as a backup — UTS excludes ITC.',
-      scholarships_text: 'Limited places, strong academic record. Pakistan is eligible. NL Scholarship is a smaller add-on only if UT rules allow one award.',
-      prepare: 'Unconditional or strong admission to M-GEO. Proof you can pay the €17,000 remainder by the payment deadline.',
-      watch_outs: 'Partial means partial. Do not budget as if it were Erasmus Mundus.',
-      last_checked: '1 Oct 2026',
-    },
-  },
-  {
-    slug: 'wur-excellence',
-    acronym: 'WUR-EX',
-    name: 'Wageningen Excellence Scholarship',
-    official_title: 'Wageningen University Excellence Programme (tuition waiver)',
-    priority: 'A-',
-    coordinator: 'Wageningen University & Research — scholarship selection committee',
-    countries: ['Netherlands'],
-    duration: '24 months tuition waiver',
-    website: 'https://www.wur.nl/en/education/master/study-expenses-masters/scholarships',
-    apply_url: 'https://www.wur.nl/en/education/master/study-expenses-masters/scholarships',
-    fit_notes:
-      'Invitation-only tuition waiver for non-EU MSc including Geo-information Science. GPA ~80% / first class. Living costs stay on you.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-01',
-    scholarship: '2026-12-01',
-    self_funded: '2027-07-01',
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'YES — complete WUR MSc file before 1 December 2026. No separate Excellence form. Confirmed on wur.nl 1 Oct 2026.',
-      target_start: 'September 2027',
-      opens_text: 'Same portal as MGI admission. Committee ranks complete files; some candidates are emailed March–April, offers around 7 April 2027.',
-      deadline_text: '1 December 2026 for the MSc application (English + diploma in). Payment of remaining year-1 costs: 1 July 2027.',
-      tuition_text:
-        'If awarded: 24-month tuition waiver. Revised first-year invoice ~€16,500 (living, insurance, residence permit) based on current fees.',
-      self_funded_text: 'Africa Scholarship Programme and Anne van den Ban are not the Pakistan route. Excellence is the WUR GIS-relevant one.',
-      scholarships_text: 'Non-EU/non-EFTA. Unconditional admission required for the award. Lottery can be used in the final step — not guaranteed at 3.55 CGPA.',
-      prepare: 'Full Osiris file, English test, bachelor diploma by 1 Dec 2026. September start only.',
-      watch_outs: 'A tuition waiver is not a living scholarship. IND still wants the living amount on the invoice.',
-      last_checked: '1 Oct 2026',
-    },
-  },
-  {
-    slug: 'eric-bleumink',
-    acronym: 'EBF',
-    name: 'Eric Bleumink Fellowship',
-    official_title: 'Eric Bleumink Fellowship — University of Groningen',
-    priority: 'B',
-    coordinator: 'University of Groningen — Admission Office / Eric Bleumink Fund',
-    countries: ['Netherlands'],
-    duration: '1 or 2 years (September start only)',
-    website: 'https://www.rug.nl/education/scholarships/eric-bleumink-fellowship?lang=en',
-    apply_url: 'https://www.rug.nl/education/master/international-students/application-procedure',
-    fit_notes:
-      'Pakistan-eligible and actually fully funded (tuition, travel, living, books, insurance). Groningen has no ITC-style GIS master’s — closest are Spatial Sciences / Environmental and Infrastructure Planning. Very few awards (rules mention about four a year).',
-    cycle_label: '2027 intake',
-    opens: '2026-10-01',
-    scholarship: '2026-12-01',
-    self_funded: null,
-    starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: true,
-    funding_scheme: 'full',
-    extra: {
-      apply:
-        'YES only if you will apply to a Groningen master’s. There is no Bleumink form. Complete admission by 1 December 2026 so an offer can arrive before February.',
-      target_start: 'September 2027',
-      opens_text: 'Same as Groningen master’s admission (typically from October). Nomination is by the Admission Office, not by you.',
-      deadline_text:
-        'Master’s file complete by 1 December 2026. Need a provisional or unconditional offer before February. Recheck rug.nl/education/scholarships/eric-bleumink-fellowship.',
-      tuition_text:
-        'If awarded: tuition + international travel + subsistence + books + health insurance for the full 1- or 2-year master’s. Not a partial €5,000 NL Scholarship.',
-      self_funded_text:
-        'This is Groningen only. It does not pay ITC, Wageningen, GIMA, or TU Delft. Without a nomination you pay Groningen’s institutional fee yourself.',
-      scholarships_text:
-        'Pakistan is on the country list. You must have no other means of financing. Cannot combine with another full grant. Hundreds apply; only a handful are awarded.',
-      prepare:
-        'Pick a Groningen programme (Spatial Sciences research master, Environmental and Infrastructure Planning, or Energy and Environmental Sciences — not a dedicated GIS MSc). Excellent bachelor grades, recommendation letters, English as the programme requires. Apply in Studielink/OAS early.',
-      watch_outs:
-        'Do not treat this as an ITC funding route. GIS skill growth here is secondary to getting a rare full award at Groningen.',
-      last_checked: '14 Sep 2026',
-    },
-  },
-  {
-    slug: 'okp-closed',
-    acronym: 'OKP',
-    name: 'Orange Knowledge Programme (closed)',
-    official_title: 'Orange Knowledge Programme — Nuffic (no new rounds)',
-    priority: 'C',
-    coordinator: 'Nuffic / Dutch Ministry of Foreign Affairs',
-    countries: ['Netherlands'],
-    duration: 'Was a full master’s / short course scholarship',
-    website: 'https://www.studyinnl.org/finances/nl-scholarship',
-    apply_url: 'https://www.utwente.nl/en/itc/education/study-costs/scholarships/scholarship-finder/',
-    fit_notes:
-      'The old fully funded Dutch development scholarship many GIS pages still mention. Closed 31 December 2024. No 2026 or 2027 round.',
-    cycle_label: 'closed',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: null,
-    date_status: 'tba',
-    scholarships: false,
-    funding_scheme: 'partial',
-    extra: {
-      apply: 'NO. OKP ended 31 Dec 2024. Use NL Scholarship + ITC Excellence + WUR Excellence, or Erasmus Mundus GEM.',
-      target_start: 'None',
-      opens_text: 'No new call.',
-      deadline_text: 'None. Ignore third-party blogs that still list OKP 2026/27.',
-      tuition_text: 'Was often full tuition + living. That package is gone.',
-      self_funded_text: 'ITC and WUR are self-funded or partial now. Full packages left: Erasmus Mundus GEM, or Eric Bleumink at Groningen (not a GIS MSc).',
-      scholarships_text: 'Not replaced 1:1. StuNed (Indonesia) is also closed. Pakistan never had Orange Tulip as a general GIS fellowship.',
-      prepare: 'Do not prepare an OKP file.',
-      watch_outs: 'If a page says “Holland Scholarship / OKP / Orange Knowledge” in one breath, read the date.',
-      last_checked: '14 Sep 2026',
-    },
-  },
 ]
-
 const DESCRIPTION =
-  'Dutch GIS / geoinformation master’s (ITC, Wageningen, GIMA, TU Delft) plus scholarships still open to Pakistan. Orange Knowledge is closed. Partial: NL Scholarship, ITC Excellence, Wageningen Excellence. Full: Eric Bleumink at Groningen only (no GIS MSc there; very few awards). GEM is in the Erasmus Mundus catalogue.'
+  "Dutch GIS / geoinformation master's: ITC, Wageningen, GIMA, and TU Delft. GEM is in the Erasmus Mundus catalogue."
+
+const RETIRED = ['nl-scholarship', 'itc-excellence', 'wur-excellence', 'eric-bleumink', 'okp-closed']
 
 export async function seedNetherlandsCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(RETIRED)
+  if (removed) return { error: removed, count: 0 }
   const created = await findOrCreateCatalogue({
     slug: 'netherlands',
     name: 'Netherlands',
@@ -353,6 +174,6 @@ export async function seedNetherlandsCatalogue(opts?: {
   return upsertSeedProgrammes({
     catalogueId: created.catalogueId,
     programmes: PROGRAMMES,
-    source: 'ITC / UT / WUR / UU / Groningen / Study in NL pages, 14 Sep 2026',
+    source: 'ITC / UT / WUR / UU / TU Delft pages, 14 Sep 2026',
   })
 }

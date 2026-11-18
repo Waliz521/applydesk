@@ -1,3 +1,4 @@
+import { removeProgrammesBySlug } from '@/lib/seedShared'
 import { supabase } from '@/lib/supabase'
 
 type SeedRec = {
@@ -89,38 +90,6 @@ const PROGRAMMES: SeedRec[] = [
     },
   },
   {
-    slug: 'wut-mobile-mapping-navigation',
-    acronym: 'WUT-MMNS',
-    name: 'Mobile Mapping and Navigation Systems',
-    official_title: 'MSc Geodesy and Cartography — Mobile Mapping and Navigation Systems',
-    priority: 'B',
-    coordinator: 'Warsaw University of Technology — Faculty of Geodesy and Cartography',
-    duration: '18 months / 3 semesters',
-    website: 'https://zk.gik.pw.edu.pl/mmns',
-    apply_url: 'https://www.students.pw.edu.pl/index.php/Studies-Offer/M.Sc.-offer',
-    fit_notes:
-      'GNSS/INS, UAV and mobile mapping. Strong tech; weaker classic GIS than AGH. February start if you miss October.',
-    opens: '2026-11-01',
-    scholarship: null,
-    self_funded: '2027-01-15',
-    starts: '2027-02-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'Still the only Poland row aimed at a start that has not passed. Confirm the January date on students.pw.edu.pl.',
-      target_start: 'February 2027',
-      opens_text: 'WUT 2026/27 MSc offer lists a February start. Not rechecked on the faculty page on 15 Oct 2026.',
-      deadline_text: 'EXPECTED January 2027. This date is from August 2026 and has not been republished.',
-      tuition_text: '€1,800 / semester · €5,400 total (~Rs 17 lac) for 3 semesters.',
-      self_funded_text: 'Self-funded. Warsaw living is at the high end of Poland.',
-      scholarships_text: 'No EMJM. Banach NAWA 2026 did not include Pakistan.',
-      prepare: 'Often wants geodesy/geoinformatics first cycle. Your 4-year BS GIS may need individual assessment.',
-      watch_outs: 'More surveying/navigation than environmental GIS. Shorter programme.',
-      last_checked: '15 Oct 2026',
-    },
-  },
-  {
     slug: 'uwm-geodesy-geoinformatics',
     acronym: 'UWM-GiK',
     name: 'Geodesy and Geoinformatics',
@@ -183,47 +152,17 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '15 Oct 2026',
     },
   },
-  {
-    slug: 'nawa-banach',
-    acronym: 'NAWA',
-    name: 'Banach NAWA scholarship (Poland master’s)',
-    official_title: 'Stefan Banach NAWA Programme — second-cycle studies in Poland',
-    priority: 'C',
-    coordinator: 'Polish National Agency for Academic Exchange (NAWA)',
-    duration: 'Master’s + optional preparatory year',
-    website: 'https://nawa.gov.pl/en/',
-    apply_url: 'https://programs.nawa.gov.pl/login',
-    fit_notes:
-      'Polish government master’s scholarship. Separate from university admission. Pakistan was not on the 36-country list for 2026/27 (closed 8 May 2026).',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'expected',
-    scholarships: true,
-    funding_scheme: 'nawa',
-    extra: {
-      apply: 'NO for 2026/27 — Pakistan not listed. Watch the 2027 call.',
-      target_start: 'October 2027 if Pakistan is added',
-      opens_text: '2026 call closed 8 May 2026. Next call typically spring.',
-      deadline_text: 'EXPECTED spring 2027 for 2027/28 — only if Pakistan appears on that year’s list.',
-      tuition_text: 'If awarded: NAWA stipend + public university place. If not: pay the tuition on the degree cards.',
-      self_funded_text: 'This row is the scholarship, not a degree. Still apply to AGH/PULS/etc. separately.',
-      scholarships_text: 'Rechecked 15 Oct 2026. Pakistan is still not on the 36-country list. No 2027 call has been announced.',
-      prepare: 'If a future call includes Pakistan: NAWA portal + university admission proof, English B2.',
-      watch_outs: 'Do not treat NAWA as an open GIS scholarship this year.',
-      last_checked: '15 Oct 2026',
-    },
-  },
 ]
 
 const DESCRIPTION =
-  'Public Polish GIS / geodesy master’s in English. These degrees are self-funded (tuition on each card). Banach NAWA is a separate scholarship; Pakistan was not eligible in 2026/27.'
+  'Public Polish GIS / geodesy master’s in English. These degrees are self-funded. Tuition is on each card.'
 
 export async function seedPolandCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
+  const removed = await removeProgrammesBySlug(['nawa-banach'])
+  if (removed) return { error: removed, count: 0 }
   const userId = opts?.userId
   const isAdmin = Boolean(opts?.isAdmin)
 
