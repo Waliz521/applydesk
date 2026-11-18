@@ -31,7 +31,12 @@ export function CatalogueSelect({
     }
   }, [])
 
-  const options = [{ id: 'all', name: 'All catalogues' }, ...catalogues.map((c) => ({ id: c.id, name: c.name }))]
+  const options = [
+    { id: 'all', name: 'All catalogues' },
+    ...[...catalogues]
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+      .map((c) => ({ id: c.id, name: c.name })),
+  ]
 
   return (
     <div ref={rootRef} className="relative w-full sm:w-72">

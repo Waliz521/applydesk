@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { daysUntil, deadlineUrgency, formatDate, urgencyClass } from '@/lib/dates'
@@ -58,6 +59,29 @@ export function ApplicationsPage() {
       [...present].filter((name) => !REGION_ORDER.includes(name)).sort((a, b) => a.localeCompare(b)),
     )
   }, [rows, cataloguesById])
+
+  const statusCounts = useMemo(() => {
+    const scoped = rows.filter(
+      (r) => regionFilter === 'all' || regionFilterId(trackerRegionForRow(r, cataloguesById)) === regionFilter,
+    )
+    const bySlug = new Map<string, number>()
+    for (const row of scoped) {
+      const slug = statusById.get(row.status_id ?? '')?.slug
+      if (!slug) continue
+      bySlug.set(slug, (bySlug.get(slug) ?? 0) + 1)
+    }
+    return { total: scoped.length, bySlug }
+  }, [rows, regionFilter, cataloguesById, statusById])
+
+  const regionCounts = useMemo(() => {
+    const scoped = rows.filter((r) => filter === 'all' || statusById.get(r.status_id ?? '')?.slug === filter)
+    const byName = new Map<string, number>()
+    for (const row of scoped) {
+      const name = trackerRegionForRow(row, cataloguesById)
+      byName.set(name, (byName.get(name) ?? 0) + 1)
+    }
+    return { total: scoped.length, byName }
+  }, [rows, filter, cataloguesById, statusById])
 
   const visible = useMemo(() => {
     const filtered = rows.filter((r) => {
@@ -171,11 +195,22 @@ export function ApplicationsPage() {
         className="grid grid-cols-3 gap-1.5 rounded-xl border border-line bg-white p-1.5 shadow-[inset_3px_0_0_0_var(--color-gold)] min-[1100px]:grid-cols-[repeat(var(--filter-cols),minmax(0,1fr))]"
         style={{ '--filter-cols': Math.max(statuses.length + 1, 1) } as CSSProperties}
       >
-        <FilterChip active={filter === 'all'} color="var(--color-gold)" onClick={() => setFilter('all')}>
+        <FilterChip
+          active={filter === 'all'}
+          color="var(--color-gold)"
+          count={statusCounts.total}
+          onClick={() => setFilter('all')}
+        >
           All
         </FilterChip>
         {statuses.map((s) => (
-          <FilterChip key={s.id} active={filter === s.slug} color={s.color} onClick={() => setFilter(s.slug)}>
+          <FilterChip
+            key={s.id}
+            active={filter === s.slug}
+            color={s.color}
+            count={statusCounts.bySlug.get(s.slug) ?? 0}
+            onClick={() => setFilter(s.slug)}
+          >
             {s.label}
           </FilterChip>
         ))}
@@ -184,13 +219,18 @@ export function ApplicationsPage() {
       {regionOptions.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           <span className="w-full text-xs font-medium text-muted">Country catalogue</span>
-          <RegionChip active={regionFilter === 'all'} onClick={() => setRegionFilter('all')}>
+          <RegionChip active={regionFilter === 'all'} count={regionCounts.total} onClick={() => setRegionFilter('all')}>
             All countries
           </RegionChip>
           {regionOptions.map((name) => {
             const id = regionFilterId(name)
             return (
-              <RegionChip key={id} active={regionFilter === id} onClick={() => setRegionFilter(id)}>
+              <RegionChip
+                key={id}
+                active={regionFilter === id}
+                count={regionCounts.byName.get(name) ?? 0}
+                onClick={() => setRegionFilter(id)}
+              >
                 {name}
               </RegionChip>
             )
@@ -252,17 +292,11 @@ export function ApplicationsPage() {
                       ) : null}
                     </td>
                     <td className="px-4 py-3">
-                      <select
+                      <StatusMenu
                         value={row.status_id ?? ''}
-                        onChange={(e) => void setStatus(row.id, e.target.value)}
-                        className="rounded-lg border border-line px-2 py-1 text-sm"
-                      >
-                        {statuses.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.label}
-                          </option>
-                        ))}
-                      </select>
+                        options={statuses.map((s) => ({ id: s.id, label: s.label, color: s.color }))}
+                        onChange={(statusId) => void setStatus(row.id, statusId)}
+                      />
                     </td>
                     <td className="px-4 py-3">
                       {row.portal_url ? (
@@ -370,10 +404,12 @@ function Field({ name, label, required }: { name: string; label: string; require
 
 function RegionChip({
   active,
+  count,
   onClick,
   children,
 }: {
   active: boolean
+  count: number
   onClick: () => void
   children: string
 }) {
@@ -382,11 +418,12 @@ function RegionChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full px-3 py-1.5 text-sm ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm ${
         active ? 'bg-sky text-white' : 'bg-white text-slate-600 ring-1 ring-line hover:bg-slate-50'
       }`}
     >
       {children}
+      <span className={`tabular-nums ${active ? 'text-white/80' : 'text-muted'}`}>{count}</span>
     </button>
   )
 }
@@ -394,11 +431,13 @@ function RegionChip({
 function FilterChip({
   active,
   color,
+  count,
   onClick,
   children,
 }: {
   active: boolean
   color?: string | null
+  count: number
   onClick: () => void
   children: string
 }) {
@@ -416,7 +455,134 @@ function FilterChip({
         style={{ background: color || 'var(--color-navy)' }}
         aria-hidden="true"
       />
-      {children}
+      <span>{children}</span>
+      <span className={`tabular-nums ${active ? 'text-white/70' : 'text-muted'}`}>{count}</span>
     </button>
+  )
+}
+
+function StatusMenu({
+  value,
+  options,
+  onChange,
+}: {
+  value: string
+  options: { id: string; label: string; color: string | null }[]
+  onChange: (id: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({})
+  const rootRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLUListElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const listId = useId()
+  const selected = options.find((option) => option.id === value)
+
+  function placeMenu() {
+    const rect = buttonRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const below = window.innerHeight - rect.bottom
+    const openUp = below < 220 && rect.top > below
+    setMenuStyle({
+      position: 'fixed',
+      left: rect.left,
+      width: Math.max(rect.width, 176),
+      top: openUp ? undefined : rect.bottom + 6,
+      bottom: openUp ? window.innerHeight - rect.top + 6 : undefined,
+      zIndex: 40,
+    })
+  }
+
+  useEffect(() => {
+    if (!open) return
+    placeMenu()
+    function onDoc(e: MouseEvent) {
+      const target = e.target as Node
+      if (rootRef.current?.contains(target) || menuRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', placeMenu)
+    window.addEventListener('scroll', placeMenu, true)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', placeMenu)
+      window.removeEventListener('scroll', placeMenu, true)
+    }
+  }, [open])
+
+  return (
+    <div ref={rootRef} className="relative min-w-[11rem]">
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={() => setOpen((current) => !current)}
+        className={`flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-3 py-2 text-left text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-sky/30 ${
+          open ? 'border-sky text-ink' : 'border-line text-ink hover:border-sky/40'
+        }`}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span
+            className="size-2 shrink-0 rounded-full"
+            style={{ background: selected?.color || 'var(--color-navy)' }}
+            aria-hidden="true"
+          />
+          <span className="truncate">{selected?.label ?? 'Status'}</span>
+        </span>
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          className={`h-4 w-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+          aria-hidden
+        >
+          <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open
+        ? createPortal(
+        <ul
+          ref={menuRef}
+          id={listId}
+          role="listbox"
+          style={menuStyle}
+          className="max-h-64 overflow-auto rounded-xl border border-line bg-white py-1 shadow-lg"
+        >
+          {options.map((option) => {
+            const active = option.id === value
+            return (
+              <li key={option.id} role="option" aria-selected={active}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(option.id)
+                    setOpen(false)
+                  }}
+                  className={`flex w-full items-center gap-2 px-3.5 py-2 text-left text-sm ${
+                    active ? 'bg-navy font-medium text-white' : 'text-ink hover:bg-slate-50'
+                  }`}
+                >
+                  <span
+                    className={`size-2 shrink-0 rounded-full ${active ? 'ring-2 ring-white/40' : ''}`}
+                    style={{ background: option.color || 'var(--color-navy)' }}
+                    aria-hidden="true"
+                  />
+                  {option.label}
+                </button>
+              </li>
+            )
+          })}
+        </ul>,
+        document.body,
+      )
+        : null}
+    </div>
   )
 }

@@ -37,16 +37,18 @@ export const DEFAULT_CYCLE_FILTERS: CycleFilters = {
 
 const FAMILY_OPTIONS: { id: CycleFamily; label: string }[] = [
   { id: 'all', label: 'All catalogues' },
-  { id: 'erasmus-mundus', label: 'EMJM / Erasmus Mundus' },
-  { id: 'daad', label: 'DAAD (non-EPOS)' },
-  { id: 'austria', label: 'Austria' },
-  { id: 'netherlands', label: 'Netherlands' },
-  { id: 'poland', label: 'Poland' },
-  { id: 'hong-kong', label: 'Hong Kong' },
-  { id: 'france', label: 'France' },
-  { id: 'denmark', label: 'Denmark' },
-  { id: 'finland', label: 'Finland' },
-  { id: 'australia', label: 'Australia' },
+  ...[
+    { id: 'australia' as const, label: 'Australia' },
+    { id: 'austria' as const, label: 'Austria' },
+    { id: 'daad' as const, label: 'DAAD (non-EPOS)' },
+    { id: 'denmark' as const, label: 'Denmark' },
+    { id: 'erasmus-mundus' as const, label: 'EMJM / Erasmus Mundus' },
+    { id: 'finland' as const, label: 'Finland' },
+    { id: 'france' as const, label: 'France' },
+    { id: 'hong-kong' as const, label: 'Hong Kong' },
+    { id: 'netherlands' as const, label: 'Netherlands' },
+    { id: 'poland' as const, label: 'Poland' },
+  ].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })),
   { id: 'other', label: 'Other' },
 ]
 
