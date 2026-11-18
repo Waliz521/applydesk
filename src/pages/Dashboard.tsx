@@ -12,6 +12,7 @@ import { ProgrammeCard } from '@/components/ProgrammeCard'
 import { useAuth } from '@/context/AuthContext'
 import { applyByDate, cycleState, daysUntil, formatDate } from '@/lib/dates'
 import { isEposProgramme } from '@/lib/funding'
+import { seedAustraliaCatalogue } from '@/lib/seedAustralia'
 import { austriaSeedNeedsRefresh, seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
@@ -47,6 +48,7 @@ export function DashboardPage() {
   const hasFrance = catalogues.some((c) => c.slug === 'france')
   const hasDenmark = catalogues.some((c) => c.slug === 'denmark')
   const hasFinland = catalogues.some((c) => c.slug === 'finland')
+  const hasAustralia = catalogues.some((c) => c.slug === 'australia')
 
   async function loadDashboard() {
     const [cyclesRes, appsRes, statusesRes, catsRes] = await Promise.all([
@@ -122,6 +124,7 @@ export function DashboardPage() {
           'grenoble-imagers',
           'ku-geography-geoinformatics',
           'aalto-geoinformatics',
+          'sydney-mphil-science',
         ])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
       const needPoland = !cats.some((c) => c.slug === 'poland')
@@ -136,7 +139,8 @@ export function DashboardPage() {
       const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
       const needDenmark = !cats.some((c) => c.slug === 'denmark') || !slugs.has('ku-geography-geoinformatics')
       const needFinland = !cats.some((c) => c.slug === 'finland') || !slugs.has('aalto-geoinformatics')
-      if (needPoland || needAustria || needNetherlands || needHongKong || needFrance || needDenmark || needFinland) {
+      const needAustralia = !cats.some((c) => c.slug === 'australia') || !slugs.has('sydney-mphil-science')
+      if (needPoland || needAustria || needNetherlands || needHongKong || needFrance || needDenmark || needFinland || needAustralia) {
         setSeeding(true)
       }
       if (needPoland) {
@@ -230,6 +234,19 @@ export function DashboardPage() {
         }
         notes.push(`Finland catalogue added (${result.count} programmes).`)
       }
+      if (needAustralia) {
+        const result = await seedAustraliaCatalogue({
+          userId: user.id,
+          isAdmin: Boolean(profile?.is_admin),
+        })
+        if (cancelled) return
+        if (result.error) {
+          setSeeding(false)
+          setError(result.error)
+          return
+        }
+        notes.push(`Australia catalogue added (${result.count} programmes).`)
+      }
       // EMJM date refresh writes programme_cycles — only admins pass RLS.
       if (profile?.is_admin) {
         const emjm = await seedErasmusEmjmUpdates({ userId: user.id, force: true, isAdmin: true })
@@ -288,6 +305,16 @@ export function DashboardPage() {
         if (fi.error) {
           setSeeding(false)
           setError(fi.error)
+          return
+        }
+        const au = await seedAustraliaCatalogue({
+          userId: user.id,
+          isAdmin: true,
+        })
+        if (cancelled) return
+        if (au.error) {
+          setSeeding(false)
+          setError(au.error)
           return
         }
       }
@@ -391,6 +418,18 @@ export function DashboardPage() {
       }
       notes.push(`Finland catalogue added (${result.count} programmes).`)
     }
+    if (!hasAustralia) {
+      const result = await seedAustraliaCatalogue({
+        userId: user.id,
+        isAdmin: Boolean(profile?.is_admin),
+      })
+      if (result.error) {
+        setSeeding(false)
+        setError(result.error)
+        return
+      }
+      notes.push(`Australia catalogue added (${result.count} programmes).`)
+    }
     const emjm = await seedErasmusEmjmUpdates({
       userId: user.id,
       force: true,
@@ -411,7 +450,9 @@ export function DashboardPage() {
     const france = cats.find((c) => c.slug === 'france')
     const denmark = cats.find((c) => c.slug === 'denmark')
     const finland = cats.find((c) => c.slug === 'finland')
-    if (!hasFinland && finland) setCatalogueId(finland.id)
+    const australia = cats.find((c) => c.slug === 'australia')
+    if (!hasAustralia && australia) setCatalogueId(australia.id)
+    else if (!hasFinland && finland) setCatalogueId(finland.id)
     else if (!hasDenmark && denmark) setCatalogueId(denmark.id)
     else if (!hasFrance && france) setCatalogueId(france.id)
     else if (!hasHongKong && hongKong) setCatalogueId(hongKong.id)
@@ -596,6 +637,13 @@ export function DashboardPage() {
               living funds year 1 unless documented living aid.
             </p>
           ) : null}
+          {selectedCatalogue?.slug === 'australia' ? (
+            <p className="mt-2 text-sm text-slate-600">
+              Green <span className="font-medium">RTP stipend</span> is full tuition plus a living allowance on a research master’s.
+              Sydney closes 18 December 2026. Monash International Round 1 closes 28 February 2027. ANU Round 2 closes 15 April 2027.
+              Lodge only after a supervisor has agreed. Coursework GIS degrees are not listed.
+            </p>
+          ) : null}
           {selectedCatalogue?.slug === 'erasmus-mundus' ? (
             <p className="mt-2 text-sm text-slate-600">
               Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
@@ -614,7 +662,8 @@ export function DashboardPage() {
         !hasHongKong ||
         !hasFrance ||
         !hasDenmark ||
-        !hasFinland) &&
+        !hasFinland ||
+        !hasAustralia) &&
       !loading ? (
         <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
@@ -626,6 +675,7 @@ export function DashboardPage() {
               !hasFrance && 'France',
               !hasDenmark && 'Denmark',
               !hasFinland && 'Finland',
+              !hasAustralia && 'Australia',
             ]
               .filter(Boolean)
               .join(' and ')}{' '}
@@ -635,7 +685,8 @@ export function DashboardPage() {
               (!hasHongKong ? 1 : 0) +
               (!hasFrance ? 1 : 0) +
               (!hasDenmark ? 1 : 0) +
-              (!hasFinland ? 1 : 0) >
+              (!hasFinland ? 1 : 0) +
+              (!hasAustralia ? 1 : 0) >
             1
               ? 'are not in this dropdown yet.'
               : 'is not in this dropdown yet.'}{' '}

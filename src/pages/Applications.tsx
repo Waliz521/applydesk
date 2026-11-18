@@ -14,6 +14,7 @@ const REGION_ORDER = [
   'Hong Kong',
   'Denmark',
   'Finland',
+  'Australia',
   'Germany (DAAD)',
   'Other',
 ]

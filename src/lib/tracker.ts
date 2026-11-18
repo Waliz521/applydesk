@@ -19,7 +19,7 @@ function trackerScholarshipName(programme: Programme): string {
     case 'partial':
       return 'Partial scholarship'
     case 'full':
-      return 'Eric Bleumink Fellowship'
+      return programme.extra?.funding_label?.trim() || 'Eric Bleumink Fellowship'
     case 'emjm':
       return 'Erasmus Mundus Joint Master'
     default:

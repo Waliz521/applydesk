@@ -10,6 +10,7 @@ export const TRACKER_REGION_BY_CATALOGUE: Record<string, string> = {
   'hong-kong': 'Hong Kong',
   denmark: 'Denmark',
   finland: 'Finland',
+  australia: 'Australia',
   daad: 'Germany (DAAD)',
 }
 

@@ -7,6 +7,7 @@ import { fundingScheme, isEposProgramme } from '@/lib/funding'
 import type { FundingScheme } from '@/lib/types'
 import { priorityRank } from '@/lib/priority'
 import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker'
+import { seedAustraliaCatalogue } from '@/lib/seedAustralia'
 import { seedAustriaCatalogue } from '@/lib/seedAustria'
 import { seedErasmusEmjmUpdates } from '@/lib/seedErasmusEmjm'
 import { seedDenmarkCatalogue } from '@/lib/seedDenmark'
@@ -56,6 +57,10 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
     { id: 'all', label: 'All Finland' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
     { id: 'partial', label: 'Tuition waiver' },
+  ],
+  australia: [
+    { id: 'all', label: 'All Australia' },
+    { id: 'full', label: 'RTP stipend' },
   ],
   'hong-kong': [
     { id: 'all', label: 'All Hong Kong' },
@@ -148,6 +153,7 @@ export function CataloguePage() {
           active?.slug === 'france' ||
           active?.slug === 'denmark' ||
           active?.slug === 'finland' ||
+          active?.slug === 'australia' ||
           active?.slug === 'erasmus-mundus') &&
         funding !== 'all' &&
         fundingScheme(p, active?.name) !== funding
@@ -356,6 +362,30 @@ export function CataloguePage() {
     if (data?.id) setActiveId(data.id)
   }
 
+  async function loadAustraliaList() {
+    setSeeding(true)
+    setError(null)
+    setNotice(null)
+    const result = await seedAustraliaCatalogue({
+      userId: user?.id,
+      isAdmin: Boolean(profile?.is_admin),
+    })
+    setSeeding(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    setNotice(`Australia list updated (${result.count} programmes).`)
+    await loadCatalogues()
+    const { data } = await supabase
+      .from('catalogues')
+      .select('id')
+      .eq('slug', 'australia')
+      .is('owner_user_id', null)
+      .maybeSingle()
+    if (data?.id) setActiveId(data.id)
+  }
+
   async function refreshEmjm() {
     setSeeding(true)
     setError(null)
@@ -516,6 +546,16 @@ export function CataloguePage() {
             {seeding ? 'Adding Finland…' : 'Add Finland catalogue'}
           </button>
         ) : null}
+        {canEdit && !catalogues.some((c) => c.slug === 'australia') ? (
+          <button
+            type="button"
+            onClick={() => void loadAustraliaList()}
+            disabled={seeding}
+            className="rounded-full bg-slate-800 px-3 py-1.5 text-sm text-white"
+          >
+            {seeding ? 'Adding Australia…' : 'Add Australia catalogue'}
+          </button>
+        ) : null}
       </div>
 
       {active ? (
@@ -597,6 +637,16 @@ export function CataloguePage() {
                       className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
                     >
                       {seeding ? 'Updating…' : 'Load / refresh Finland GIS list'}
+                    </button>
+                  ) : null}
+                  {active.slug === 'australia' ? (
+                    <button
+                      type="button"
+                      onClick={() => void loadAustraliaList()}
+                      disabled={seeding}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white"
+                    >
+                      {seeding ? 'Updating…' : 'Load / refresh Australia list'}
                     </button>
                   ) : null}
                   {active.slug === 'erasmus-mundus' ? (
@@ -773,6 +823,13 @@ export function CataloguePage() {
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
               Grey <FundingBadge scheme="self_funded" /> Aalto Geoinformatics / Helsinki Geography fees. Violet{' '}
               <FundingBadge scheme="partial" /> tuition waivers only — Migri still wants ~€9,600 living proof unless living aid is documented.
+            </p>
+          ) : null}
+
+          {active.slug === 'australia' ? (
+            <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
+              <FundingBadge scheme="full" label="RTP stipend" /> Sydney MPhil (18 Dec 2026), Monash research master’s (28 Feb 2027),
+              ANU Fenner MPhil (15 Apr 2027). Full tuition and a living allowance. A supervisor has to agree before you lodge.
             </p>
           ) : null}
         </div>

@@ -29,6 +29,7 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     cat.includes('france') ||
     cat.includes('denmark') ||
     cat.includes('finland') ||
+    cat.includes('australia') ||
     cat.includes('self-funded')
   ) {
     if (slug.includes('dk-government') || slug.includes('fi-waiver') || slug.includes('ruc-environmental')) {
@@ -46,7 +47,15 @@ export function fundingScheme(programme: Programme, catalogueName?: string): Fun
     ) {
       return 'partial'
     }
-    if (slug.includes('bleumink') || slug.includes('eiffel')) return 'full'
+    if (
+      slug.includes('bleumink') ||
+      slug.includes('eiffel') ||
+      slug === 'sydney-mphil-science' ||
+      slug === 'monash-mres-eae' ||
+      slug === 'anu-mphil-fenner'
+    ) {
+      return 'full'
+    }
     if (slug.includes('geods')) return 'self_funded'
     if (slug.includes('rpg') || slug.includes('geog-rpg') || slug.includes('lsgs')) return 'partial'
     return 'self_funded'
