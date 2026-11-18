@@ -161,7 +161,7 @@ export async function seedPolandCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
-  const removed = await removeProgrammesBySlug(['nawa-banach'])
+  const removed = await removeProgrammesBySlug(['nawa-banach', 'wut-mobile-mapping-navigation'])
   if (removed) return { error: removed, count: 0 }
   const userId = opts?.userId
   const isAdmin = Boolean(opts?.isAdmin)

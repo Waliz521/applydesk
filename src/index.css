@@ -10,7 +10,7 @@
   --color-gold: #e4c27a;
   --color-sky: #0284c7;
   --color-sky-dark: #0369a1;
-  --color-paper: #f4f7fb;
+  --color-paper: #efeae2;
 }
 
 html,
@@ -25,4 +25,10 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+}
+
+.app-wallpaper {
+  background-color: #efeae2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23cbbfaf' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='28' cy='32' r='10'/%3E%3Cpath d='M24 34c1.2 1.4 2.6 2 4 2s2.8-.6 4-2M24 29h.1M32 29h.1'/%3E%3Cpath d='M86 22l2.2 4.6 5 .7-3.6 3.5.9 5.1L86 33.4 81.5 36l.9-5.1-3.6-3.5 5-.7z'/%3E%3Cpath d='M168 28h16a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6h-8l-6 5v-5h-2a6 6 0 0 1-6-6V34a6 6 0 0 1 6-6z'/%3E%3Cpath d='M36 108c8-14 18-14 18 0 0 10-9 16-9 16s-9-6-9-16z'/%3E%3Ccircle cx='118' cy='112' r='8'/%3E%3Cpath d='M118 120v16M110 148h16'/%3E%3Cpath d='M176 104h22v18h-22zM180 104v-4h14v4'/%3E%3Cpath d='M48 188c10 0 12-8 22-8s12 8 22 8 12-8 22-8'/%3E%3Ccircle cx='196' cy='196' r='7'/%3E%3Cpath d='M196 189v4l3 2'/%3E%3C/svg%3E");
+  background-attachment: fixed;
 }

@@ -217,7 +217,7 @@ export function Layout() {
         </aside>
 
         <div
-          className={`flex min-w-0 flex-1 flex-col transition-[padding] duration-200 ease-out motion-reduce:transition-none ${
+          className={`app-wallpaper flex min-w-0 flex-1 flex-col transition-[padding] duration-200 ease-out motion-reduce:transition-none ${
             collapsed ? 'md:pl-[4.75rem]' : 'md:pl-64'
           }`}
         >

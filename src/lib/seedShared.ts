@@ -69,6 +69,23 @@ export async function findOrCreateCatalogue(opts: {
   return { error: null, catalogueId: catalogueId ?? null }
 }
 
+/** Catalogue rows that are a grant or a dropped degree, not a programme to apply to. */
+export const RETIRED_GRANT_SLUGS = [
+  'nl-scholarship',
+  'itc-excellence',
+  'wur-excellence',
+  'eric-bleumink',
+  'okp-closed',
+  'hk-hkpfs',
+  'nawa-banach',
+  'oead-busek',
+  'aai-one-world',
+  'oead-ernst-mach',
+  'finland-tuition-waivers',
+  'dk-government-scholarship',
+  'wut-mobile-mapping-navigation',
+]
+
 /** Drop catalogue rows that are a grant, not a degree. Tracker rows stay, unlinked. */
 export async function removeProgrammesBySlug(slugs: string[]): Promise<string | null> {
   if (slugs.length === 0) return null

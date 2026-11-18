@@ -21,6 +21,7 @@ import { seedFranceCatalogue } from '@/lib/seedFrance'
 import { seedHongKongCatalogue } from '@/lib/seedHongKong'
 import { seedNetherlandsCatalogue } from '@/lib/seedNetherlands'
 import { seedPolandCatalogue } from '@/lib/seedPoland'
+import { removeProgrammesBySlug, RETIRED_GRANT_SLUGS } from '@/lib/seedShared'
 import { addProgrammeToTracker, removeProgrammeFromTracker } from '@/lib/tracker'
 import { supabase } from '@/lib/supabase'
 import type { Application, Catalogue, OpenRow, Programme, ProgrammeCycle } from '@/lib/types'
@@ -109,6 +110,11 @@ export function DashboardPage() {
     if (authLoading || (user && !profile)) return
     let cancelled = false
     async function load() {
+      if (user && profile?.is_admin) {
+        const removed = await removeProgrammesBySlug(RETIRED_GRANT_SLUGS)
+        if (cancelled) return
+        if (removed) setError(removed)
+      }
       const cats = await loadDashboard()
       if (cancelled || !user) return
       const notes: string[] = []
@@ -254,66 +260,6 @@ export function DashboardPage() {
           return
         }
         if (emjm.updated) notes.push(`EMJM dates refreshed (${emjm.count} programmes).`)
-        const nl = await seedNetherlandsCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (nl.error) {
-          setSeeding(false)
-          setError(nl.error)
-          return
-        }
-        const hk = await seedHongKongCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (hk.error) {
-          setSeeding(false)
-          setError(hk.error)
-          return
-        }
-        const fr = await seedFranceCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (fr.error) {
-          setSeeding(false)
-          setError(fr.error)
-          return
-        }
-        const dk = await seedDenmarkCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (dk.error) {
-          setSeeding(false)
-          setError(dk.error)
-          return
-        }
-        const fi = await seedFinlandCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (fi.error) {
-          setSeeding(false)
-          setError(fi.error)
-          return
-        }
-        const au = await seedAustraliaCatalogue({
-          userId: user.id,
-          isAdmin: true,
-        })
-        if (cancelled) return
-        if (au.error) {
-          setSeeding(false)
-          setError(au.error)
-          return
-        }
       }
       setSeeding(false)
       if (notes.length === 0) return
