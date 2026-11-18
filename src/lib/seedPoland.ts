@@ -25,39 +25,7 @@ type SeedRec = {
 const CYCLE_LABEL = '2026/27 intake'
 
 const PROGRAMMES: SeedRec[] = [
-  {
-    slug: 'agh-remote-sensing-geo-informatics',
-    acronym: 'AGH-RSGI',
-    name: 'Remote Sensing and Geo Informatics',
-    official_title: 'MSc Remote Sensing and Geo Informatics',
-    priority: 'A',
-    coordinator: 'AGH University of Krakow — Faculty of Geo-Data Science, Geodesy and Environmental Engineering',
-    duration: '24 months / 4 semesters',
-    website: 'https://www.international.agh.edu.pl/en/studies/education-offer-master-studies',
-    apply_url: 'https://www.international.agh.edu.pl/en/studies/education-offer-master-studies',
-    fit_notes:
-      'Best English GIS match in Poland: Sentinel/Copernicus, Python for RS, time series, ML, geo-tools, hazards, urban/environment. Accepts a bachelor, not only an engineer.',
-    opens: '2027-06-01',
-    scholarship: null,
-    self_funded: '2027-09-30',
-    starts: '2027-10-01',
-    date_status: 'confirmed',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'October 2026 intake has closed. Next recruitment is summer 2027.',
-      target_start: '1 October 2027',
-      opens_text: 'AGH resolution for 2027/28: summer recruitment 1 June 2027 to 30 September 2027. The detailed international calendar is due in May 2027.',
-      deadline_text: 'Confirmed window: 1 June 2027–30 September 2027 for an October 2027 start.',
-      tuition_text: '€1,650 / semester · €6,600 total (~Rs 21 lac). First year €3,300 (~Rs 11 lac).',
-      self_funded_text: 'Self-funded. Islamabad visa usually wants first-year tuition paid or shown, plus living money. No German blocked account.',
-      scholarships_text: 'No EMJM/DAAD on this degree. Banach NAWA 2026 did not include Pakistan.',
-      prepare: 'Entrance exam (image processing, NDVI, map scale, stats). IELTS/B2. Legalised degree + transcript.',
-      watch_outs: 'Kraków living is the expensive part, not the tuition.',
-      last_checked: '15 Oct 2026',
-    },
-  },
-  {
+{
     slug: 'puls-geoinformation-spatial-management',
     acronym: 'PULS-GEO',
     name: 'Geoinformation and Spatial Management',
@@ -72,96 +40,39 @@ const PROGRAMMES: SeedRec[] = [
     opens: null,
     scholarship: null,
     self_funded: null,
-    starts: '2027-10-01',
+    starts: '2026-10-01',
     date_status: 'tba',
     scholarships: false,
     funding_scheme: 'self_funded',
     extra: {
-      apply: 'October 2026 intake has started. The next recruitment dates are not published.',
-      target_start: 'October 2027, date not published',
-      opens_text: 'The 2026/27 winter semester is underway. No 2027/28 foreign-student deadline is on the faculty site yet.',
-      deadline_text: 'October 2026 recruitment is closed. Next deadline TBA.',
+      apply: 'This is the current degree. The October 2026 intake has started.',
+      target_start: 'October 2026',
+      opens_text: 'Lectures for this intake began in October 2026.',
+      deadline_text: 'October 2026 recruitment is the current degree. The next foreign-student deadline is not published.',
       tuition_text: '€4,200 total (~Rs 13.6 lac). €1,100 × 3 + €900. Enrolment fee €65 (non-EU).',
       self_funded_text: 'Self-funded. Year 1 is about €2,200 (~Rs 7 lac) plus visa show-money.',
       scholarships_text: 'No built-in EM scholarship. Banach NAWA 2026 did not include Pakistan.',
       prepare: 'BSc GIS / geography / environment. English B2.',
-      watch_outs: 'Less pure web GIS than AGH. Poznań living is cheaper than Kraków/Warsaw.',
-      last_checked: '15 Oct 2026',
-    },
-  },
-  {
-    slug: 'uwm-geodesy-geoinformatics',
-    acronym: 'UWM-GiK',
-    name: 'Geodesy and Geoinformatics',
-    official_title: 'MSc Geodesy and Cartography — Geodesy and Geoinformatics',
-    priority: 'B',
-    coordinator: 'University of Warmia and Mazury in Olsztyn — Faculty of Geoengineering',
-    duration: '18 months / 3 semesters',
-    website: 'https://irk.uwm.edu.pl/pl/offer/REK_25_26_OBCE/programme/08_SMU_GiK_ANG/?from=field%3A08',
-    apply_url: 'https://irk.uwm.edu.pl/pl/offer/REK_25_26_OBCE/programme/08_SMU_GiK_ANG/?from=field%3A08',
-    fit_notes: 'Historic geoengineering faculty. GNSS, satellite RS, GIS programming. Cheapest tuition; smaller city.',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'tba',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'October 2026 intake has closed. Next IRK dates are not published.',
-      target_start: 'October 2027, date not published',
-      opens_text: 'The September 2026 window used on this card has passed.',
-      deadline_text: 'October 2026 recruitment is closed. Next deadline TBA. Recheck UWM IRK.',
-      tuition_text: '5,000 PLN / semester · 15,000 PLN total (~Rs 11 lac) for 3 semesters.',
-      self_funded_text: 'Self-funded. Lowest tuition; Olsztyn living is cheaper than Kraków/Warsaw.',
-      scholarships_text: 'No EMJM. Banach NAWA 2026 did not include Pakistan.',
-      prepare: 'English B2. Related bachelor (geodesy, geoinformatics, geography).',
-      watch_outs: 'Weaker web-GIS story than AGH. Use if budget is the constraint.',
-      last_checked: '15 Oct 2026',
-    },
-  },
-  {
-    slug: 'pwr-geodesy-cartography',
-    acronym: 'PWr-GiK',
-    name: 'Geodesy and Cartography',
-    official_title: 'MSc Geodesy and Cartography (English) / Geomatics for Mineral Resources',
-    priority: 'B',
-    coordinator: 'Wrocław University of Science and Technology — Faculty of Geoengineering, Mining and Geology',
-    duration: '18–24 months',
-    website: 'https://wggg.pwr.edu.pl/en/candidates/msc-studies/geodesy-and-cartography',
-    apply_url: 'https://wggg.pwr.edu.pl/en/candidates/msc-studies/geodesy-and-cartography',
-    fit_notes:
-      'Spatial data, GIS, remote sensing, ML. Mining geomatics track can include a double degree with Freiberg or Leoben.',
-    opens: null,
-    scholarship: null,
-    self_funded: null,
-    starts: '2027-10-01',
-    date_status: 'tba',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'October 2026 intake has closed. Next recruitment dates are not published.',
-      target_start: 'October 2027, date not published',
-      opens_text: 'The September 2026 window used on this card has passed.',
-      deadline_text: 'October 2026 recruitment is closed. Next deadline TBA. Recheck admission@pwr.edu.pl.',
-      tuition_text: 'About €2,000 / semester (non-EU). Confirm the 2026/27 table.',
-      self_funded_text: 'Self-funded. EU students often pay nothing; you do not.',
-      scholarships_text: 'No EMJM. Banach NAWA 2026 did not include Pakistan.',
-      prepare: 'Bachelor in geodesy, mining/geology, or related. IELTS 6.5 listed on older pages.',
-      watch_outs: 'Mining flavour on the geomatics specialisation.',
+      watch_outs: 'Lighter on remote sensing and photogrammetry than a specialist RS master’s. Poznań living is cheaper than Kraków.',
       last_checked: '15 Oct 2026',
     },
   },
 ]
 
 const DESCRIPTION =
-  'Public Polish GIS / geodesy master’s in English. These degrees are self-funded. Tuition is on each card.'
+  'Poznań University of Life Sciences, MSc Geoinformation and Spatial Management. This is the current degree. AGH was not pursued.'
 
 export async function seedPolandCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
-  const removed = await removeProgrammesBySlug(['nawa-banach', 'wut-mobile-mapping-navigation'])
+  const removed = await removeProgrammesBySlug([
+    'nawa-banach',
+    'wut-mobile-mapping-navigation',
+    'agh-remote-sensing-geo-informatics',
+    'uwm-geodesy-geoinformatics',
+    'pwr-geodesy-cartography',
+  ])
   if (removed) return { error: removed, count: 0 }
   const userId = opts?.userId
   const isAdmin = Boolean(opts?.isAdmin)

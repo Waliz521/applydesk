@@ -123,11 +123,12 @@ export function DashboardPage() {
         .select('slug')
         .in('slug', [
           'plus-applied-geoinformatics',
-          'itc-mgeo',
+          'wur-mgi',
+          'rug-eip',
           'polyu-lsgs-rpg',
+          'cuhk-esgs-phd',
           'grenoble-imagers',
           'ku-geography-geoinformatics',
-          'aalto-geoinformatics',
           'sydney-mphil-science',
         ])
       const slugs = new Set((sentinels ?? []).map((row) => row.slug as string))
@@ -137,11 +138,13 @@ export function DashboardPage() {
         !cats.some((c) => c.slug === 'austria') ||
         !slugs.has('plus-applied-geoinformatics') ||
         austriaStale
-      const needNetherlands = !cats.some((c) => c.slug === 'netherlands') || !slugs.has('itc-mgeo')
-      const needHongKong = !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg')
+      const needNetherlands =
+        !cats.some((c) => c.slug === 'netherlands') || !slugs.has('wur-mgi') || !slugs.has('rug-eip')
+      const needHongKong =
+        !cats.some((c) => c.slug === 'hong-kong') || !slugs.has('polyu-lsgs-rpg') || !slugs.has('cuhk-esgs-phd')
       const needFrance = !cats.some((c) => c.slug === 'france') || !slugs.has('grenoble-imagers')
       const needDenmark = !cats.some((c) => c.slug === 'denmark') || !slugs.has('ku-geography-geoinformatics')
-      const needFinland = !cats.some((c) => c.slug === 'finland') || !slugs.has('aalto-geoinformatics')
+      const needFinland = false
       const needAustralia = !cats.some((c) => c.slug === 'australia') || !slugs.has('sydney-mphil-science')
       if (needPoland || needAustria || needNetherlands || needHongKong || needFrance || needDenmark || needFinland || needAustralia) {
         setSeeding(true)
@@ -535,42 +538,37 @@ export function DashboardPage() {
           ) : null}
           {selectedCatalogue?.slug === 'poland' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> means you pay the university (cost on the card).
+              Dark <span className="font-medium">Self-funded · tuition</span> is the Poznań degree.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'austria' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is statutory Austrian tuition on the degree cards. CDE is in Erasmus Mundus.
+              Dark <span className="font-medium">Self-funded · tuition</span> is Salzburg Applied Geoinformatics. CDE is in Erasmus Mundus.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'netherlands' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is ITC / WUR / GIMA / Delft fees (~€22k/year).
-              GEM sits in Erasmus Mundus.
+              Groningen Environmental and Infrastructure Planning is the Eric Bleumink route. Wageningen Geo-information Science is the Anne van den Ban route. GEM sits in Erasmus Mundus.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'france' ? (
             <p className="mt-2 text-sm text-slate-600">
-              France Excellence Pakistan Climate Change is IMT PM3E only. The Études en France cart locks on 18 November 2026, and PM3E also needs the IMT form. IMG and Grenoble are on the cart but not on that scholarship.
+              Grenoble IMAGERS and Aix-Marseille IMG are the submitted Études en France programmes. IMT PM3E was rejected for 2027.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'hong-kong' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Violet <span className="font-medium">Partial</span> is MPhil/PhD with a university studentship (supervisor first). Dark{' '}
-              <span className="font-medium">Self-funded · tuition</span> is taught MSc GeoDS (~HK$250k).
+              Violet <span className="font-medium">Partial</span> is the PolyU and CUHK PhDs on the Hong Kong PhD Fellowship file. Both are due 1 December 2026.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'denmark' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is non-EU fees (KU ~€17k/year). Violet{' '}
-              <span className="font-medium">Partial</span> is the Roskilde Environmental Science degree, which can include a fee waiver and stipend.
-              No German blocked account; a residence permit still needs subsistence unless the offer covers living.
+              Dark <span className="font-medium">Self-funded · tuition</span> is Copenhagen Geography and Geoinformatics. The portal deadline for a Pakistani applicant is 15 January 2027.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'finland' ? (
             <p className="mt-2 text-sm text-slate-600">
-              Dark <span className="font-medium">Self-funded · tuition</span> is ~€13–17k/year. A university may waive tuition on the degree application.
-              There is no separate national living-grant card. Migri expects ~€9,600 living funds in year 1 unless documented living aid.
+              There is no Finland application in the notes, so this catalogue has no programme cards.
             </p>
           ) : null}
           {selectedCatalogue?.slug === 'australia' ? (

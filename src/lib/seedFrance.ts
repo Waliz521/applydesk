@@ -7,9 +7,6 @@ const TUITION =
 const SCHOLARSHIP =
   'No automatic scholarship with the degree. Ask the university’s international office to nominate you for France Excellence Eiffel. Their file to Campus France is due 6 January 2027. Eiffel is a living stipend for 12–24 months, and only if the university places the degree under ecological transition, mathematics and digital sciences, or engineering.'
 
-const CLIMATE =
-  'France Excellence Pakistan – Climate Change, the embassy award for this programme only. It covers tuition, a monthly living allowance, one return ticket, social security, French classes before departure, and reimbursement of the Études en France fee after the award. Pakistani nationality, age 28 or under at application, a four-year HEC bachelor with CGPA at least 3.0/4, and no more than two years since the bachelor. File the Études en France cart by 18 November 2026. IMG and Grenoble are not on this list.'
-
 /** Removed from this catalogue: French-certificate degrees, and the Eiffel scholarship card. */
 const RETIRED_SLUGS = [
   'uge-geomatique-m1',
@@ -23,50 +20,10 @@ const RETIRED_SLUGS = [
   'nantes-eps',
   'mafen',
   'avignon-mafen',
+  'imt-pm3e',
 ] as const
 
 const PROGRAMMES: SeedRec[] = [
-  {
-    slug: 'imt-pm3e',
-    acronym: 'PM3E',
-    name: 'Project management for environmental and energy engineering',
-    official_title:
-      'MSc Process and Bioprocess Engineering — track Project Management for Environmental and Energy Engineering',
-    priority: 'A',
-    coordinator: 'IMT Atlantique — Nantes',
-    countries: ['France'],
-    duration: '2 years (M1, Bac+4)',
-    website: 'https://www.imt-atlantique.fr/en/study/masters/msc/pbpe-pm3e',
-    apply_url: 'https://www.imt-atlantique.fr/en/study/masters/msc/pbpe-pm3e/apply',
-    language: 'English',
-    fit_notes:
-      'On the 2027 France Excellence Pakistan Climate Change list. Fully English, Nantes, September start. The embassy award needs both the Études en France cart and the IMT application before 18 November 2026. M1 asks for a science or engineering bachelor, preferably mechanical, chemical, energy, or environmental engineering, with mathematics, chemistry, physics, and fluids. A GIS bachelor is outside that list. IELTS 6.5 is the floor they print.',
-    cycle_label: 'Sep 2027 · France Excellence',
-    opens: '2026-10-01',
-    scholarship: '2026-11-18',
-    self_funded: '2027-04-30',
-    starts: '2027-09-01',
-    date_status: 'confirmed',
-    scholarships: true,
-    funding_scheme: 'full',
-    extra: {
-      funding_label: 'France Excellence',
-      apply: 'OPEN. Études en France (Bac+4) and the IMT form. Campus France says only files on both platforms are eligible for this scholarship. The IMT page itself stays open until 30 April 2027, which is too late for the embassy award.',
-      target_start: 'September 2027',
-      opens_text: 'Campus France Pakistan opened the 2027 candidature on 1 October 2026. The IMT September 2027 round opened in October 2026.',
-      deadline_text:
-        'France Excellence Pakistan Climate Change closes 18 November 2026. The IMT selection form closes 30 April 2027.',
-      tuition_text: '€9,000 a year on the IMT page. The climate award covers tuition if you are selected.',
-      self_funded_text:
-        'Without the embassy award the fee is €9,000 a year. The IMT page does not offer an Eiffel nomination on this MSc. The school form can still be filed until 30 April 2027.',
-      scholarships_text: CLIMATE,
-      prepare:
-        'CV, motivation letter on environment and energy projects, transcripts, bachelor certificate, IELTS, TOEFL, TOEIC, Cambridge, or Duolingo, and reference letters. IELTS 6.5, TOEFL iBT 80, TOEIC 750, or Duolingo 120. French is not required.',
-      watch_outs:
-        'Preferred backgrounds are mechanical, chemical, energy, environmental, civil, or electrical engineering. A GIS bachelor does not meet that list. Two years, with a 5- to 6-month internship. Confirmed on the Campus France Pakistan climate page and the IMT apply page, 7 November 2026.',
-      last_checked: '7 Nov 2026',
-    },
-  },
   {
     slug: 'grenoble-imagers',
     acronym: 'IMAGERS',
@@ -178,7 +135,7 @@ export async function seedFranceCatalogue(opts: {
     slug: 'france',
     name: 'France',
     description:
-      'Études en France master’s. France Excellence Pakistan Climate Change is IMT PM3E only (cart by 18 November 2026). Grenoble IMAGERS and Aix-Marseille IMG are on the cart but not on that scholarship.',
+      'Études en France file. Grenoble IMAGERS and Aix-Marseille IMG stay on the submitted cart. IMT PM3E was rejected for 2027.',
     userId: opts.userId,
     isAdmin: opts.isAdmin,
   })

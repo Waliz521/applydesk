@@ -36,17 +36,16 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
   ],
   netherlands: [
     { id: 'all', label: 'All Netherlands' },
-    { id: 'self_funded', label: 'Self-funded (tuition)' },
+    { id: 'full', label: 'Bleumink, if nominated' },
+    { id: 'partial', label: 'Anne van den Ban' },
   ],
   france: [
     { id: 'all', label: 'All France' },
-    { id: 'full', label: 'France Excellence Climate' },
     { id: 'self_funded', label: 'Master’s (tuition)' },
   ],
   denmark: [
     { id: 'all', label: 'All Denmark' },
     { id: 'self_funded', label: 'Self-funded (tuition)' },
-    { id: 'partial', label: 'Danish gov / partial' },
   ],
   finland: [
     { id: 'all', label: 'All Finland' },
@@ -58,8 +57,7 @@ const FUNDING_OPTIONS: Record<string, readonly { id: 'all' | FundingScheme; labe
   ],
   'hong-kong': [
     { id: 'all', label: 'All Hong Kong' },
-    { id: 'partial', label: 'RPG / PGS' },
-    { id: 'self_funded', label: 'Taught MSc (tuition)' },
+    { id: 'partial', label: 'HKPFS / studentship' },
   ],
   'erasmus-mundus': [
     { id: 'all', label: 'All Erasmus' },
@@ -756,7 +754,7 @@ export function CataloguePage() {
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
               · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · GeoTech 7 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. FloodRISK and WAVES are not listed: GroundwatCH is the IHE application, and GEM is the Twente application. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
+              deadline 3 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. GeoTech is not started, so it is not listed. FloodRISK and WAVES are not listed: GroundwatCH is the IHE application, and GEM is the Twente application. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
             </p>
           ) : null}
 
@@ -782,34 +780,31 @@ export function CataloguePage() {
 
           {active.slug === 'netherlands' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> ITC / WUR / GIMA / Delft fees. GEM is under Erasmus Mundus.
+              Groningen Environmental and Infrastructure Planning, and Wageningen Geo-information Science. GEM is under Erasmus Mundus.
             </p>
           ) : null}
 
           {active.slug === 'france' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              France Excellence Pakistan Climate Change is IMT PM3E only. Cart and IMT form by 18 November 2026. Grenoble IMAGERS and Aix-Marseille IMG are listed for Eiffel/self-funded paths, not the climate award.
+              Grenoble IMAGERS and Aix-Marseille IMG are the submitted programmes. IMT PM3E was rejected for 2027.
             </p>
           ) : null}
 
           {active.slug === 'hong-kong' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Violet <FundingBadge scheme="partial" /> HKU/PolyU MPhil/PhD with a university studentship — email faculty first.
-              Grey <FundingBadge scheme="self_funded" /> taught MSc GeoDS (~HK$250k). Planning
-              notes: <span className="font-medium">hong-kong-universities.md</span> in the repo.
+              Violet <FundingBadge scheme="partial" /> PolyU and CUHK PhDs on the Hong Kong PhD Fellowship file. Both are due 1 December 2026.
             </p>
           ) : null}
 
           {active.slug === 'denmark' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> KU Geoinformatics / AU Geoscience tuition. Violet{' '}
-              <FundingBadge scheme="partial" /> Roskilde Environmental Science, which can include a fee waiver and stipend.
+              Grey <FundingBadge scheme="self_funded" /> University of Copenhagen, Geography and Geoinformatics. Deadline 15 January 2027.
             </p>
           ) : null}
 
           {active.slug === 'finland' ? (
             <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              Grey <FundingBadge scheme="self_funded" /> Aalto Geoinformatics / Helsinki Geography fees. Migri still wants ~€9,600 living proof unless living aid is documented.
+              No Finland application is open, so this catalogue has no programme cards.
             </p>
           ) : null}
 

@@ -84,6 +84,23 @@ export const RETIRED_GRANT_SLUGS = [
   'finland-tuition-waivers',
   'dk-government-scholarship',
   'wut-mobile-mapping-navigation',
+  'itc-mgeo',
+  'uu-gima',
+  'tud-geomatics',
+  'hku-geog-rpg',
+  'hku-geods-msc',
+  'tuw-geodesy-geoinformation',
+  'ruc-environmental-science',
+  'aarhus-geoscience',
+  'agh-remote-sensing-geo-informatics',
+  'uwm-geodesy-geoinformatics',
+  'pwr-geodesy-cartography',
+  'imt-pm3e',
+  'aalto-geoinformatics',
+  'helsinki-geography',
+  'geotech',
+  'sufonama',
+  'msc-ef',
 ]
 
 /** Drop catalogue rows that are a grant, not a degree. Tracker rows stay, unlinked. */

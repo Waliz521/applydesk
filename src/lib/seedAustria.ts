@@ -75,55 +75,20 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '20 Oct 2026',
     },
   },
-  {
-    slug: 'tuw-geodesy-geoinformation',
-    acronym: 'TUW-GEO',
-    name: 'Geodesy and Geoinformation',
-    official_title: 'Dipl.-Ing. Geodesy and Geoinformation (MSc-equivalent)',
-    priority: 'A-',
-    coordinator: 'TU Wien — Department of Geodesy and Geoinformation',
-    countries: ['Austria'],
-    duration: '24 months / 4 semesters / 120 ECTS',
-    website: 'https://www.tuwien.at/en/studies/studies/master-programmes/mathematics-and-geoinformation/geodesy-and-geoinformation',
-    apply_url: 'https://geo-master.at/how-to-apply/',
-    fit_notes:
-      'New English geodesy + geoinformation master’s in Vienna. Stronger surveying/Earth-system than web GIS. No entrance exam; dean may add up to 30 ECTS bridging courses.',
-    cycle_label: '2027 summer intake',
-    opens: '2026-07-16',
-    scholarship: null,
-    self_funded: '2027-01-15',
-    starts: '2027-03-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'YES for March 2027 if TISS + legalised docs can go in now — processing takes 10–12 weeks.',
-      target_start: 'March 2027 (summer). Next winter window: 16 Jan–15 Jul 2027 for October 2027.',
-      opens_text: 'Non-EU summer window: 16 July–15 January. Winter: 16 January–15 July.',
-      deadline_text:
-        'EXPECTED 15 January 2027 for March 2027 start. October 2027: 15 July 2027. Confirm on tuwien.at admission pages.',
-      tuition_text:
-        'Usually €726.72 / semester for third-country students. Some developing-country waivers exist — confirm whether Pakistan is listed. Vienna living is expensive.',
-      self_funded_text:
-        'Self-funded. Residence permit needs proof of funds. No German blocked account. Enrol in person after the admission letter.',
-      scholarships_text:
-        'No EMJM. Watch OeAD Busek if a new call appears. Pakistan is not on the automatic least-developed-country tuition waiver; confirm any developing-country fee rule in writing.',
-      prepare:
-        'TISS guest account + admission documents. English proof (rectorate rules). BS GIS may get bridging math/physics/geodesy exams (max 30 ECTS). No German required.',
-      watch_outs:
-        'This is not a classic web-GIS course. Start the file early — 10–12 weeks processing, then visa.',
-      last_checked: '14 Sep 2026',
-    },
-  },
 ]
 const DESCRIPTION =
-  "Austrian GIS / geoinformation master's in English. PLUS Applied Geoinformatics and TU Wien Geodesy and Geoinformation. Statutory tuition is on each card. CDE sits in the Erasmus Mundus catalogue."
+  "MSc Applied Geoinformatics at the University of Salzburg. TU Wien was set aside. CDE sits in the Erasmus Mundus catalogue."
 
 export async function seedAustriaCatalogue(opts?: {
   userId?: string
   isAdmin?: boolean
 }): Promise<{ error: string | null; count: number }> {
-  const removed = await removeProgrammesBySlug(['oead-busek', 'aai-one-world', 'oead-ernst-mach'])
+  const removed = await removeProgrammesBySlug([
+    'oead-busek',
+    'aai-one-world',
+    'oead-ernst-mach',
+    'tuw-geodesy-geoinformation',
+  ])
   if (removed) return { error: removed, count: 0 }
   const created = await findOrCreateCatalogue({
     slug: 'austria',

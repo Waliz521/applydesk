@@ -2,41 +2,44 @@ import { findOrCreateCatalogue, removeProgrammesBySlug, upsertSeedProgrammes, ty
 
 const PROGRAMMES: SeedRec[] = [
   {
-    slug: 'itc-mgeo',
-    acronym: 'ITC-MGEO',
-    name: 'Geo-information Science and Earth Observation',
-    official_title: 'MSc Geo-information Science and Earth Observation (ITC)',
+    slug: 'rug-eip',
+    acronym: 'RUG-EIP',
+    name: 'Environmental and Infrastructure Planning',
+    official_title: 'MSc Environmental and Infrastructure Planning',
     priority: 'A',
-    coordinator: 'University of Twente — Faculty ITC, Enschede',
+    coordinator: 'University of Groningen — Faculty of Spatial Sciences',
     countries: ['Netherlands'],
-    duration: '24 months / 120 ECTS',
-    website: 'https://www.utwente.nl/en/itc/education/study-finder/geo-information-science-earth-observation/',
-    apply_url: 'https://www.utwente.nl/en/itc/education/how-to-apply/master-admission-and-application-master/',
+    duration: '12 months',
+    website: 'https://www.rug.nl/masters/environmental-and-infrastructure-planning/?lang=en',
+    apply_url: 'https://www.rug.nl/masters/environmental-and-infrastructure-planning/?lang=en',
     fit_notes:
-      'Best Netherlands GIS match. Tracks include GeoAI, resources/water, urban/land, hazards. Closest to BS GIS + NESPAK web GIS + Forest Dept RS.',
+      'The Groningen programme on the Eric Bleumink route. Taught planning degree, assessed from a GIS bachelor. Not a GIS or remote-sensing master’s.',
     cycle_label: '2027 intake',
     opens: '2026-10-01',
-    scholarship: null,
-    self_funded: '2027-06-01',
+    scholarship: '2026-12-01',
+    self_funded: '2027-05-01',
     starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'full',
     extra: {
-      apply: 'YES for September 2027 — application window expected from 1 October 2026. Use ITC Excellence / NL Scholarship rows for funding.',
-      target_start: '1 September 2027',
-      opens_text: 'ITC: start the Osiris file from 1 October for the next September intake.',
+      funding_label: 'Bleumink, if nominated',
+      apply: 'The master’s file has to be complete before 1 December 2026. There is no separate Bleumink form. The Admission Office nominates.',
+      target_start: '1 September 2027. A February start is not a Bleumink route.',
+      opens_text: 'Studielink for September 2027 is open.',
       deadline_text:
-        'EXPECTED 1 June 2027 for a complete non-EEA file (residence-permit nationality). Scholarship deadlines are earlier — see ITC Excellence.',
+        'Confirmed by study@rug.nl, 3 November 2026: the master’s file should be complete before 1 December 2026. A conditional offer before February is required for Bleumink. The ordinary non-EU deadline of 1 May 2027 is too late for the fellowship.',
       tuition_text:
-        'Institutional fee ~€21,700 for 2026/27 year 1 (year 2 estimated ~€22,250). Plus living ~€15,000/year, insurance, IND fee. First year is paid up front for the visa.',
+        'If nominated and awarded, the fellowship covers tuition, flights, books, insurance, and a living allowance. About four awards a year, university-wide.',
       self_funded_text:
-        'Self-funded unless ITC Excellence or NL Scholarship lands. Dutch blocked-account style: ITC invoices tuition + living before IND. Orange Knowledge is closed.',
+        'Without the fellowship, the visa file needs the living amount transferred to Groningen, currently about €1,180 a month up to €14,160, plus tuition.',
       scholarships_text:
-        'UTS (University of Twente Scholarship) is not available for ITC master’s programmes. Use ITC Excellence (partial; ~€17,000 own contribution) and NL Scholarship (€5,000 year 1). GEM is in the Erasmus Mundus catalogue.',
-      prepare: 'Related bachelor, IELTS Academic 6.5 (speaking 6.0) / TOEFL iBT 90. Work experience helps but is not a DAAD-style 2-year rule.',
-      watch_outs: 'This is the expensive GIS route. Do not treat OKP pages you still see online as open.',
-      last_checked: '14 Sep 2026',
+        'Eric Bleumink is a nomination, not a form. NL Scholarship (€5,000 in year 1) is a separate Groningen award and does not replace the living-cost transfer.',
+      prepare:
+        'Degree, full transcript, IELTS, and a list of relevant course descriptions, including statistics and research methods. English is Admissions Level 2.',
+      watch_outs:
+        'Nominees are told. If the Admission Office has not written by 1 February 2027, treat that as no nomination. Results are due before 1 March 2027.',
+      last_checked: '16 Nov 2026',
     },
   },
   {
@@ -49,7 +52,7 @@ const PROGRAMMES: SeedRec[] = [
     countries: ['Netherlands'],
     duration: '24 months / 120 ECTS',
     website: 'https://www.wur.nl/en/education-programmes/master/msc-programmes/msc-geo-information-science.htm',
-    apply_url: 'https://www.wur.nl/en/education/master/study-expenses-masters/scholarships',
+    apply_url: 'https://www.wur.nl/en/education/master/masters-geo-information-science',
     fit_notes:
       'Campus GIS + remote sensing inside environmental / life sciences. Strong if you want water, land, agriculture, or climate layers on top of GIS.',
     cycle_label: '2027 intake',
@@ -57,102 +60,42 @@ const PROGRAMMES: SeedRec[] = [
     scholarship: '2026-12-01',
     self_funded: '2027-04-15',
     starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'partial',
     extra: {
-      apply: 'YES — file a complete MSc application by 1 December 2026 if you want the Excellence tuition waiver considered.',
-      target_start: '1 September 2027 (WUR scholarships are September-only)',
-      opens_text: 'Studielink / Osiris typically from October. Scholarship track needs the file complete by 1 December.',
+      funding_label: 'Anne van den Ban',
+      apply: 'The fund reads a complete MSc file. There is no separate scholarship form. Studielink enrolment is not enough — the Osiris file has to be submitted before 1 December 2026.',
+      target_start: '1 September 2027. Wageningen scholarships are September-only.',
+      opens_text: 'Studielink and Osiris are open for September 2027.',
       deadline_text:
-        'Excellence / invitation scholarships: EXPECTED 1 December 2026. General non-EU admission for September is often ~15 April — confirm wur.nl. 15 April 2026 for Sept 2026 has passed.',
-      tuition_text: 'Non-EU 2026/27 €21,900 / year. 2027/28 estimated €22,500. First-year invoice also includes living, insurance, IND.',
-      self_funded_text:
-        'Without a waiver, year-1 payment is tuition + ~12.5 months living before visa. Africa Scholarship / Anne van den Ban are not Pakistan routes.',
-      scholarships_text:
-        'WU Excellence: tuition waived 24 months if invited (GPA ~80%+ / first class). You still pay ~€16,500 year-1 living+insurance+permit by 1 July 2027. NL Scholarship is a separate €5,000 if WUR participates that year.',
-      prepare: 'IELTS/TOEFL by the scholarship deadline. CGPA 3.55/4 is in the Excellence conversation — not a guarantee.',
-      watch_outs: 'You cannot apply for the Excellence award separately. Incomplete 1 Dec files are not ranked.',
-      last_checked: '14 Sep 2026',
-    },
-  },
-  {
-    slug: 'uu-gima',
-    acronym: 'GIMA',
-    name: 'Geographical Information Management and Applications',
-    official_title: 'MSc Geographical Information Management and Applications (joint degree)',
-    priority: 'A-',
-    coordinator: 'Utrecht University with TU Delft, Wageningen, and University of Twente / ITC',
-    countries: ['Netherlands'],
-    duration: '24 months full-time (or 4 years part-time) / 120 ECTS',
-    website: 'https://www.uu.nl/en/masters/geographical-information-management-and-applications-gima',
-    apply_url: 'https://www.uu.nl/en/masters/geographical-information-management-and-applications-gima/application-and-admission/degree-from-a-non-dutch-university',
-    fit_notes:
-      'Blended GIS management + SDI + AI. Four two-week campus blocks, rest remote. More geo-information management than ITC’s sensor/RS core.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-01',
-    scholarship: '2027-02-01',
-    self_funded: '2027-04-01',
-    starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'Watch — apply via Utrecht Studielink. Scholarship candidates need an earlier file (often 1 February).',
-      target_start: 'September 2027',
-      opens_text: 'Applications typically open 1 October.',
-      deadline_text:
-        'EXPECTED 1 February 2027 for scholarship candidates; 1 April 2027 other non-EU. Recheck uu.nl. Part-time is a weaker residence-permit story.',
-      tuition_text: 'Non-EU 2026/27 €25,306 (institutional). Dutch/EU ~€2,694.',
-      self_funded_text: 'Full-time non-EU still needs IND proof of funds. Blended format is not a cheap online master’s.',
-      scholarships_text:
-        'Utrecht NL Scholarship / Bright Minds if GIMA is on that year’s participating list — confirm on the UU scholarship page. Not Erasmus Mundus.',
-      prepare: 'BSc in GIS / geography / engineering + basic GIS. English as UU requires. Application fee in OSIRIS.',
-      watch_outs: 'Joint/blended programmes can be awkward for AAI One World–style grants and for some visas. Prefer ITC or WUR if you need a classic campus permit.',
-      last_checked: '14 Sep 2026',
-    },
-  },
-  {
-    slug: 'tud-geomatics',
-    acronym: 'TUD-GEO',
-    name: 'Geomatics',
-    official_title: 'MSc Geomatics for the Built Environment',
-    priority: 'B',
-    coordinator: 'TU Delft — Faculty of Architecture and the Built Environment',
-    countries: ['Netherlands'],
-    duration: '24 months / 120 ECTS',
-    website: 'https://www.tudelft.nl/en/education/programmes/masters/gm/msc-geomatics',
-    apply_url: 'https://www.tudelft.nl/en/education/programmes/masters/gm/msc-geomatics/admission-and-application/non-dutch-bsc-degree',
-    fit_notes:
-      '3D geomatics, spatial data, built environment. Strong tech; weaker environmental GIS than ITC/WUR. TU Delft warns many admits never enrol because of cost.',
-    cycle_label: '2027 intake',
-    opens: '2026-10-15',
-    scholarship: null,
-    self_funded: '2027-04-01',
-    starts: '2027-09-01',
-    date_status: 'expected',
-    scholarships: false,
-    funding_scheme: 'self_funded',
-    extra: {
-      apply: 'Optional — only with a realistic funds plan. 2026 non-EU deadline was 1 April 2026 (closed).',
-      target_start: 'September 2027',
-      opens_text: 'TU Delft MSc portal typically from mid-October.',
-      deadline_text: 'EXPECTED 1 April 2027 (23:59 CEST). Rolling assessment within ~12 weeks.',
+        'Confirmed for this file: submit the Osiris application before 1 December 2026. The ordinary non-EU date, documents by 1 May 2027, is too late for the fund.',
       tuition_text:
-        'Non-EU institutional fee plus Delft living. TU Delft cites ~€50,000 / year all-in (tuition + living + insurance) on older pages — confirm the 2027 table.',
-      self_funded_text: 'Residence permit is study-only. Working to fund the degree is a poor visa plan.',
+        'Non-EU 2026/27 €21,900 / year. A full Anne van den Ban award can cover tuition, a living allowance, travel, the visa, and insurance for 24 months. A partial award leaves a gap.',
+      self_funded_text:
+        'Without an award, the first-year invoice is tuition plus living, insurance, and the IND fee.',
       scholarships_text:
-        'Justus & Louise van Effen, NL Scholarship, and faculty awards are limited and competitive. UTS does not apply (that is Twente, and not ITC).',
-      prepare: 'Spatial-thinking bachelor (GIS, geography, CS, geodesy). IELTS/TOEFL per TU Delft. Financial plan in the application mindset.',
-      watch_outs: 'High study load; part-time work is discouraged. Prefer ITC if the goal is RS/GIS rather than 3D built-environment geomatics.',
-      last_checked: '14 Sep 2026',
+        'Anne van den Ban Fund. Pakistan is on the country list. The award can be partial or full. Results go only to selected candidates, in May 2027. Wageningen Excellence is a different, invitation-only waiver.',
+      prepare:
+        'Degree, stamped transcript, IELTS, and a CV of at most two pages. The published norm is at least 6 ECTS in two of GIS, remote sensing, and programming.',
+      watch_outs: 'A pre-master’s place is not eligible for the fund. The portal’s 1 May date is the ordinary deadline, not the fund deadline.',
+      last_checked: '16 Nov 2026',
     },
   },
 ]
 const DESCRIPTION =
-  "Dutch GIS / geoinformation master's: ITC, Wageningen, GIMA, and TU Delft. GEM is in the Erasmus Mundus catalogue."
+  'Two Netherlands programmes: Groningen Environmental and Infrastructure Planning, and Wageningen Geo-information Science. GEM is in the Erasmus Mundus catalogue.'
 
-const RETIRED = ['nl-scholarship', 'itc-excellence', 'wur-excellence', 'eric-bleumink', 'okp-closed']
+const RETIRED = [
+  'nl-scholarship',
+  'itc-excellence',
+  'wur-excellence',
+  'eric-bleumink',
+  'okp-closed',
+  'itc-mgeo',
+  'uu-gima',
+  'tud-geomatics',
+]
 
 export async function seedNetherlandsCatalogue(opts?: {
   userId?: string
@@ -174,6 +117,6 @@ export async function seedNetherlandsCatalogue(opts?: {
   return upsertSeedProgrammes({
     catalogueId: created.catalogueId,
     programmes: PROGRAMMES,
-    source: 'ITC / UT / WUR / UU / TU Delft pages, 14 Sep 2026',
+    source: 'University of Groningen EIP and Wageningen Geo-information Science pages, 16 Nov 2026',
   })
 }
