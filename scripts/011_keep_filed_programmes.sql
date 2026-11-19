@@ -23,10 +23,7 @@ where programme_id in (
     'pwr-geodesy-cartography',
     'imt-pm3e',
     'aalto-geoinformatics',
-    'helsinki-geography',
-    'geotech',
-    'sufonama',
-    'msc-ef'
+    'helsinki-geography'
   )
   or catalogue_id in (select id from public.catalogues where slug = 'daad')
 );
@@ -48,10 +45,7 @@ where programme_id in (
     'pwr-geodesy-cartography',
     'imt-pm3e',
     'aalto-geoinformatics',
-    'helsinki-geography',
-    'geotech',
-    'sufonama',
-    'msc-ef'
+    'helsinki-geography'
   )
   or catalogue_id in (select id from public.catalogues where slug = 'daad')
 );
@@ -71,10 +65,7 @@ where slug in (
   'pwr-geodesy-cartography',
   'imt-pm3e',
   'aalto-geoinformatics',
-  'helsinki-geography',
-  'geotech',
-  'sufonama',
-  'msc-ef'
+  'helsinki-geography'
 )
 or catalogue_id in (select id from public.catalogues where slug = 'daad');
 

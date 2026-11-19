@@ -126,6 +126,112 @@ const PROGRAMMES: SeedRec[] = [
       last_checked: '6 Nov 2026',
     },
   },
+  {
+    slug: 'geotech',
+    acronym: 'GeoTech',
+    name: 'Geospatial Technologies',
+    official_title: 'Erasmus Mundus Joint Master in Geospatial Technologies',
+    priority: 'A',
+    coordinator: 'University of Münster, with NOVA IMS Lisbon and Universitat Jaume I',
+    countries: ['Germany', 'Portugal', 'Spain'],
+    duration: '18 months',
+    website: 'https://mastergeotech.info/',
+    apply_url: 'https://mastergeotech.info/how-to-apply/dates-and-deadlines/',
+    fit_notes:
+      'GIS, Earth observation, and GeoAI joint master. Register as a Partner Country student. The degree must already be finished by the scholarship deadline.',
+    cycle_label: '2027 intake',
+    opens: '2026-10-01',
+    scholarship: '2027-01-07',
+    self_funded: null,
+    starts: '2027-09-01',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'emjm',
+    extra: {
+      apply: 'Scholarship applications are open until 7 January 2027, 18:00 CET. Apply as a Partner Country student.',
+      target_start: 'September 2027',
+      opens_text: 'Scholarship applications are open.',
+      deadline_text: 'Confirmed: 7 January 2027, 18:00 CET, for the Erasmus Mundus scholarship.',
+      tuition_text: 'EMJM: tuition covered and €1,400/month for 18 months.',
+      self_funded_text: 'Self-funded applications open only after the scholarship deadline.',
+      scholarships_text:
+        'Erasmus Mundus scholarships are open. The programme page lists about 19 partner-country awards and about 2 programme-country awards per edition.',
+      prepare:
+        'Two recommenders. The portal emails them and they must upload before 7 January 2027, 18:00 CET. Public motivation video of at most 2 minutes. European CV with no gaps over the last 5.5 years.',
+      watch_outs: 'A Partner Country applicant whose first degree is unfinished on 7 January 2027 is not eligible for the scholarship.',
+      last_checked: '19 Nov 2026',
+    },
+  },
+  {
+    slug: 'sufonama',
+    acronym: 'SUFONAMA',
+    name: 'Sustainable Forest and Nature Management',
+    official_title: 'Erasmus Mundus Joint Master in Sustainable Forest and Nature Management',
+    priority: 'A-',
+    coordinator: 'University of Copenhagen, with Bangor, Göttingen, SLU Alnarp, and Padova',
+    countries: ['Denmark', 'United Kingdom', 'Germany', 'Sweden', 'Italy'],
+    duration: '24 months / 120 ECTS',
+    website: 'https://sufonama-em.eu/',
+    apply_url: 'https://sufonama-em.eu/application/',
+    fit_notes:
+      'Forest and nature management. Year 1 is in Copenhagen. Year 2 is a binding specialisation at Bangor, Göttingen, Alnarp, or Padova.',
+    cycle_label: '2027 intake',
+    opens: '2026-11-15',
+    scholarship: '2027-01-15',
+    self_funded: '2027-01-15',
+    starts: '2027-09-01',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'emjm',
+    extra: {
+      apply: 'Outside the EU/EEA/Switzerland the portal is open. The scholarship is a question on the admission form.',
+      target_start: 'September 2027',
+      opens_text: 'Outside EU/EEA/Switzerland: portal opens 15 November 2026, 23:59 CET. EU/EEA/Switzerland: 16 January 2027.',
+      deadline_text: 'Confirmed: outside EU/EEA/Switzerland, 15 January 2027, 23:59 CET. EU/EEA/Switzerland: 1 March 2027, 23:59 CET.',
+      tuition_text: 'Non-EU tuition is €33,600 for two years. An Erasmus Mundus award waives it and pays €1,400/month for up to 24 months.',
+      self_funded_text: 'Admission without the scholarship is possible on the same form. First-semester tuition is due 15 April.',
+      scholarships_text:
+        'Erasmus Mundus scholarship. No application fee. Two signed letters on letterhead are required, at least one from a teacher. You cannot hold a second Erasmus Mundus scholarship.',
+      prepare: 'Europass CV, a motivation letter of about 500 words, and two recommendation letters.',
+      watch_outs: 'The year-2 university is chosen on the form and is binding. A scholarship requires 30 ECTS in two countries other than the country of residence at application.',
+      last_checked: '19 Nov 2026',
+    },
+  },
+  {
+    slug: 'msc-ef',
+    acronym: 'MSc EF',
+    name: 'European Forestry',
+    official_title: 'Master of Science in European Forestry',
+    priority: 'A-',
+    coordinator: 'University of Eastern Finland, Joensuu',
+    countries: ['Finland'],
+    duration: '24 months',
+    website: 'https://sites.uef.fi/europeanforestry/',
+    apply_url: 'https://sites.uef.fi/europeanforestry/how-to-apply/',
+    fit_notes:
+      'Erasmus Mundus forestry master. A bachelor in forestry or a related field is the published entry. Every complete file is considered for the scholarship.',
+    cycle_label: '2027 intake',
+    opens: '2026-12-02',
+    scholarship: '2027-01-13',
+    self_funded: '2027-01-13',
+    starts: '2027-08-01',
+    date_status: 'confirmed',
+    scholarships: true,
+    funding_scheme: 'emjm',
+    extra: {
+      apply: 'The call opens 2 December 2026 on Studyinfo. There is no separate scholarship form.',
+      target_start: 'August 2027',
+      opens_text: 'Confirmed: the call opens 2 December 2026 at 08:00 UTC+2.',
+      deadline_text:
+        'Confirmed: 13 January 2027, 23:59 UTC+2. The 3-minute motivation video is due 20 January 2027, 23:59 Helsinki time.',
+      tuition_text: 'EMJM scholars: tuition covered and the monthly allowance. Results by 31 May 2027.',
+      self_funded_text: 'The same call also considers applicants who are not awarded the scholarship.',
+      scholarships_text: 'Erasmus Mundus scholarship. The admission file does not ask for a recommendation letter.',
+      prepare: 'Degree, transcript, English certificate, CV, passport photo, and a 3-minute motivation video. No recommendation letter.',
+      watch_outs: 'Submit the Studyinfo form before recording the video. A missing video means the file cannot be selected.',
+      last_checked: '19 Nov 2026',
+    },
+  },
 ]
 
 const FACT_CYCLES: Record<string, Record<string, string | boolean | null>> = {
@@ -212,7 +318,7 @@ async function patchCheckedFacts(): Promise<string | null> {
 /** Cards removed from this catalogue, not relabelled.
  *  No 2027 EMJM scholarship: merged, imete, coasthazar, cartography, mespom, imrd.
  *  Closed for this applicant: floodrisk (IHE asks for one EM programme; GroundwatCH is submitted),
- *  waves (GEM is the submitted Twente application). */
+ *  waves (not applying). */
 const RETIRED_SLUGS = ['merged', 'imete', 'coasthazar', 'cartography', 'mespom', 'imrd', 'floodrisk', 'waves'] as const
 
 async function retireProgrammesWithoutScholarship(catalogueId: string): Promise<string | null> {
@@ -252,7 +358,7 @@ export async function seedErasmusEmjmUpdates(opts?: {
   const result = await upsertSeedProgrammes({
     catalogueId: found.catalogueId,
     programmes: PROGRAMMES,
-    source: 'Official GEM, CDE, and GroundwatCH sites, 6 Nov 2026',
+    source: 'Official EMJM sites, 19 Nov 2026',
   })
   return { ...result, updated: !result.error && result.count > 0 }
 }

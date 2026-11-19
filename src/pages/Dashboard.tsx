@@ -581,9 +581,7 @@ export function DashboardPage() {
           {selectedCatalogue?.slug === 'erasmus-mundus' ? (
             <p className="mt-2 text-sm text-slate-600">
               Indigo <span className="font-medium">EMJM scholarship</span> is €1,400/month (up to 24 months) + tuition covered — apply on each programme site.
-              Pakistan is eligible. <span className="font-medium">GEM</span> deadline 15 Jan 2027 (no reference letter).{' '}
-              <span className="font-medium">GroundwatCH</span> Partner deadline 3 Jan 2027. It needs two letters dated within six months. IHE asks for one Erasmus Mundus programme a year, so FloodRISK is not listed. GEM is the submitted Twente application, so WAVES is not listed.{' '}
-              <span className="font-medium">CDE</span> Call 4 is 2 Nov 2026–22 Jan 2027. Programmes with no Erasmus Mundus scholarship are not listed. That includes MESPOM (CEU Admissions, 6 Nov 2026) and IMRD, whose current fees page charges tuition and does not publish a 2027 EMJM award.
+              Pakistan is eligible. Confirmed calls: GroundwatCH 3 Jan 2027, GeoTech 7 Jan 2027, MSc EF 13 Jan 2027, GEM and SUFONAMA 15 Jan 2027, CDE 22 Jan 2027. FloodRISK is not listed because GroundwatCH is the IHE application. WAVES is not listed. Programmes with no Erasmus Mundus scholarship, including MESPOM and IMRD, are not listed.
             </p>
           ) : null}
         </div>

@@ -98,9 +98,6 @@ export const RETIRED_GRANT_SLUGS = [
   'imt-pm3e',
   'aalto-geoinformatics',
   'helsinki-geography',
-  'geotech',
-  'sufonama',
-  'msc-ef',
 ]
 
 /** Drop catalogue rows that are a grant, not a degree. Tracker rows stay, unlinked. */

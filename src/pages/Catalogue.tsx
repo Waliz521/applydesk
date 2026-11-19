@@ -753,8 +753,7 @@ export function CataloguePage() {
               <PriorityBadge value="A-" /> water + spatial
               <PriorityBadge value="B" /> secondary
               <PriorityBadge value="C" /> weak GIS / watch
-              · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GEM 15 Jan 2027 · GroundwatCH Partner
-              deadline 3 Jan 2027 · CDE 2 Nov 2026–22 Jan 2027. GeoTech is not started, so it is not listed. FloodRISK and WAVES are not listed: GroundwatCH is the IHE application, and GEM is the Twente application. Programmes with no Erasmus Mundus scholarship, including Cartography, MESPOM, and IMRD, are not listed.
+              · <FundingBadge scheme="emjm" /> €1,400/mo + tuition (Pakistan eligible). GroundwatCH 3 Jan 2027 · GeoTech 7 Jan 2027 · MSc EF 13 Jan 2027 · GEM and SUFONAMA 15 Jan 2027 · CDE 22 Jan 2027. FloodRISK and WAVES are not listed. Programmes with no Erasmus Mundus scholarship, including MESPOM and IMRD, are not listed.
             </p>
           ) : null}
 
